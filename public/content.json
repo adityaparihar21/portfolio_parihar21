@@ -1,0 +1,168 @@
+{
+  "brand": {
+    "name": "Aditya Parihar",
+    "monogram": "AP",
+    "location": "Based in India",
+    "nav": [
+      { "label": "Home", "href": "#top" },
+      { "label": "Work", "href": "#work" },
+      { "label": "Creative", "href": "#creative" },
+      { "label": "About", "href": "#about" },
+      { "label": "Contact", "href": "#contact" }
+    ]
+  },
+  "hero": {
+    "eyebrow": "The Creative Engineer",
+    "name": "Aditya Parihar",
+    "tagline": "Code. Vision. Cinematography.",
+    "primaryCta": { "label": "View Projects", "href": "#work" },
+    "secondaryCta": { "label": "GitHub Profile", "href": "https://github.com/adityaparihar21" },
+    "media": "/DARK.mp4"
+  },
+  "selectedWork": {
+    "eyebrow": "Technical Portfolio",
+    "title": "Featured Engineering",
+    "viewAll": { "label": "View All on GitHub", "href": "https://github.com/adityaparihar21" },
+    "projects": [
+      {
+        "id": "ctj",
+        "category": "React • Tailwind • Framer Motion",
+        "title": "Communal Typewriter Journal",
+        "description": "A cinematic digital journaling web app inspired by vintage typewriters, analog poetry, and dark academia interfaces. Features live sound design, ink ribbon switching, and snapshot exports.",
+        "image": "/ctj21.png",
+        "href": "https://github.com/adityaparihar21/ctj21"
+      },
+
+      {
+        "id": "ascii-engine",
+        "category": "Java • Image Processing",
+        "title": "Real-Time ASCII Engine",
+        "description": "A live image-processing engine that transforms webcam frames into dynamic ASCII art through luminance mapping and character rendering.",
+        "image": "/asciii.png",
+        "href": "https://github.com/adityaparihar21/ascii-webcam"
+      },
+      {
+        "id": "trip-co",
+        "category": "AI • Itinerary",
+        "title": "Trip Co",
+        "description": "An AI-powered itinerary generation app that crafts personalized travel plans based on user preferences, budget, and duration. Currently under active development.",
+        "image": "/tripco_hero_final.html",
+        "href": "https://github.com/adityaparihar21/trip-co"
+      }
+    ]
+  },
+  "creativeWork": {
+    "eyebrow": "Creative Portfolio",
+    "title": "Selected Video Edits",
+    "projects": [
+      {
+        "id": "upes-branding",
+        "category": "Editing • Sound Design",
+        "title": "UPES fresher video2025",
+        "description": "A dynamic  student experience edit showcasing the lifestyle and fun at UPES.",
+        "image": "/fresherupes.mp4",
+        "href": "#"
+      },
+      {
+        "id": "dark-cinematic",
+        "category": "Directing • Grading",
+        "title": "Dark Cinematic",
+        "description": "An atmospheric visual narrative with a focus on rhythm, vintage aesthetics, and meticulous color grading.",
+        "image": "/DARK.mp4",
+        "href": "#"
+      },
+      {
+        "id": "birthday-video",
+        "category": "Editing • Personal",
+        "title": "for myself",
+        "description": "A creative personal birthday video edit.",
+        "image": "/birthday.mp4",
+        "href": "#"
+      },
+      {
+        "id": "year-2025",
+        "category": "Nostalgia • Editing",
+        "title": "Year 2025",
+        "description": "A nostalgic video compilation of memories from the year 2025.",
+        "image": "/year2025.mp4",
+        "href": "#"
+      },
+      {
+        "id": "life-at-upes-collab",
+        "category": "Collab • Editing",
+        "title": "@life_at_upes Collab",
+        "description": "My first-year collaboration video with the official UPES Instagram page (@life_at_upes) which helped me reach many talented people at my college.",
+        "image": "/life_at_upes.MP4",
+        "href": "https://www.instagram.com/life_at_upes/"
+      },
+      {
+        "id": "saharsh-style",
+        "category": "Cinematic • Sound Design",
+        "title": "Saharsh Style Edit",
+        "description": "A cinematic video edit set to audio by Saharsh (a well-known cinematographer), who appreciated, shared, and commented on the work on his socials.",
+        "image": "/saharshstyle.mp4",
+        "href": "#"
+      }
+    ]
+  },
+  "clients": {
+    "eyebrow": "Tech Stack",
+    "title": "Tools & Technologies",
+    "logos": [
+      "Java",
+      "Python",
+      "OpenCV",
+      "MediaPipe",
+      "C / C++",
+      "React.js",
+      "Node.js",
+      "MySQL",
+      "MongoDB",
+      "PostgreSQL",
+      "HTML5",
+      "CSS3",
+      "JavaScript",
+      "Git"
+    ]
+  },
+  "creativeTools": {
+    "eyebrow": "Creative Stack",
+    "title": "Creative Tools",
+    "logos": [
+      "DaVinci Resolve",
+      "Premiere Pro",
+      "After Effects",
+      "CapCut",
+      "Lightroom",
+      "Photoshop",
+      "TouchDesigner (Learning in progress)"
+    ]
+  },
+  "about": {
+    "eyebrow": "About",
+    "title": "Engineering meets cinematography",
+    "paragraphs": [
+      "I'm Aditya Parihar, a BTech CSE student specializing in Artificial Intelligence and Machine Learning at UPES. I'm passionate about backend architecture, computational logic, and software development.",
+      "Alongside engineering, I've worked as Lead Video Editor @life_at_upes and as a freelance editor — blending deep technical knowledge in Java and Computer Vision with professional video production."
+    ],
+    "cta": { "label": "Get in Touch", "href": "#contact" },
+    "portrait": "/about.JPG"
+  },
+  "testimonial": {
+    "eyebrow": "Philosophy",
+    "title": "What drives the work",
+    "quote": "I build software the way I edit film — with intention, rhythm, and an obsession for the details that make a system feel alive.",
+    "author": "Aditya Parihar"
+  },
+  "cta": {
+    "eyebrow": "Let's Build Together",
+    "title": "Have a project in mind?",
+    "description": "Open to collaborations, open-source contributions, and engineering opportunities.",
+    "email": "parihar21aditya@gmail.com",
+    "socials": [
+      { "label": "GitHub", "href": "https://github.com/adityaparihar21" },
+      { "label": "LinkedIn", "href": "https://linkedin.com" },
+      { "label": "Instagram", "href": "https://www.instagram.com/parihar._.21" }
+    ]
+  }
+}
