@@ -703,8 +703,7 @@ function CallToAction({ data }: { data: ReturnType<typeof useContent> }) {
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
         <img
-          src="/letsconnect.JPG"
-          alt=""
+          src="/letsconnect.jpg"
           className="h-full w-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-black/75 backdrop-blur-[2px]" />

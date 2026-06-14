@@ -29,7 +29,7 @@
         "category": "React • Tailwind • Framer Motion",
         "title": "Communal Typewriter Journal",
         "description": "A cinematic digital journaling web app inspired by vintage typewriters, analog poetry, and dark academia interfaces. Features live sound design, ink ribbon switching, and snapshot exports.",
-        "image": "/ctj21.png",
+        "image": "/ctj21.jpg",
         "href": "https://github.com/adityaparihar21/ctj21"
       },
 
@@ -38,7 +38,7 @@
         "category": "Java • Image Processing",
         "title": "Real-Time ASCII Engine",
         "description": "A live image-processing engine that transforms webcam frames into dynamic ASCII art through luminance mapping and character rendering.",
-        "image": "/asciii.png",
+        "image": "/asciii.jpg",
         "href": "https://github.com/adityaparihar21/ascii-webcam"
       },
       {
@@ -146,7 +146,7 @@
       "Alongside engineering, I've worked as Lead Video Editor @life_at_upes and as a freelance editor — blending deep technical knowledge in Java and Computer Vision with professional video production."
     ],
     "cta": { "label": "Get in Touch", "href": "#contact" },
-    "portrait": "/about.JPG"
+    "portrait": "/about.jpg"
   },
   "testimonial": {
     "eyebrow": "Philosophy",
