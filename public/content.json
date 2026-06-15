@@ -56,6 +56,14 @@
     "title": "Selected Video Edits",
     "projects": [
       {
+        "id": "new-reel",
+        "category": "Cinematic • Editing",
+        "title": "Instagram Reel",
+        "description": "A cinematic vertical video edit shared on Instagram.",
+        "image": "/reel.mp4",
+        "href": "https://www.instagram.com/reel/DIbvZw6yMhg/"
+      },
+      {
         "id": "upes-branding",
         "category": "Editing • Sound Design",
         "title": "UPES fresher video2025",
