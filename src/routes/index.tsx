@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ChevronDown, Instagram, Youtube, Github, Linkedin, Mail, ArrowRight, Volume2, VolumeX, Menu, X } from "lucide-react";
 
@@ -150,6 +150,7 @@ function Hero({
         {isVideo ? (
           <video
             src={mediaUrl}
+            poster={mediaUrl.substring(0, mediaUrl.lastIndexOf('.')) + '_poster.jpg'}
             autoPlay
             loop
             muted={isMuted}
@@ -269,6 +270,121 @@ function SectionEyebrow({ children }: { children: string }) {
   );
 }
 
+/* ---------------- Project Media Loader ---------------- */
+function ProjectMedia({
+  src,
+  title,
+  id,
+  activeAudioId,
+  setActiveAudioId,
+}: {
+  src: string;
+  title: string;
+  id: string;
+  activeAudioId: string | null;
+  setActiveAudioId: (id: string | null) => void;
+}) {
+  const isHtml = src.endsWith(".html");
+  const isVideo = /\.(mp4|webm|ogg|mov|m4v)$/i.test(src);
+
+  if (isHtml) {
+    return (
+      <iframe
+        src={src}
+        title={title}
+        className="absolute inset-0 w-full h-full border-0 pointer-events-none"
+      />
+    );
+  }
+
+  if (isVideo) {
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [isHovered, setIsHovered] = useState(false);
+    const [inView, setInView] = useState(false);
+
+    useEffect(() => {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          setInView(entry.isIntersecting);
+        },
+        { threshold: 0.15 }
+      );
+
+      if (containerRef.current) {
+        observer.observe(containerRef.current);
+      }
+      return () => observer.disconnect();
+    }, []);
+
+    useEffect(() => {
+      const video = videoRef.current;
+      if (!video) return;
+
+      const shouldPlay = inView || isHovered;
+
+      if (shouldPlay) {
+        video.play().catch((err) => {
+          // Ignore play interruption errors
+        });
+      } else {
+        video.pause();
+      }
+    }, [inView, isHovered]);
+
+    const poster = src.substring(0, src.lastIndexOf(".")) + "_poster.jpg";
+
+    return (
+      <div
+        ref={containerRef}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className="relative w-full h-full bg-black flex items-center justify-center"
+      >
+        <video
+          ref={videoRef}
+          src={src}
+          poster={poster}
+          preload="none"
+          loop
+          muted={activeAudioId !== id}
+          playsInline
+          className="max-h-full max-w-full object-contain"
+        />
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setActiveAudioId(activeAudioId === id ? null : id);
+          }}
+          className="absolute right-4 bottom-4 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-foreground/20 bg-background/15 text-foreground backdrop-blur-md transition-all hover:bg-background/30 hover:scale-105 active:scale-95"
+          aria-label={activeAudioId === id ? "Mute video" : "Unmute video"}
+        >
+          {activeAudioId === id ? (
+            <Volume2 className="h-4.5 w-4.5" strokeWidth={1.5} />
+          ) : (
+            <VolumeX className="h-4.5 w-4.5" strokeWidth={1.5} />
+          )}
+        </button>
+      </div>
+    );
+  }
+
+  // Fallback to image
+  return (
+    <motion.img
+      src={src}
+      alt={title}
+      loading="lazy"
+      initial={{ scale: 1.15 }}
+      whileInView={{ scale: 1 }}
+      viewport={{ once: true, margin: "-120px" }}
+      transition={{ duration: 1.6, ease: EASE_OUT_EXPO }}
+      className="h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.04]"
+    />
+  );
+}
+
 /* ---------------- Selected Work ---------------- */
 function SelectedWork({
   data,
@@ -316,50 +432,13 @@ function SelectedWork({
               <div className="md:col-span-8 overflow-hidden bg-card">
                 <div className="aspect-[16/10] overflow-hidden relative w-full h-full">
                   {p.image ? (
-                    p.image.endsWith(".html") ? (
-                      <iframe
-                        src={p.image}
-                        title={p.title}
-                        className="absolute inset-0 w-full h-full border-0 pointer-events-none"
-                      />
-                    ) : /\.(mp4|webm|ogg|mov|m4v)$/i.test(p.image) ? (
-                      <div className="relative w-full h-full bg-black flex items-center justify-center">
-                        <video
-                          src={p.image}
-                          autoPlay
-                          loop
-                          muted={activeAudioId !== p.id}
-                          playsInline
-                          className="max-h-full max-w-full object-contain"
-                        />
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setActiveAudioId(activeAudioId === p.id ? null : p.id);
-                          }}
-                          className="absolute right-4 bottom-4 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-foreground/20 bg-background/15 text-foreground backdrop-blur-md transition-all hover:bg-background/30 hover:scale-105 active:scale-95"
-                          aria-label={activeAudioId === p.id ? "Mute video" : "Unmute video"}
-                        >
-                          {activeAudioId === p.id ? (
-                            <Volume2 className="h-4.5 w-4.5" strokeWidth={1.5} />
-                          ) : (
-                            <VolumeX className="h-4.5 w-4.5" strokeWidth={1.5} />
-                          )}
-                        </button>
-                      </div>
-                    ) : (
-                      <motion.img
-                        src={p.image}
-                        alt={p.title}
-                        loading="lazy"
-                        initial={{ scale: 1.15 }}
-                        whileInView={{ scale: 1 }}
-                        viewport={{ once: true, margin: "-120px" }}
-                        transition={{ duration: 1.6, ease: EASE_OUT_EXPO }}
-                        className="h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.04]"
-                      />
-                    )
+                    <ProjectMedia
+                      src={p.image}
+                      title={p.title}
+                      id={p.id}
+                      activeAudioId={activeAudioId}
+                      setActiveAudioId={setActiveAudioId}
+                    />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center border border-border bg-card/60">
                       <span className="text-[10px] font-medium tracking-[0.3em] uppercase text-muted-foreground/60">
@@ -459,50 +538,13 @@ function CreativeWork({
               <div className="md:col-span-8 overflow-hidden bg-card">
                 <div className="aspect-[16/10] overflow-hidden relative w-full h-full">
                   {p.image ? (
-                    p.image.endsWith(".html") ? (
-                      <iframe
-                        src={p.image}
-                        title={p.title}
-                        className="absolute inset-0 w-full h-full border-0 pointer-events-none"
-                      />
-                    ) : /\.(mp4|webm|ogg|mov|m4v)$/i.test(p.image) ? (
-                      <div className="relative w-full h-full bg-black flex items-center justify-center">
-                        <video
-                          src={p.image}
-                          autoPlay
-                          loop
-                          muted={activeAudioId !== p.id}
-                          playsInline
-                          className="max-h-full max-w-full object-contain"
-                        />
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setActiveAudioId(activeAudioId === p.id ? null : p.id);
-                          }}
-                          className="absolute right-4 bottom-4 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-foreground/20 bg-background/15 text-foreground backdrop-blur-md transition-all hover:bg-background/30 hover:scale-105 active:scale-95"
-                          aria-label={activeAudioId === p.id ? "Mute video" : "Unmute video"}
-                        >
-                          {activeAudioId === p.id ? (
-                            <Volume2 className="h-4.5 w-4.5" strokeWidth={1.5} />
-                          ) : (
-                            <VolumeX className="h-4.5 w-4.5" strokeWidth={1.5} />
-                          )}
-                        </button>
-                      </div>
-                    ) : (
-                      <motion.img
-                        src={p.image}
-                        alt={p.title}
-                        loading="lazy"
-                        initial={{ scale: 1.15 }}
-                        whileInView={{ scale: 1 }}
-                        viewport={{ once: true, margin: "-120px" }}
-                        transition={{ duration: 1.6, ease: EASE_OUT_EXPO }}
-                        className="h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.04]"
-                      />
-                    )
+                    <ProjectMedia
+                      src={p.image}
+                      title={p.title}
+                      id={p.id}
+                      activeAudioId={activeAudioId}
+                      setActiveAudioId={setActiveAudioId}
+                    />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center border border-border bg-card/60">
                       <span className="text-[10px] font-medium tracking-[0.3em] uppercase text-muted-foreground/60">
