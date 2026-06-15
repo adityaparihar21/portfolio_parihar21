@@ -4,25 +4,49 @@
     "monogram": "AP",
     "location": "Based in India",
     "nav": [
-      { "label": "Home", "href": "#top" },
-      { "label": "Work", "href": "#work" },
-      { "label": "Creative", "href": "#creative" },
-      { "label": "About", "href": "#about" },
-      { "label": "Contact", "href": "#contact" }
+      {
+        "label": "Home",
+        "href": "#top"
+      },
+      {
+        "label": "Work",
+        "href": "#work"
+      },
+      {
+        "label": "Creative",
+        "href": "#creative"
+      },
+      {
+        "label": "About",
+        "href": "#about"
+      },
+      {
+        "label": "Contact",
+        "href": "#contact"
+      }
     ]
   },
   "hero": {
     "eyebrow": "The Creative Engineer",
     "name": "Aditya Parihar",
     "tagline": "Code. Vision. Cinematography.",
-    "primaryCta": { "label": "View Projects", "href": "#work" },
-    "secondaryCta": { "label": "GitHub Profile", "href": "https://github.com/adityaparihar21" },
+    "primaryCta": {
+      "label": "View Projects",
+      "href": "#work"
+    },
+    "secondaryCta": {
+      "label": "GitHub Profile",
+      "href": "https://github.com/adityaparihar21"
+    },
     "media": "/DARK.mp4"
   },
   "selectedWork": {
     "eyebrow": "Technical Portfolio",
     "title": "Featured Engineering",
-    "viewAll": { "label": "View All on GitHub", "href": "https://github.com/adityaparihar21" },
+    "viewAll": {
+      "label": "View All on GitHub",
+      "href": "https://github.com/adityaparihar21"
+    },
     "projects": [
       {
         "id": "ctj",
@@ -32,7 +56,6 @@
         "image": "/ctj21.jpg",
         "href": "https://github.com/adityaparihar21/ctj21"
       },
-
       {
         "id": "ascii-engine",
         "category": "Java • Image Processing",
@@ -199,7 +222,10 @@
       "I'm Aditya Parihar, a BTech CSE student specializing in Artificial Intelligence and Machine Learning at UPES. I'm passionate about backend architecture, computational logic, and software development.",
       "Alongside engineering, I've worked as Lead Video Editor @life_at_upes and as a freelance editor — blending deep technical knowledge in Java and Computer Vision with professional video production."
     ],
-    "cta": { "label": "Get in Touch", "href": "#contact" },
+    "cta": {
+      "label": "Get in Touch",
+      "href": "#contact"
+    },
     "portrait": "/about.jpg"
   },
   "testimonial": {
@@ -214,9 +240,54 @@
     "description": "Open to collaborations, open-source contributions, and engineering opportunities.",
     "email": "parihar21aditya@gmail.com",
     "socials": [
-      { "label": "GitHub", "href": "https://github.com/adityaparihar21" },
-      { "label": "LinkedIn", "href": "https://linkedin.com" },
-      { "label": "Instagram", "href": "https://www.instagram.com/parihar._.21" }
+      {
+        "label": "GitHub",
+        "href": "https://github.com/adityaparihar21"
+      },
+      {
+        "label": "LinkedIn",
+        "href": "https://linkedin.com"
+      },
+      {
+        "label": "Instagram",
+        "href": "https://www.instagram.com/parihar._.21"
+      }
+    ]
+  },
+  "workedWith": {
+    "eyebrow": "Collaborations",
+    "title": "Worked With",
+    "brands": [
+      {
+        "name": "Zenrun Club",
+        "description": "An online membership platform and community focused on mindful, stress-free running, helping runners find balance and enjoyment without performance pressure.",
+        "logo": "/logos/zenrun.jpg"
+      },
+      {
+        "name": "Eatiyapa",
+        "description": "A popular local food and hospitality brand based in Dehradun, known for its distinct culinary identity and vibrant takeaway offerings.",
+        "logo": "/logos/eatiyapa.jpg"
+      },
+      {
+        "name": "Paradox",
+        "description": "Tanishq Singh (Paradox), a versatile Indian hip-hop artist and MTV Hustle 2.0 runner-up, celebrated for blending melodic rap with regional influences.",
+        "logo": "/logos/paradox.jpg"
+      },
+      {
+        "name": "Mall of Dehradun",
+        "description": "A premier shopping and entertainment destination in Uttarakhand, offering a mix of international retail brands, dining options, and multiplex experiences.",
+        "logo": "/logos/mall_of_dehradun.jpg"
+      },
+      {
+        "name": "Qua Restaurant",
+        "description": "A highly-rated fine-dining restaurant and bar on Rajpur Road, Dehradun, renowned for its elegant ambiance, live music, and diverse cuisine.",
+        "logo": "/logos/qua.jpg"
+      },
+      {
+        "name": "UPES",
+        "description": "The University of Petroleum and Energy Studies, a prestigious private university in Dehradun recognized for its specialized, industry-aligned academic programs.",
+        "logo": "/logos/upes.jpg"
+      }
     ]
   }
 }

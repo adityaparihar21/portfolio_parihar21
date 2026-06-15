@@ -58,6 +58,15 @@ export type SiteData = {
       href: string;
     }[];
   };
+  workedWith: {
+    eyebrow: string;
+    title: string;
+    brands: {
+      name: string;
+      description: string;
+      logo: string;
+    }[];
+  };
   clients: { eyebrow: string; title: string; logos: string[] };
   creativeTools: { eyebrow: string; title: string; logos: string[] };
   about: {

@@ -162,8 +162,13 @@
 }
 
 @keyframes marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 .animate-marquee {
@@ -174,18 +179,21 @@
 .custom-scrollbar::-webkit-scrollbar {
   height: 6px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: oklch(0.78 0.09 80 / 20%);
   border-radius: 9999px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: oklch(0.78 0.09 80 / 40%);
 }
+
 .custom-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: oklch(0.78 0.09 80 / 20%) transparent;
 }
-

@@ -1036,6 +1036,64 @@ function CreativeTools({ data }: { data: ReturnType<typeof useContent> }) {
   );
 }
 
+/* ---------------- Worked With ---------------- */
+function WorkedWith({ data }: { data: ReturnType<typeof useContent> }) {
+  if (!data.workedWith) return null;
+  const { eyebrow, title, brands } = data.workedWith;
+  return (
+    <section className="bg-background px-6 py-32 md:px-12 md:py-44 border-t border-border">
+      <div className="mx-auto max-w-[1600px]">
+        <motion.div
+          variants={staggerParent}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-120px" }}
+          className="mb-20 flex flex-col items-start gap-6"
+        >
+          <SectionEyebrow>{eyebrow}</SectionEyebrow>
+          <motion.h2
+            variants={fadeUp}
+            transition={{ duration: 1, ease: EASE_OUT_EXPO }}
+            className="font-serif text-5xl font-medium leading-[1.05] tracking-tight md:text-7xl"
+          >
+            {title}
+          </motion.h2>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16">
+          {brands.map((brand, i) => (
+            <motion.div
+              key={brand.name}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.8, delay: i * 0.1, ease: EASE_OUT_EXPO }}
+              className="flex flex-col gap-6 group"
+            >
+              <div className="h-32 w-full flex items-center justify-start bg-card/25 border border-border/40 rounded-2xl p-6 transition-all duration-500 group-hover:border-primary/50 group-hover:bg-card/40">
+                <img
+                  src={brand.logo}
+                  alt={brand.name}
+                  loading="lazy"
+                  className="h-full w-auto object-contain max-w-[80%] transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
+              <div className="flex flex-col gap-3">
+                <h3 className="font-serif text-3xl italic tracking-wide text-foreground group-hover:text-primary transition-colors">
+                  {brand.name}
+                </h3>
+                <p className="text-sm font-light leading-relaxed text-muted-foreground">
+                  {brand.description}
+                </p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Index() {
   const data = useContent();
   const [activeAudioId, setActiveAudioId] = useState<string | null>(null);
@@ -1048,6 +1106,7 @@ function Index() {
       <Clients data={data} />
       <CreativeWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
       <UPESWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
+      <WorkedWith data={data} />
       <CreativeTools data={data} />
       <About data={data} />
       <Testimonial data={data} />
