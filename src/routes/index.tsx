@@ -647,52 +647,100 @@ function UPESWork({
 
         <div
           ref={scrollContainerRef}
-          className="flex gap-8 overflow-x-auto snap-x snap-mandatory pb-8 custom-scrollbar scroll-smooth items-start hide-scrollbar md:scrollbar-thin"
+          className="flex gap-8 overflow-x-auto snap-x snap-mandatory pb-8 custom-scrollbar scroll-smooth items-stretch hide-scrollbar md:scrollbar-thin"
           style={{ scrollbarWidth: 'thin' }}
         >
-          {projects.map((p) => {
-            const isLandscape = p.image.includes("fresher") || p.image.includes("reel4");
-            const isReel = p.href.includes("reel");
-            return (
-              <motion.a
-                key={p.id}
-                href={p.href}
-                target="_blank"
-                rel="noreferrer"
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-120px" }}
-                transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
-                className="group flex flex-col gap-4 bg-card/25 border border-border/40 p-4 rounded-xl hover:border-primary/40 transition-all duration-300 shrink-0 snap-start w-[85vw] sm:w-[55vw] md:w-[40vw] lg:w-[28vw]"
-              >
-                <div className={`overflow-hidden bg-black rounded-lg w-full relative ${
-                  isLandscape ? "aspect-[16/10]" : "aspect-[9/16]"
-                }`}>
-                  <ProjectMedia
-                    src={p.image}
-                    title={p.title}
-                    id={p.id}
-                    activeAudioId={activeAudioId}
-                    setActiveAudioId={setActiveAudioId}
-                  />
-                </div>
-                <div className="flex flex-col gap-2 mt-2">
-                  <span className="text-[9px] font-medium tracking-[0.25em] uppercase text-primary">
-                    {p.category}
-                  </span>
-                  <h3 className="font-serif text-2xl font-medium leading-tight tracking-tight text-foreground group-hover:text-primary transition-colors">
-                    {p.title}
-                  </h3>
-                  <p className="text-xs font-light leading-relaxed text-muted-foreground">
-                    {p.description}
-                  </p>
-                  <span className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.2em] uppercase text-primary transition-all group-hover:gap-2.5">
-                    {isReel ? "View Reel" : "View Project"} <ArrowRight className="h-3 w-3" strokeWidth={1.5} />
-                  </span>
-                </div>
-              </motion.a>
-            );
-          })}
+          {/* Stacked Landscapes Column */}
+          {projects.filter((p) => p.image.includes("fresher") || p.image.includes("reel4")).length > 0 && (
+            <div className="flex flex-col gap-6 shrink-0 snap-start w-[85vw] sm:w-[55vw] md:w-[40vw] lg:w-[28vw]">
+              {projects
+                .filter((p) => p.image.includes("fresher") || p.image.includes("reel4"))
+                .map((p) => {
+                  const isReel = p.href.includes("reel");
+                  return (
+                    <motion.a
+                      key={p.id}
+                      href={p.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      initial={{ opacity: 0, y: 35 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-120px" }}
+                      transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
+                      className="group flex flex-col justify-between gap-3 bg-card/25 border border-border/40 p-4 rounded-xl hover:border-primary/40 transition-all duration-300 flex-1 min-h-0"
+                    >
+                      <div className="overflow-hidden bg-black rounded-lg w-full relative aspect-[16/10]">
+                        <ProjectMedia
+                          src={p.image}
+                          title={p.title}
+                          id={p.id}
+                          activeAudioId={activeAudioId}
+                          setActiveAudioId={setActiveAudioId}
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1.5 mt-1">
+                        <span className="text-[9px] font-medium tracking-[0.25em] uppercase text-primary">
+                          {p.category}
+                        </span>
+                        <h3 className="font-serif text-xl font-medium leading-tight tracking-tight text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                          {p.title}
+                        </h3>
+                        <p className="text-[11px] font-light leading-relaxed text-muted-foreground line-clamp-2">
+                          {p.description}
+                        </p>
+                        <span className="mt-1 inline-flex items-center gap-1.5 text-[9px] font-semibold tracking-[0.2em] uppercase text-primary transition-all group-hover:gap-2.5">
+                          {isReel ? "View Reel" : "View Project"} <ArrowRight className="h-3 w-3" strokeWidth={1.5} />
+                        </span>
+                      </div>
+                    </motion.a>
+                  );
+                })}
+            </div>
+          )}
+
+          {/* Portrait Reels Columns */}
+          {projects
+            .filter((p) => !p.image.includes("fresher") && !p.image.includes("reel4"))
+            .map((p) => {
+              const isReel = p.href.includes("reel");
+              return (
+                <motion.a
+                  key={p.id}
+                  href={p.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-120px" }}
+                  transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
+                  className="group flex flex-col gap-4 bg-card/25 border border-border/40 p-4 rounded-xl hover:border-primary/40 transition-all duration-300 shrink-0 snap-start w-[85vw] sm:w-[55vw] md:w-[40vw] lg:w-[28vw]"
+                >
+                  <div className="overflow-hidden bg-black rounded-lg w-full relative aspect-[9/16]">
+                    <ProjectMedia
+                      src={p.image}
+                      title={p.title}
+                      id={p.id}
+                      activeAudioId={activeAudioId}
+                      setActiveAudioId={setActiveAudioId}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2 mt-2">
+                    <span className="text-[9px] font-medium tracking-[0.25em] uppercase text-primary">
+                      {p.category}
+                    </span>
+                    <h3 className="font-serif text-2xl font-medium leading-tight tracking-tight text-foreground group-hover:text-primary transition-colors">
+                      {p.title}
+                    </h3>
+                    <p className="text-xs font-light leading-relaxed text-muted-foreground">
+                      {p.description}
+                    </p>
+                    <span className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.2em] uppercase text-primary transition-all group-hover:gap-2.5">
+                      {isReel ? "View Reel" : "View Project"} <ArrowRight className="h-3 w-3" strokeWidth={1.5} />
+                    </span>
+                  </div>
+                </motion.a>
+              );
+            })}
         </div>
       </div>
     </section>
