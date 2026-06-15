@@ -1077,14 +1077,14 @@ function WorkedWith({ data }: { data: ReturnType<typeof useContent> }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.8, delay: i * 0.1, ease: EASE_OUT_EXPO }}
-              className="flex flex-col gap-6 group"
+              className="flex flex-col gap-6 group bg-card/25 border border-border/40 rounded-3xl p-8 transition-all duration-500 hover:border-primary/50 hover:bg-card/40 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 cursor-default"
             >
-              <div className="h-32 w-full flex items-center justify-start bg-card/25 border border-border/40 rounded-2xl p-6 transition-all duration-500 group-hover:border-primary/50 group-hover:bg-card/40">
+              <div className="h-20 w-full flex items-center justify-start">
                 <img
                   src={brand.logo}
                   alt={brand.name}
                   loading="lazy"
-                  className="h-full w-auto object-contain max-w-[80%] transition-transform duration-500 group-hover:scale-105"
+                  className="h-full w-auto object-contain max-w-[80%] transition-transform duration-500 group-hover:scale-[1.03]"
                 />
               </div>
               <div className="flex flex-col gap-3">
