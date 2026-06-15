@@ -627,22 +627,31 @@ function UPESWork({
             </motion.h2>
           </motion.div>
 
-          {/* Navigation Controls */}
-          <div className="flex gap-4">
-            <button
-              onClick={() => scroll("left")}
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-card/25 text-foreground backdrop-blur-sm transition-all hover:bg-primary hover:text-primary-foreground hover:border-primary active:scale-95 cursor-pointer"
-              aria-label="Scroll left"
+          {/* Navigation Controls & Message */}
+          <div className="flex flex-col items-start md:items-end gap-4">
+            <motion.p
+              variants={fadeUp}
+              transition={{ duration: 1, delay: 0.2, ease: EASE_OUT_EXPO }}
+              className="text-[11px] font-light italic text-muted-foreground/70 max-w-[280px] md:text-right"
             >
-              <ArrowRight className="h-5 w-5 rotate-180" strokeWidth={1.5} />
-            </button>
-            <button
-              onClick={() => scroll("right")}
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-card/25 text-foreground backdrop-blur-sm transition-all hover:bg-primary hover:text-primary-foreground hover:border-primary active:scale-95 cursor-pointer"
-              aria-label="Scroll right"
-            >
-              <ArrowRight className="h-5 w-5" strokeWidth={1.5} />
-            </button>
+              *Stopped working with the college media team as there was no room for progress.
+            </motion.p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => scroll("left")}
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-card/25 text-foreground backdrop-blur-sm transition-all hover:bg-primary hover:text-primary-foreground hover:border-primary active:scale-95 cursor-pointer"
+                aria-label="Scroll left"
+              >
+                <ArrowRight className="h-5 w-5 rotate-180" strokeWidth={1.5} />
+              </button>
+              <button
+                onClick={() => scroll("right")}
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-card/25 text-foreground backdrop-blur-sm transition-all hover:bg-primary hover:text-primary-foreground hover:border-primary active:scale-95 cursor-pointer"
+                aria-label="Scroll right"
+              >
+                <ArrowRight className="h-5 w-5" strokeWidth={1.5} />
+              </button>
+            </div>
           </div>
         </div>
 
