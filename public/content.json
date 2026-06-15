@@ -56,14 +56,6 @@
     "title": "Selected Video Edits",
     "projects": [
       {
-        "id": "new-reel",
-        "category": "Cinematic • Editing",
-        "title": "Instagram Reel",
-        "description": "A cinematic vertical video edit shared on Instagram.",
-        "image": "/reel.mp4",
-        "href": "https://www.instagram.com/reel/DIbvZw6yMhg/"
-      },
-      {
         "id": "upes-branding",
         "category": "Editing • Sound Design",
         "title": "UPES fresher video2025",
@@ -110,6 +102,36 @@
         "description": "A cinematic video edit set to audio by Saharsh (a well-known cinematographer), who appreciated, shared, and commented on the work on his socials.",
         "image": "/saharshstyle.mp4",
         "href": "#"
+      }
+    ]
+  },
+  "upesWork": {
+    "eyebrow": "UPES Social Media",
+    "title": "Campus Life & Reels",
+    "projects": [
+      {
+        "id": "upes-reel-1",
+        "category": "Editing • Rhythm",
+        "title": "UPES Campus Vibe",
+        "description": "A high-tempo creative edit featuring campus aesthetics and student lifestyle.",
+        "image": "/upes_reel1.mp4",
+        "href": "https://www.instagram.com/reel/DIbvZw6yMhg/"
+      },
+      {
+        "id": "upes-reel-2",
+        "category": "Cinematography • Flow",
+        "title": "UPES Student Hub",
+        "description": "An atmospheric look at the bustling energy and community layout of the UPES campus.",
+        "image": "/upes_reel2.mp4",
+        "href": "https://www.instagram.com/reel/DH6L9RayHGo/"
+      },
+      {
+        "id": "upes-reel-3",
+        "category": "Vibe • Modern Edit",
+        "title": "Campus Chronicles",
+        "description": "A visual showcase of daily life and social interactions at UPES.",
+        "image": "/upes_reel3.mp4",
+        "href": "https://www.instagram.com/reel/DIEYAJ3SUbp/"
       }
     ]
   },

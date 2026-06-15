@@ -582,6 +582,81 @@ function CreativeWork({
   );
 }
 
+/* ---------------- UPES Social Media Work ---------------- */
+function UPESWork({
+  data,
+  activeAudioId,
+  setActiveAudioId,
+}: {
+  data: ReturnType<typeof useContent>;
+  activeAudioId: string | null;
+  setActiveAudioId: (id: string | null) => void;
+}) {
+  const { eyebrow, title, projects } = data.upesWork;
+  return (
+    <section id="upes-social" className="bg-background px-6 py-32 md:px-12 md:py-44 border-t border-border">
+      <div className="mx-auto max-w-[1600px]">
+        <motion.div
+          variants={staggerParent}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-120px" }}
+          className="mb-20 flex flex-col items-start gap-6"
+        >
+          <SectionEyebrow>{eyebrow}</SectionEyebrow>
+          <motion.h2
+            variants={fadeUp}
+            transition={{ duration: 1, ease: EASE_OUT_EXPO }}
+            className="font-serif text-5xl font-medium leading-[1.05] tracking-tight md:text-7xl"
+          >
+            {title}
+          </motion.h2>
+        </motion.div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 md:gap-12">
+          {projects.map((p) => (
+            <motion.a
+              key={p.id}
+              href={p.href}
+              target="_blank"
+              rel="noreferrer"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-120px" }}
+              transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
+              className="group flex flex-col gap-4 bg-card/25 border border-border/40 p-4 rounded-xl hover:border-primary/40 transition-colors"
+            >
+              <div className="overflow-hidden bg-black rounded-lg aspect-[9/16] w-full relative">
+                <ProjectMedia
+                  src={p.image}
+                  title={p.title}
+                  id={p.id}
+                  activeAudioId={activeAudioId}
+                  setActiveAudioId={setActiveAudioId}
+                />
+              </div>
+              <div className="flex flex-col gap-2 mt-2">
+                <span className="text-[9px] font-medium tracking-[0.25em] uppercase text-primary">
+                  {p.category}
+                </span>
+                <h3 className="font-serif text-2xl font-medium leading-tight tracking-tight text-foreground group-hover:text-primary transition-colors">
+                  {p.title}
+                </h3>
+                <p className="text-xs font-light leading-relaxed text-muted-foreground">
+                  {p.description}
+                </p>
+                <span className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.2em] uppercase text-primary transition-all group-hover:gap-2.5">
+                  View Reel <ArrowRight className="h-3 w-3" strokeWidth={1.5} />
+                </span>
+              </div>
+            </motion.a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ---------------- Clients (marquee logos) ---------------- */
 function Clients({ data }: { data: ReturnType<typeof useContent> }) {
   const { eyebrow, title, logos } = data.clients;
@@ -881,6 +956,7 @@ function Index() {
       <SelectedWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
       <Clients data={data} />
       <CreativeWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
+      <UPESWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
       <CreativeTools data={data} />
       <About data={data} />
       <Testimonial data={data} />

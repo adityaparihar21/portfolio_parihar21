@@ -46,6 +46,18 @@ export type SiteData = {
       href: string;
     }[];
   };
+  upesWork: {
+    eyebrow: string;
+    title: string;
+    projects: {
+      id: string;
+      category: string;
+      title: string;
+      description: string;
+      image: string;
+      href: string;
+    }[];
+  };
   clients: { eyebrow: string; title: string; logos: string[] };
   creativeTools: { eyebrow: string; title: string; logos: string[] };
   about: {
