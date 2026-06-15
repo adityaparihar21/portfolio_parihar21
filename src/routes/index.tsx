@@ -593,66 +593,106 @@ function UPESWork({
   setActiveAudioId: (id: string | null) => void;
 }) {
   const { eyebrow, title, projects } = data.upesWork;
-  return (
-    <section id="upes-social" className="bg-background px-6 py-32 md:px-12 md:py-44 border-t border-border">
-      <div className="mx-auto max-w-[1600px]">
-        <motion.div
-          variants={staggerParent}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-120px" }}
-          className="mb-20 flex flex-col items-start gap-6"
-        >
-          <SectionEyebrow>{eyebrow}</SectionEyebrow>
-          <motion.h2
-            variants={fadeUp}
-            transition={{ duration: 1, ease: EASE_OUT_EXPO }}
-            className="font-serif text-5xl font-medium leading-[1.05] tracking-tight md:text-7xl"
-          >
-            {title}
-          </motion.h2>
-        </motion.div>
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {projects.map((p) => (
-            <motion.a
-              key={p.id}
-              href={p.href}
-              target="_blank"
-              rel="noreferrer"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-120px" }}
-              transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
-              className="group flex flex-col gap-4 bg-card/25 border border-border/40 p-4 rounded-xl hover:border-primary/40 transition-colors"
+  const scroll = (direction: "left" | "right") => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = window.innerWidth * 0.45;
+      scrollContainerRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  return (
+    <section id="upes-social" className="bg-background px-6 py-32 md:px-12 md:py-44 border-t border-border overflow-hidden">
+      <div className="mx-auto max-w-[1600px]">
+        <div className="mb-14 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+          <motion.div
+            variants={staggerParent}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-120px" }}
+            className="flex flex-col items-start gap-6"
+          >
+            <SectionEyebrow>{eyebrow}</SectionEyebrow>
+            <motion.h2
+              variants={fadeUp}
+              transition={{ duration: 1, ease: EASE_OUT_EXPO }}
+              className="font-serif text-5xl font-medium leading-[1.05] tracking-tight md:text-7xl"
             >
-              <div className={`overflow-hidden bg-black rounded-lg w-full relative ${
-                p.image.includes("reel") ? "aspect-[9/16]" : "aspect-[16/10]"
-              }`}>
-                <ProjectMedia
-                  src={p.image}
-                  title={p.title}
-                  id={p.id}
-                  activeAudioId={activeAudioId}
-                  setActiveAudioId={setActiveAudioId}
-                />
-              </div>
-              <div className="flex flex-col gap-2 mt-2">
-                <span className="text-[9px] font-medium tracking-[0.25em] uppercase text-primary">
-                  {p.category}
-                </span>
-                <h3 className="font-serif text-2xl font-medium leading-tight tracking-tight text-foreground group-hover:text-primary transition-colors">
-                  {p.title}
-                </h3>
-                <p className="text-xs font-light leading-relaxed text-muted-foreground">
-                  {p.description}
-                </p>
-                <span className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.2em] uppercase text-primary transition-all group-hover:gap-2.5">
-                  {p.image.includes("reel") ? "View Reel" : "View Project"} <ArrowRight className="h-3 w-3" strokeWidth={1.5} />
-                </span>
-              </div>
-            </motion.a>
-          ))}
+              {title}
+            </motion.h2>
+          </motion.div>
+
+          {/* Navigation Controls */}
+          <div className="flex gap-4">
+            <button
+              onClick={() => scroll("left")}
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-card/25 text-foreground backdrop-blur-sm transition-all hover:bg-primary hover:text-primary-foreground hover:border-primary active:scale-95 cursor-pointer"
+              aria-label="Scroll left"
+            >
+              <ArrowRight className="h-5 w-5 rotate-180" strokeWidth={1.5} />
+            </button>
+            <button
+              onClick={() => scroll("right")}
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-card/25 text-foreground backdrop-blur-sm transition-all hover:bg-primary hover:text-primary-foreground hover:border-primary active:scale-95 cursor-pointer"
+              aria-label="Scroll right"
+            >
+              <ArrowRight className="h-5 w-5" strokeWidth={1.5} />
+            </button>
+          </div>
+        </div>
+
+        <div
+          ref={scrollContainerRef}
+          className="flex gap-8 overflow-x-auto snap-x snap-mandatory pb-8 custom-scrollbar scroll-smooth items-start hide-scrollbar md:scrollbar-thin"
+          style={{ scrollbarWidth: 'thin' }}
+        >
+          {projects.map((p) => {
+            const isLandscape = p.image.includes("fresher") || p.image.includes("reel4");
+            const isReel = p.href.includes("reel");
+            return (
+              <motion.a
+                key={p.id}
+                href={p.href}
+                target="_blank"
+                rel="noreferrer"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-120px" }}
+                transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
+                className="group flex flex-col gap-4 bg-card/25 border border-border/40 p-4 rounded-xl hover:border-primary/40 transition-all duration-300 shrink-0 snap-start w-[85vw] sm:w-[55vw] md:w-[40vw] lg:w-[28vw]"
+              >
+                <div className={`overflow-hidden bg-black rounded-lg w-full relative ${
+                  isLandscape ? "aspect-[16/10]" : "aspect-[9/16]"
+                }`}>
+                  <ProjectMedia
+                    src={p.image}
+                    title={p.title}
+                    id={p.id}
+                    activeAudioId={activeAudioId}
+                    setActiveAudioId={setActiveAudioId}
+                  />
+                </div>
+                <div className="flex flex-col gap-2 mt-2">
+                  <span className="text-[9px] font-medium tracking-[0.25em] uppercase text-primary">
+                    {p.category}
+                  </span>
+                  <h3 className="font-serif text-2xl font-medium leading-tight tracking-tight text-foreground group-hover:text-primary transition-colors">
+                    {p.title}
+                  </h3>
+                  <p className="text-xs font-light leading-relaxed text-muted-foreground">
+                    {p.description}
+                  </p>
+                  <span className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.2em] uppercase text-primary transition-all group-hover:gap-2.5">
+                    {isReel ? "View Reel" : "View Project"} <ArrowRight className="h-3 w-3" strokeWidth={1.5} />
+                  </span>
+                </div>
+              </motion.a>
+            );
+          })}
         </div>
       </div>
     </section>
