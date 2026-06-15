@@ -110,26 +110,34 @@
     "title": "Campus Life & Reels",
     "projects": [
       {
+        "id": "upes-branding-2",
+        "category": "Editing • Sound Design",
+        "title": "UPES fresher video2025",
+        "description": "A dynamic student experience edit showcasing the lifestyle and fun at UPES.",
+        "image": "/fresherupes.mp4",
+        "href": "#"
+      },
+      {
         "id": "upes-reel-1",
-        "category": "Editing • Rhythm",
-        "title": "UPES Campus Vibe",
-        "description": "A high-tempo creative edit featuring campus aesthetics and student lifestyle.",
+        "category": "Artist Reveal • Editing",
+        "title": "Javed Ali Reveal",
+        "description": "The voice that melts hearts..... The legend himself, Javed Ali is coming to set the stage on fire at UURJA’25! Realme Music Studio brings the magic, powered by Realme P3 Ultra 5G.",
         "image": "/upes_reel1.mp4",
         "href": "https://www.instagram.com/reel/DIbvZw6yMhg/"
       },
       {
         "id": "upes-reel-2",
-        "category": "Cinematography • Flow",
-        "title": "UPES Student Hub",
-        "description": "An atmospheric look at the bustling energy and community layout of the UPES campus.",
+        "category": "Artist Reveal • Sound Design",
+        "title": "DJ Aerro Reveal",
+        "description": "The bass is about to hit, and the energy is about to explode! DJ Aerro is here to set UURJA on fire—get ready for a night of unstoppable madness!",
         "image": "/upes_reel2.mp4",
         "href": "https://www.instagram.com/reel/DH6L9RayHGo/"
       },
       {
         "id": "upes-reel-3",
-        "category": "Vibe • Modern Edit",
-        "title": "Campus Chronicles",
-        "description": "A visual showcase of daily life and social interactions at UPES.",
+        "category": "Artist Reveal • Folk Fusion",
+        "title": "Mame Khan Reveal",
+        "description": "Do you get lost in Coke Studio sessions, dreaming of witnessing your favorite artist live? Well, UURJA brings Mame Khan! Get ready to be mesmerized by Rajasthan’s folk music.",
         "image": "/upes_reel3.mp4",
         "href": "https://www.instagram.com/reel/DIEYAJ3SUbp/"
       }

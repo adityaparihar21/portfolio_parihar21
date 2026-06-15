@@ -613,7 +613,7 @@ function UPESWork({
           </motion.h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 md:gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {projects.map((p) => (
             <motion.a
               key={p.id}
@@ -626,7 +626,9 @@ function UPESWork({
               transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
               className="group flex flex-col gap-4 bg-card/25 border border-border/40 p-4 rounded-xl hover:border-primary/40 transition-colors"
             >
-              <div className="overflow-hidden bg-black rounded-lg aspect-[9/16] w-full relative">
+              <div className={`overflow-hidden bg-black rounded-lg w-full relative ${
+                p.image.includes("reel") ? "aspect-[9/16]" : "aspect-[16/10]"
+              }`}>
                 <ProjectMedia
                   src={p.image}
                   title={p.title}
@@ -646,7 +648,7 @@ function UPESWork({
                   {p.description}
                 </p>
                 <span className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.2em] uppercase text-primary transition-all group-hover:gap-2.5">
-                  View Reel <ArrowRight className="h-3 w-3" strokeWidth={1.5} />
+                  {p.image.includes("reel") ? "View Reel" : "View Project"} <ArrowRight className="h-3 w-3" strokeWidth={1.5} />
                 </span>
               </div>
             </motion.a>
