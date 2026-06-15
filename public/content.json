@@ -102,6 +102,14 @@
         "description": "A cinematic video edit set to audio by Saharsh (a well-known cinematographer), who appreciated, shared, and commented on the work on his socials.",
         "image": "/saharshstyle.mp4",
         "href": "#"
+      },
+      {
+        "id": "chakrata-day-trip",
+        "category": "Creative Vlog",
+        "title": "Chakrata Day Trip",
+        "description": "Creative vlog of the trip - CHAKRATA DAY TRIP <span class=\"font-serif italic\">'with da boys'</span>",
+        "image": "/chakrata.mp4",
+        "href": "https://www.instagram.com/reel/DZR8lnFvI5t/"
       }
     ]
   },

@@ -567,9 +567,10 @@ function CreativeWork({
                 <h3 className="font-serif text-3xl font-medium leading-tight tracking-tight md:text-4xl">
                   {p.title}
                 </h3>
-                <p className="text-sm font-light leading-relaxed text-muted-foreground md:text-base">
-                  {p.description}
-                </p>
+                <p
+                  className="text-sm font-light leading-relaxed text-muted-foreground md:text-base"
+                  dangerouslySetInnerHTML={{ __html: p.description }}
+                />
                 <span className="mt-2 inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.25em] uppercase text-primary transition-all group-hover:gap-3">
                   View Edit <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.5} />
                 </span>
