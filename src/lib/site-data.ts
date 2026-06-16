@@ -68,6 +68,18 @@ export type SiteData = {
     }[];
   };
   clients: { eyebrow: string; title: string; logos: string[] };
+  certifications: {
+    eyebrow: string;
+    title: string;
+    projects: {
+      id: string;
+      title: string;
+      category: string;
+      description: string;
+      file: string;
+      href: string;
+    }[];
+  };
   creativeTools: { eyebrow: string; title: string; logos: string[] };
   about: {
     eyebrow: string;

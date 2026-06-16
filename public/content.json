@@ -202,6 +202,60 @@
       "Git"
     ]
   },
+  "certifications": {
+    "eyebrow": "Credentials",
+    "title": "Certifications",
+    "projects": [
+      {
+        "id": "claude-101",
+        "category": "AI • LLM",
+        "title": "Claude 101",
+        "description": "Certification demonstrating foundational understanding of Claude and Anthropic models.",
+        "file": "/certificates/Claude 101.pdf",
+        "href": "https://linkedin.com/in/adityaparihar21/details/certifications/"
+      },
+      {
+        "id": "claude-code-101",
+        "category": "AI • Coding",
+        "title": "Claude Code 101",
+        "description": "Certification for applying Claude in coding workflows and AI-assisted programming.",
+        "file": "/certificates/Claude Code 101.pdf",
+        "href": "https://linkedin.com/in/adityaparihar21/details/certifications/"
+      },
+      {
+        "id": "claude-code-in-action",
+        "category": "AI • Engineering",
+        "title": "Claude Code in Action",
+        "description": "Certification for practical, hands-on implementation of Claude in software projects.",
+        "file": "/certificates/Claude Code in Action.pdf",
+        "href": "https://linkedin.com/in/adityaparihar21/details/certifications/"
+      },
+      {
+        "id": "claude-platform-101",
+        "category": "AI • Platform",
+        "title": "Claude Platform 101",
+        "description": "Certification covering the Anthropic platform architecture and integration basics.",
+        "file": "/certificates/Claude Platform 101.pdf",
+        "href": "https://linkedin.com/in/adityaparihar21/details/certifications/"
+      },
+      {
+        "id": "claude-anthropic-api",
+        "category": "AI • API Integration",
+        "title": "Claude with the Anthropic API",
+        "description": "Certification for mastering the Anthropic API to build AI-driven applications.",
+        "file": "/certificates/Claude with the Anthropic API.pdf",
+        "href": "https://linkedin.com/in/adityaparihar21/details/certifications/"
+      },
+      {
+        "id": "claude-cowork",
+        "category": "AI • Productivity",
+        "title": "Introduction to Claude Cowork",
+        "description": "Certification on leveraging Claude for collaborative tasks and productivity enhancement.",
+        "file": "/certificates/Introduction to Claude Cowork.pdf",
+        "href": "https://linkedin.com/in/adityaparihar21/details/certifications/"
+      }
+    ]
+  },
   "creativeTools": {
     "eyebrow": "Creative Stack",
     "title": "Creative Tools",

@@ -799,6 +799,77 @@ function Clients({ data }: { data: ReturnType<typeof useContent> }) {
   );
 }
 
+/* ---------------- Certifications ---------------- */
+function Certifications({ data }: { data: ReturnType<typeof useContent> }) {
+  if (!data.certifications) return null;
+  const { eyebrow, title, projects } = data.certifications;
+  return (
+    <section className="bg-background px-6 py-32 md:px-12 md:py-44 border-t border-border">
+      <div className="mx-auto max-w-[1600px]">
+        <motion.div
+          variants={staggerParent}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-120px" }}
+          className="mb-20 flex flex-col items-start gap-6"
+        >
+          <SectionEyebrow>{eyebrow}</SectionEyebrow>
+          <motion.h2
+            variants={fadeUp}
+            transition={{ duration: 1, ease: EASE_OUT_EXPO }}
+            className="font-serif text-5xl font-medium leading-[1.05] tracking-tight md:text-7xl"
+          >
+            {title}
+          </motion.h2>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
+          {projects.map((cert, i) => (
+            <motion.div
+              key={cert.id}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.8, delay: i * 0.1, ease: EASE_OUT_EXPO }}
+              className="group flex flex-col justify-between gap-6 bg-card/25 border border-border/40 rounded-3xl p-8 transition-all duration-500 hover:border-primary/50 hover:bg-card/40 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5"
+            >
+              <div className="flex flex-col gap-4">
+                <span className="text-[10px] font-medium tracking-[0.3em] uppercase text-primary">
+                  {cert.category}
+                </span>
+                <h3 className="font-serif text-2xl font-medium leading-tight tracking-tight text-foreground group-hover:text-primary transition-colors">
+                  {cert.title}
+                </h3>
+                <p className="text-sm font-light leading-relaxed text-muted-foreground">
+                  {cert.description}
+                </p>
+              </div>
+              <div className="flex flex-col gap-4 mt-4 pt-4 border-t border-border/50">
+                <a
+                  href={cert.file}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.25em] uppercase text-foreground transition-all hover:text-primary group-hover:gap-3"
+                >
+                  View Certificate <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.5} />
+                </a>
+                <a
+                  href={cert.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.25em] uppercase text-muted-foreground transition-all hover:text-primary"
+                >
+                  <Linkedin className="h-3.5 w-3.5" strokeWidth={1.5} /> View on LinkedIn
+                </a>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ---------------- About ---------------- */
 function About({ data }: { data: ReturnType<typeof useContent> }) {
   const { eyebrow, title, paragraphs, cta, portrait } = data.about;
@@ -1113,6 +1184,7 @@ function Index() {
       <Hero data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
       <SelectedWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
       <Clients data={data} />
+      <Certifications data={data} />
       <CreativeWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
       <UPESWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
       <WorkedWith data={data} />
