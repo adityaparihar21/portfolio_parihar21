@@ -45,22 +45,22 @@ function Preloader({ monogram }: { monogram: string }) {
     <motion.div
       initial={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.8, ease: EASE_OUT_EXPO }}
+      transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black"
     >
       <motion.div
-        animate={{ opacity: [0.5, 1, 0.5], scale: [0.98, 1, 0.98] }}
-        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-        className="flex flex-col items-center gap-6"
+        animate={{ opacity: [0.3, 1, 0.3], scale: [0.97, 1, 0.97] }}
+        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+        className="flex flex-col items-center gap-8 md:gap-10"
       >
-        <span className="font-serif text-5xl italic text-foreground">
+        <span className="font-serif text-7xl md:text-9xl italic tracking-wide text-foreground drop-shadow-2xl">
           {monogram}
         </span>
-        <div className="h-0.5 w-12 overflow-hidden bg-white/10 rounded-full">
+        <div className="h-[2px] w-24 md:w-32 overflow-hidden bg-white/10 rounded-full">
           <motion.div
             initial={{ x: "-100%" }}
             animate={{ x: "100%" }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
             className="h-full w-full bg-primary"
           />
         </div>
