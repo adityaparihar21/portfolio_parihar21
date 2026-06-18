@@ -52,9 +52,13 @@ function Preloader({ monogram }: { monogram: string }) {
   const springY = useSpring(mouseY, { stiffness: 50, damping: 20 });
 
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.play().catch(() => {});
-    }
+    // Play cinematic atmospheric wind/rumble
+    const rumble = new Audio("/preloader_rumble.mp3");
+    rumble.volume = 0.5;
+    rumble.play().catch(() => {
+      // Modern browsers block autoplay without interaction. 
+      // Silently catch so the app doesn't crash on first load.
+    });
 
     const handleMouseMove = (e: MouseEvent) => {
       mouseX.set(e.clientX);
@@ -67,9 +71,22 @@ function Preloader({ monogram }: { monogram: string }) {
 
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("touchmove", handleTouchMove);
+    
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("touchmove", handleTouchMove);
+      
+      // Smoothly fade out the rumble when preloader exits
+      let vol = rumble.volume;
+      const fadeInterval = setInterval(() => {
+        if (vol > 0.05) {
+          vol -= 0.05;
+          rumble.volume = vol;
+        } else {
+          clearInterval(fadeInterval);
+          rumble.pause();
+        }
+      }, 50);
     };
   }, [mouseX, mouseY]);
 
