@@ -5,48 +5,77 @@ import * as THREE from 'three';
 
 /* ── Antique Gold "AP" Minted Coin ── */
 function APCoin() {
-  // Rich, slightly worn antique gold material
+  const coinRef = useRef<THREE.Group>(null);
+
+  // Manual smooth rotation per user request
+  useFrame((state, delta) => {
+    if (coinRef.current) {
+      coinRef.current.rotation.y += delta * 0.4;
+    }
+  });
+
+  // Rich, premium antique gold material with clearcoat
   const coinMaterial = (
-    <meshStandardMaterial
-      color="#D4AF37"          // Classic old gold tone
-      metalness={0.88}
-      roughness={0.32}         // Slightly rougher to look like an old minted coin
+    <meshPhysicalMaterial
+      color="#C8A34A"
+      metalness={1}
+      roughness={0.42}
+      clearcoat={0.15}
+      clearcoatRoughness={0.5}
+      reflectivity={1}
       envMapIntensity={2.5}
     />
   );
 
   return (
-    // Scale down the entire coin by 0.75 to prevent the WebGL invisible frame from cropping it!
-    <group scale={0.75}>
-      {/* The Solid Coin Base */}
+    <group scale={0.8} ref={coinRef}>
+      {/* The Solid Coin Base (Thickness 0.35, so faces are at Z=±0.175) */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[2.0, 2.0, 0.25, 64]} />
+        <cylinderGeometry args={[2.0, 2.0, 0.35, 128]} />
         {coinMaterial}
       </mesh>
 
-      {/* The Thick Raised Outer Lip of the Coin */}
-      <mesh>
-        <torusGeometry args={[1.9, 0.15, 64, 64]} />
+      {/* Edge Grooves (open ended cylinder wrapping the base to add edge texture) */}
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[2.005, 2.005, 0.35, 128, 1, true]} />
+        {coinMaterial}
+      </mesh>
+
+      {/* Front Raised Outer Rim (embedded torus creates a perfect coin lip) */}
+      <mesh position={[0, 0, 0.175]}>
+        <torusGeometry args={[1.92, 0.08, 32, 128]} />
+        {coinMaterial}
+      </mesh>
+
+      {/* Back Raised Outer Rim */}
+      <mesh position={[0, 0, -0.175]}>
+        <torusGeometry args={[1.92, 0.08, 32, 128]} />
+        {coinMaterial}
+      </mesh>
+
+      {/* Front Inner Decorative Ring */}
+      <mesh position={[0, 0, 0.175]}>
+        <torusGeometry args={[1.7, 0.03, 16, 128]} />
         {coinMaterial}
       </mesh>
       
-      {/* The Inner Decorative Thin Ring (Classic old coin style) */}
-      <mesh>
-        <torusGeometry args={[1.7, 0.04, 32, 64]} />
+      {/* Back Inner Decorative Ring */}
+      <mesh position={[0, 0, -0.175]}>
+        <torusGeometry args={[1.7, 0.03, 16, 128]} />
         {coinMaterial}
       </mesh>
 
-      {/* Front Minted Text */}
-      <group position={[0.15, 0, 0.06]}>
+      {/* Front Minted Text - Positioned at 0.175 so it sits perfectly flush with the coin face */}
+      <group position={[0.15, 0, 0.175]}>
         <Center>
           <Text3D
             font="/fonts/gentilis_bold.typeface.json"
             size={1.1}
-            height={0.15} // Thick extrusion
+            height={0.05} // Shallow depth so it looks authentically minted/stamped
             curveSegments={20}
             bevelEnabled
-            bevelThickness={0.04} // Heavy bevel to catch light like a stamped coin
-            bevelSize={0.03}
+            bevelThickness={0.02}
+            bevelSize={0.015}
             bevelOffset={0}
             bevelSegments={8}
           >
@@ -57,17 +86,17 @@ function APCoin() {
       </group>
 
       {/* Back Minted Text (Flipped 180 degrees) */}
-      <group position={[-0.15, 0, -0.06]}>
+      <group position={[-0.15, 0, -0.175]}>
         <group rotation={[0, Math.PI, 0]}>
           <Center>
             <Text3D
               font="/fonts/gentilis_bold.typeface.json"
               size={1.1}
-              height={0.15}
+              height={0.05}
               curveSegments={20}
               bevelEnabled
-              bevelThickness={0.04}
-              bevelSize={0.03}
+              bevelThickness={0.02}
+              bevelSize={0.015}
               bevelOffset={0}
               bevelSegments={8}
             >
@@ -81,33 +110,17 @@ function APCoin() {
   );
 }
 
-/* ── Cinematic moody lights matching the dark warm site palette ── */
+/* ── Cinematic moody lights ── */
 function DynamicLights() {
-  const warm = useRef<THREE.PointLight>(null);
-  const cool = useRef<THREE.PointLight>(null);
-
-  useFrame(({ clock }) => {
-    const t = clock.elapsedTime;
-    if (warm.current) {
-      warm.current.position.x = Math.sin(t * 0.45) * 3.5;
-      warm.current.position.y = Math.cos(t * 0.35) * 2.5;
-    }
-    if (cool.current) {
-      cool.current.position.x = Math.cos(t * 0.38) * -3;
-      cool.current.position.y = Math.sin(t * 0.52) * 1.8;
-    }
-  });
-
   return (
     <>
-      {/* Warm amber key light — matches site's gold primary */}
-      <pointLight ref={warm} position={[3, 3, 3]} intensity={35} color="#C8A96E" />
-      {/* Cool desaturated fill */}
-      <pointLight ref={cool} position={[-3, -1, 2]} intensity={12} color="#D4CFC8" />
-      {/* Soft rim from behind */}
-      <pointLight position={[0, 1, -3.5]} intensity={18} color="#B8A070" />
-      {/* Very soft ambient so darks aren't pitch black */}
-      <ambientLight intensity={0.15} color="#E8DCC8" />
+      <ambientLight intensity={0.08} />
+      {/* Warm key light */}
+      <pointLight position={[4, 3, 2]} intensity={18} color="#ffdf95" />
+      {/* Cool fill light */}
+      <pointLight position={[-3, 1, 3]} intensity={8} color="#ffffff" />
+      {/* Golden rim light from below */}
+      <pointLight position={[0, -2, -3]} intensity={6} color="#a28d63" />
     </>
   );
 }
@@ -117,20 +130,22 @@ export default function AP3DMonogram({ className = '' }: { className?: string })
   return (
     <div className={`w-full h-full cursor-grab active:cursor-grabbing ${className}`}>
       <Canvas
-        camera={{ position: [0, 0, 4.8], fov: 42 }}
+        camera={{ position: [0, 0, 5.6], fov: 32 }}
         gl={{ antialias: true, alpha: true }}
         style={{ background: 'transparent' }}
         dpr={typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 2) : 1}
       >
         <Suspense fallback={null}>
           <DynamicLights />
-          <Environment preset="apartment" />
+          {/* City environment provides stronger, more varied reflections for gold */}
+          <Environment preset="city" />
           <APCoin />
+          
+          {/* Controls locked since coin rotates automatically */}
           <OrbitControls 
             enableZoom={false} 
             enablePan={false} 
-            autoRotate 
-            autoRotateSpeed={2} 
+            enableRotate={false} 
             makeDefault 
           />
         </Suspense>
