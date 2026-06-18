@@ -124,14 +124,14 @@ function Preloader({ monogram }: { monogram: string }) {
       />
 
       <div className="z-10 flex flex-col items-center gap-4 pointer-events-none">
-        <motion.div
+        <motion.h1
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, ease: EASE_OUT_EXPO }}
-          className="flex justify-center items-center"
+          className="inline-block px-4 py-2 font-serif text-7xl md:text-9xl italic tracking-wide text-foreground drop-shadow-2xl leading-none"
         >
-          <ThreeMonogram />
-        </motion.div>
+          {data.brand.monogram}
+        </motion.h1>
 
         <div className="h-6 flex items-center justify-center">
           <AnimatePresence mode="wait">
@@ -282,10 +282,10 @@ function Hero({
           mediaUrl === "/DARK.mp4" ? (
             <CanvasSequence
               folderPath="/hero-seq"
-              frameCount={75}
+              frameCount={320}
               fps={15}
-              width={720}
-              height={307}
+              width={1280}
+              height={546}
               className="h-[115%] w-full object-cover"
               onReady={onMediaReady}
               scrollScrub={false}
@@ -318,20 +318,7 @@ function Hero({
       />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
 
-      {/* Mute/Unmute toggle button */}
-      {isVideo && (
-        <button
-          onClick={() => setActiveAudioId(isMuted ? "hero" : null)}
-          className="absolute right-6 bottom-24 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-foreground/20 bg-background/15 text-foreground backdrop-blur-md transition-all hover:bg-background/30 hover:scale-105 active:scale-95 md:right-12 md:bottom-32"
-          aria-label={isMuted ? "Unmute video" : "Mute video"}
-        >
-          {isMuted ? (
-            <VolumeX className="h-5 w-5" strokeWidth={1.5} />
-          ) : (
-            <Volume2 className="h-5 w-5" strokeWidth={1.5} />
-          )}
-        </button>
-      )}
+
 
       <motion.div
         style={{ y: contentY }}
