@@ -166,7 +166,7 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.35, ease: EASE_OUT_EXPO }}
-                className="font-serif text-xs md:text-sm tracking-[0.35em] uppercase text-muted-foreground/50 italic"
+                className="font-serif text-sm md:text-base tracking-[0.3em] uppercase text-foreground/90 italic drop-shadow-md"
               >
                 {words[index]}
               </motion.span>
@@ -174,8 +174,8 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
           </div>
 
           {/* Timer bar / Divider */}
-          <div className="flex items-center gap-4 opacity-70">
-            <div className="h-px w-10 md:w-20 bg-white/10" />
+          <div className="flex items-center gap-4 opacity-90">
+            <div className="h-px w-10 md:w-20 bg-foreground/30 shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
             <AnimatePresence mode="wait">
               {!showEnter ? (
                 /* Thin shimmer bar while loading */
@@ -184,13 +184,13 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="h-px w-24 md:w-32 overflow-hidden bg-white/8 relative"
+                  className="h-px w-24 md:w-32 overflow-hidden bg-foreground/20 relative shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
                 >
                   <motion.div
                     initial={{ x: "-100%" }}
                     animate={{ x: "100%" }}
                     transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", repeatDelay: 0.4 }}
-                    className="absolute inset-0 h-full w-full bg-foreground/60"
+                    className="absolute inset-0 h-full w-full bg-primary/90"
                   />
                 </motion.div>
               ) : (
@@ -199,13 +199,13 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
                   key="countdown"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="font-sans text-[9px] tracking-[0.35em] uppercase text-muted-foreground/40 whitespace-nowrap"
+                  className="font-serif text-[10px] md:text-xs tracking-[0.3em] uppercase text-foreground/90 italic whitespace-nowrap drop-shadow-md"
                 >
                   auto in {countdown}s
                 </motion.span>
               )}
             </AnimatePresence>
-            <div className="h-px w-10 md:w-20 bg-white/10" />
+            <div className="h-px w-10 md:w-20 bg-foreground/30 shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
           </div>
         </div>
 
@@ -222,10 +222,10 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
             >
               <button
                 onClick={onEnter}
-                className="relative overflow-hidden px-10 py-4 border border-white/20 bg-black/40 backdrop-blur-md transition-all duration-500 hover:scale-[1.02] hover:bg-white/10 hover:border-white/40 active:scale-95 group rounded-sm shadow-[0_0_30px_rgba(255,255,255,0.05)] cursor-pointer"
+                className="relative overflow-hidden px-12 py-3 border border-transparent bg-foreground transition-all duration-500 hover:scale-[1.03] hover:bg-foreground/90 active:scale-95 group rounded-sm shadow-[0_4px_30px_rgba(237,224,202,0.15)] cursor-pointer"
               >
-                <div className="absolute inset-0 bg-white/5 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-500 ease-out" />
-                <span className="relative z-10 font-sans text-[10px] md:text-xs tracking-[0.4em] uppercase text-white/80 group-hover:text-white transition-colors duration-300">
+                <div className="absolute inset-0 bg-primary/10 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+                <span className="relative z-10 font-serif text-[11px] md:text-xs tracking-[0.35em] uppercase text-background group-hover:text-background/80 transition-colors duration-300 font-medium">
                   Enter Site
                 </span>
               </button>
