@@ -43,15 +43,19 @@ const staggerParent = {
 function Preloader({ monogram }: { monogram: string }) {
   const [index, setIndex] = useState(0);
   const words = ["Code.", "Vision.", "Cinematography."];
+  const videoRef = useRef<HTMLVideoElement>(null);
 
+  // Smooth mouse tracking for the light spotlight
   const mouseX = useMotionValue(typeof window !== "undefined" ? window.innerWidth / 2 : 0);
   const mouseY = useMotionValue(typeof window !== "undefined" ? window.innerHeight / 2 : 0);
-
-  // Smooth mouse movement
-  const springX = useSpring(mouseX, { stiffness: 100, damping: 30 });
-  const springY = useSpring(mouseY, { stiffness: 100, damping: 30 });
+  const springX = useSpring(mouseX, { stiffness: 50, damping: 20 });
+  const springY = useSpring(mouseY, { stiffness: 50, damping: 20 });
 
   useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {});
+    }
+
     const handleMouseMove = (e: MouseEvent) => {
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
@@ -86,18 +90,19 @@ function Preloader({ monogram }: { monogram: string }) {
       {/* Cloud Video Background */}
       <motion.div
         initial={{ opacity: 0, scale: 1 }}
-        animate={{ opacity: 0.65, scale: 1.15 }}
+        animate={{ opacity: 1, scale: 1.15 }}
         exit={{ opacity: 0, scale: 1.25 }}
         transition={{ duration: 4, ease: "easeOut" }}
         className="absolute inset-0 z-0 pointer-events-none"
       >
         <video
+          ref={videoRef}
           src="/preloader_clouds_v2.mp4"
           autoPlay
           muted
           loop
           playsInline
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover opacity-80"
         />
         {/* Subtle, reduced vignette */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -1353,10 +1358,10 @@ function Index() {
   const [minTimeElapsed, setMinTimeElapsed] = useState(false);
 
   useEffect(() => {
-    // Enforce a minimum loading time of 3.5 seconds to let other videos buffer
-    const minTimer = setTimeout(() => setMinTimeElapsed(true), 3500);
-    // Absolute maximum loading time of 7 seconds (fallback)
-    const maxTimer = setTimeout(() => setIsLoading(false), 7000);
+    // Enforce a minimum loading time of 2.5 seconds to let other videos buffer
+    const minTimer = setTimeout(() => setMinTimeElapsed(true), 2500);
+    // Absolute maximum loading time of 4.5 seconds (fallback)
+    const maxTimer = setTimeout(() => setIsLoading(false), 4500);
     
     return () => {
       clearTimeout(minTimer);
