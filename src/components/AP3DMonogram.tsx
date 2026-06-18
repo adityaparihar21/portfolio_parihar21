@@ -3,32 +3,73 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Text3D, Center, Environment, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
-/* ── Warm-cream serif "AP" mesh ── */
-function APText() {
+/* ── Warm-cream serif "AP" minted on a 3D Coin ── */
+function APCoin() {
+  // Shared material for the coin and text to look like a solid minted piece
+  const coinMaterial = (
+    <meshStandardMaterial
+      color="#EDE0CA"
+      metalness={0.82}
+      roughness={0.18}
+      envMapIntensity={2.2}
+    />
+  );
+
   return (
-    <group position={[0.35, 0, 0]}>
-      <Center>
-        <Text3D
-          font="/fonts/gentilis_bold.typeface.json"
-          size={1.5}
-          height={0.38}
-          curveSegments={20}
-          bevelEnabled
-          bevelThickness={0.035}
-          bevelSize={0.022}
-          bevelOffset={0}
-          bevelSegments={6}
-        >
-          AP
-          {/* Warm cream-pearl material — matches site foreground */}
-          <meshStandardMaterial
-            color="#EDE0CA"          // warm cream — site's foreground tone
-            metalness={0.82}
-            roughness={0.18}
-            envMapIntensity={2.2}
-          />
-        </Text3D>
-      </Center>
+    <group>
+      {/* The Solid Coin Base */}
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[2.0, 2.0, 0.25, 64]} />
+        {coinMaterial}
+      </mesh>
+
+      {/* The Raised Outer Lip of the Coin */}
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[1.9, 0.15, 64, 64]} />
+        {coinMaterial}
+      </mesh>
+
+      {/* Front Minted Text */}
+      <group position={[0.2, 0, 0.08]}>
+        <Center>
+          <Text3D
+            font="/fonts/gentilis_bold.typeface.json"
+            size={1.3}
+            height={0.1} // Depth of the embossed text
+            curveSegments={20}
+            bevelEnabled
+            bevelThickness={0.02}
+            bevelSize={0.015}
+            bevelOffset={0}
+            bevelSegments={4}
+          >
+            AP
+            {coinMaterial}
+          </Text3D>
+        </Center>
+      </group>
+
+      {/* Back Minted Text (Flipped 180 degrees) */}
+      <group position={[-0.2, 0, -0.08]}>
+        <group rotation={[0, Math.PI, 0]}>
+          <Center>
+            <Text3D
+              font="/fonts/gentilis_bold.typeface.json"
+              size={1.3}
+              height={0.1}
+              curveSegments={20}
+              bevelEnabled
+              bevelThickness={0.02}
+              bevelSize={0.015}
+              bevelOffset={0}
+              bevelSegments={4}
+            >
+              AP
+              {coinMaterial}
+            </Text3D>
+          </Center>
+        </group>
+      </group>
     </group>
   );
 }
@@ -77,7 +118,7 @@ export default function AP3DMonogram({ className = '' }: { className?: string })
         <Suspense fallback={null}>
           <DynamicLights />
           <Environment preset="apartment" />
-          <APText />
+          <APCoin />
           <OrbitControls 
             enableZoom={false} 
             enablePan={false} 
