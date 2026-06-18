@@ -1,7 +1,7 @@
 import { useRef, useMemo, Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Text3D, Center, Environment, OrbitControls, ContactShadows } from '@react-three/drei';
-import { EffectComposer, Bloom, ToneMapping, Vignette, SMAA } from '@react-three/postprocessing';
+import { EffectComposer, ToneMapping, Vignette, SMAA } from '@react-three/postprocessing';
 import { ToneMappingMode } from 'postprocessing';
 import * as THREE from 'three';
 
@@ -153,7 +153,7 @@ function APCoin() {
   };
 
   return (
-    <group scale={0.28} ref={coinRef}>
+    <group scale={0.18} ref={coinRef}>
       {/* The Solid Coin Base */}
       <mesh rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[2.0, 2.0, 0.35, 128]} />
@@ -274,13 +274,6 @@ function CinematicLights() {
 function PostProcessing() {
   return (
     <EffectComposer multisampling={0}>
-      {/* Subtle gold bloom — catches light on the coin edges beautifully */}
-      <Bloom
-        intensity={0.35}
-        luminanceThreshold={0.8}
-        luminanceSmoothing={0.3}
-        mipmapBlur
-      />
       {/* Filmic tone mapping for richer colors */}
       <ToneMapping mode={ToneMappingMode.AGX} />
       {/* Subtle vignette for cinematic framing */}
