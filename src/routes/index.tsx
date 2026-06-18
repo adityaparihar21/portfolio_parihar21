@@ -55,26 +55,38 @@ function Preloader({ monogram }: { monogram: string }) {
     // Play cinematic atmospheric wind/rumble
     const rumble = new Audio("/preloader_rumble.mp3");
     rumble.volume = 0.5;
-    rumble.play().catch(() => {
-      // Modern browsers block autoplay without interaction. 
-      // Silently catch so the app doesn't crash on first load.
-    });
+    
+    let hasPlayed = false;
+    const playAudio = () => {
+      if (!hasPlayed) {
+        rumble.play().then(() => {
+          hasPlayed = true;
+        }).catch(() => {});
+      }
+    };
+
+    // Try playing immediately (works if page was refreshed)
+    playAudio();
 
     const handleMouseMove = (e: MouseEvent) => {
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
+      playAudio(); // Also triggers audio if blocked initially
     };
     const handleTouchMove = (e: TouchEvent) => {
       mouseX.set(e.touches[0].clientX);
       mouseY.set(e.touches[0].clientY);
+      playAudio();
     };
 
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("touchmove", handleTouchMove);
+    window.addEventListener("click", playAudio);
     
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("click", playAudio);
       
       // Smoothly fade out the rumble when preloader exits
       let vol = rumble.volume;
