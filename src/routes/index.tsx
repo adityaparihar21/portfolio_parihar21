@@ -47,8 +47,6 @@ const staggerParent = {
 
 /* ---------------- Preloader ---------------- */
 function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter, countdown }: { monogram: string, triggerTransition: boolean, onComplete: () => void, showEnter: boolean, onEnter: () => void, countdown: number }) {
-  const [index, setIndex] = useState(0);
-  const words = ["Code.", "Vision.", "Cinematography."];
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Smooth mouse tracking for the light spotlight
@@ -77,11 +75,10 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
   }, [mouseX, mouseY]);
 
   useEffect(() => {
-    if (index < words.length - 1) {
-      const timer = setTimeout(() => setIndex(index + 1), 800);
-      return () => clearTimeout(timer);
+    if (videoRef.current) {
+      videoRef.current.playbackRate = 1.25;
     }
-  }, [index, words.length]);
+  }, []);
 
   useEffect(() => {
     if (triggerTransition) {
@@ -114,10 +111,11 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
         initial={{ opacity: 0, scale: 1, y: 0 }}
         animate={{ opacity: 1, scale: 2.5, y: "-15%" }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 5, ease: "easeOut" }}
+        transition={{ duration: 3.75, ease: "easeOut" }}
         className="preloader-bg absolute inset-0 z-0 pointer-events-none origin-center"
       >
         <video
+          ref={videoRef}
           src="/preloader_clouds_v2.mp4"
           autoPlay
           loop
@@ -157,20 +155,19 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
         
         {/* ALWAYS VISIBLE: Cycling words + Timer bar */}
         <div className="flex flex-col items-center gap-5">
-          {/* Cycling descriptor words */}
-          <div className="h-5 flex items-center justify-center overflow-hidden">
-            <AnimatePresence mode="wait">
+          {/* All descriptor words side by side */}
+          <div className="flex items-center justify-center gap-3 md:gap-4 overflow-hidden">
+            {["Code.", "Vision.", "Cinematography."].map((word, i) => (
               <motion.span
-                key={index}
+                key={word}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.35, ease: EASE_OUT_EXPO }}
-                className="font-serif text-sm md:text-base tracking-[0.3em] uppercase text-foreground/90 italic drop-shadow-md"
+                transition={{ duration: 0.6, delay: i * 0.15, ease: EASE_OUT_EXPO }}
+                className="font-serif text-sm md:text-base tracking-[0.2em] md:tracking-[0.3em] uppercase text-foreground/90 italic drop-shadow-md"
               >
-                {words[index]}
+                {word}
               </motion.span>
-            </AnimatePresence>
+            ))}
           </div>
 
           {/* Timer bar / Divider */}
