@@ -95,18 +95,10 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
         gsap.to(".preloader-bg", { 
           scale: 1.1, 
           opacity: 0, 
-          duration: 2.5, 
+          duration: 3.0, // Perfectly synced to the 3.04s audio riser peak
           ease: "power2.inOut",
           onComplete: () => {
-            // Fade out and stop the audio cleanly
-            gsap.to(audio, { 
-              volume: 0, 
-              duration: 0.5, 
-              onComplete: () => {
-                audio.pause();
-                audio.currentTime = 0;
-              } 
-            });
+            audio.pause();
             onComplete();
           } 
         });
@@ -175,15 +167,15 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
         
         {/* ALWAYS VISIBLE: Cycling words + Timer bar */}
         <div className="flex flex-col items-center gap-5">
-          {/* All descriptor words side by side */}
-          <div className="flex items-center justify-center gap-3 md:gap-4 overflow-hidden">
+          {/* All descriptor words side by side on desktop, stacked on mobile */}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-4 overflow-hidden">
             {["Code.", "Vision.", "Cinematography."].map((word, i) => (
               <motion.span
                 key={word}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: i * 0.15, ease: EASE_OUT_EXPO }}
-                className="font-serif text-sm md:text-base tracking-[0.2em] md:tracking-[0.3em] uppercase text-foreground/90 italic drop-shadow-md"
+                className="font-serif text-[11px] md:text-base tracking-[0.2em] md:tracking-[0.3em] uppercase text-foreground/90 italic drop-shadow-md"
               >
                 {word}
               </motion.span>
