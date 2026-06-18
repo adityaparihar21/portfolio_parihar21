@@ -174,7 +174,7 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
         initial={{ opacity: 0, scale: 0.85 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
-        className="absolute inset-0 z-10 flex items-center justify-center drop-shadow-2xl pointer-events-auto"
+        className="absolute inset-0 z-10 drop-shadow-2xl pointer-events-auto"
       >
         <AP3DMonogram />
       </motion.div>
