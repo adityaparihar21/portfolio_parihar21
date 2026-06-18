@@ -105,13 +105,13 @@ function Preloader({ monogram }: { monogram: string }) {
 
       {/* Interactive Spotlight */}
       <motion.div 
-        className="pointer-events-none absolute z-0 h-[800px] w-[800px] rounded-full opacity-30"
+        className="pointer-events-none absolute z-0 h-[800px] w-[800px] rounded-full opacity-40"
         style={{
           x: springX,
           y: springY,
           translateX: "-50%",
           translateY: "-50%",
-          background: "radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 60%)"
+          background: "radial-gradient(circle, rgba(224, 185, 80, 0.15) 0%, rgba(224, 185, 80, 0.05) 30%, transparent 60%)"
         }}
       />
 
@@ -144,7 +144,7 @@ function Preloader({ monogram }: { monogram: string }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 1 }}
-          className="mt-6 h-[2px] w-24 md:w-32 overflow-hidden bg-white/10 rounded-full"
+          className="mt-6 h-[2px] w-48 md:w-80 lg:w-[450px] overflow-hidden bg-white/10 rounded-full"
         >
           <motion.div
             initial={{ x: "-100%" }}
