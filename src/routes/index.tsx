@@ -1424,7 +1424,7 @@ function Index() {
       <About data={data} />
       <Testimonial data={data} />
       <CallToAction data={data} />
-      </div>
+      </motion.div>
     </>
   );
 }
