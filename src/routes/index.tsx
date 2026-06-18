@@ -91,9 +91,19 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
       audioRef.current.play().catch(e => console.warn("Audio playback blocked", e));
 
       const runTransition = async () => {
-        // Fade out monogram and text
+        // Fade out text UI quickly
         gsap.to(".preloader-content", { opacity: 0, duration: 0.8, ease: "power2.out" });
         
+        // WARP SPEED MONOGRAM: Spin wildly and shoot directly into the camera lens!
+        gsap.to(".preloader-monogram", {
+          scale: 150, // Massive scale to fly "through" the hole
+          rotation: 720, // Spin wildly
+          opacity: 0, 
+          transformOrigin: "62% 48%", // Aiming perfectly for the hole in the 'P'
+          duration: 2.5,
+          ease: "power3.in" // Start slow, accelerate to warp speed
+        });
+
         // Smooth fade out and slight zoom for the new interior video
         gsap.to(".preloader-bg", { 
           scale: 1.1, 
@@ -170,14 +180,16 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
       />
 
       {/* 3D Monogram - Exactly Centered */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.85 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-[280px] h-[160px] md:w-[460px] md:h-[280px] lg:w-[560px] lg:h-[340px] drop-shadow-2xl"
-      >
-        <AP3DMonogram />
-      </motion.div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-[280px] h-[160px] md:w-[460px] md:h-[280px] lg:w-[560px] lg:h-[340px]">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.85 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
+          className="preloader-monogram w-full h-full drop-shadow-2xl origin-center"
+        >
+          <AP3DMonogram />
+        </motion.div>
+      </div>
 
       {/* Loading & Enter UI - Positioned at Bottom */}
       <div className="absolute bottom-20 md:bottom-28 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-6 w-full px-6 preloader-content pointer-events-none">
