@@ -197,7 +197,13 @@ export default function DomeGallery({
       let radius = basis * fit;
       const heightGuard = h * 1.35;
       radius = Math.min(radius, heightGuard);
-      radius = clamp(radius, minRadius, maxRadius);
+      
+      let effectiveMinRadius = minRadius;
+      if (w < 768) {
+        effectiveMinRadius = 400; // Compact the dome for mobile screens but keep items legible
+      }
+      
+      radius = clamp(radius, effectiveMinRadius, maxRadius);
       lockedRadiusRef.current = Math.round(radius);
 
       const viewerPad = Math.max(8, Math.round(minDim * padFactor));
