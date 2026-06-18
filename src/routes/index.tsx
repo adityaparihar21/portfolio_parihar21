@@ -218,7 +218,7 @@ function Header({ data }: { data: ReturnType<typeof useContent> }) {
 /* ---------------- Mist Background ---------------- */
 function MistBackground() {
   return (
-    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden mix-blend-screen opacity-30">
+    <div className="pointer-events-none fixed inset-0 z-20 overflow-hidden mix-blend-screen opacity-[0.35]">
       <motion.div
         animate={{ x: ["0%", "-50%"] }}
         transition={{ duration: 90, repeat: Infinity, ease: "linear" }}
