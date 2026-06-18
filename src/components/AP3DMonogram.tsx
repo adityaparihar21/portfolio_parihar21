@@ -132,7 +132,7 @@ function APCoin() {
   // Smooth auto-rotation
   useFrame((state, delta) => {
     if (coinRef.current) {
-      coinRef.current.rotation.y += delta * 0.4;
+      coinRef.current.rotation.y += delta * 0.8;
     }
   });
 
@@ -153,7 +153,7 @@ function APCoin() {
   };
 
   return (
-    <group scale={0.4} ref={coinRef}>
+    <group scale={0.28} ref={coinRef}>
       {/* The Solid Coin Base */}
       <mesh rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[2.0, 2.0, 0.35, 128]} />
@@ -296,7 +296,7 @@ export default function AP3DMonogram({ className = '' }: { className?: string })
   return (
     <div className={`w-full h-full cursor-grab active:cursor-grabbing ${className}`}>
       <Canvas
-        camera={{ position: [0, 0, 5.6], fov: 40 }}
+        camera={{ position: [0, 0, 4], fov: 35 }}
         gl={{ antialias: false, alpha: true, toneMapping: THREE.NoToneMapping }}
         shadows
         style={{ background: 'transparent' }}
