@@ -111,9 +111,9 @@ function Preloader({ monogram }: { monogram: string }) {
 
   return (
     <motion.div
-      initial={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-      exit={{ opacity: 0, y: "-40%", scale: 1.15, filter: "blur(12px)" }}
-      transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 1, scale: 1, filter: "blur(0px) brightness(1)" }}
+      exit={{ opacity: 0, scale: 8, filter: "blur(20px) brightness(2)" }}
+      transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black overflow-hidden cursor-none"
     >
       {/* Cloud Video Background */}
@@ -1431,9 +1431,13 @@ function Index() {
       </AnimatePresence>
       <motion.div 
         className="relative min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary"
-        initial={{ opacity: 0, scale: 1.03, filter: "blur(6px)" }}
-        animate={{ opacity: isLoading ? 0 : 1, scale: isLoading ? 1.03 : 1, filter: isLoading ? "blur(6px)" : "blur(0px)" }}
-        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+        initial={{ opacity: 0, scale: 0.92, filter: "blur(8px)" }}
+        animate={{ 
+          opacity: isLoading ? 0 : 1, 
+          scale: isLoading ? 0.92 : 1, 
+          filter: isLoading ? "blur(8px)" : "blur(0px)" 
+        }}
+        transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
       >
         <Header data={data} />
         <Hero 
