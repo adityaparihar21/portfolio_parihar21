@@ -1425,7 +1425,7 @@ function Index() {
   }, [isLoading]);
 
   return (
-    <>
+    <div className="bg-black min-h-screen">
       <AnimatePresence>
         {isLoading && <Preloader monogram={data.brand.monogram} />}
       </AnimatePresence>
@@ -1433,7 +1433,7 @@ function Index() {
         className="relative min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary"
         initial={{ opacity: 0 }}
         animate={{ opacity: isLoading ? 0 : 1 }}
-        transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
+        transition={{ duration: 1.4, ease: [0.76, 0, 0.24, 1] }}
       >
         <Header data={data} />
         <Hero 
@@ -1453,6 +1453,6 @@ function Index() {
       <Testimonial data={data} />
       <CallToAction data={data} />
       </motion.div>
-    </>
+    </div>
   );
 }
