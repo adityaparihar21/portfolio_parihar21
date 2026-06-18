@@ -86,6 +86,11 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
 
   useEffect(() => {
     if (triggerTransition) {
+      // Play cinematic riser SFX
+      const audio = new Audio('/riser.mp3');
+      audio.volume = 0.85;
+      audio.play().catch(e => console.warn("Audio playback blocked", e));
+
       const runTransition = async () => {
         // Fade out monogram and text
         gsap.to(".preloader-content", { opacity: 0, duration: 0.8, ease: "power2.out" });
@@ -94,7 +99,7 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
         gsap.to(".preloader-bg", { 
           scale: 15, 
           opacity: 0, 
-          duration: 1.8, 
+          duration: 3.75, 
           ease: "power3.inOut",
           onComplete: onComplete 
         });
