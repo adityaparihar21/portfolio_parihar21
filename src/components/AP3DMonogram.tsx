@@ -28,7 +28,7 @@ function APCoin() {
   );
 
   return (
-    <group scale={0.8} ref={coinRef}>
+    <group scale={0.55} ref={coinRef}>
       {/* The Solid Coin Base (Thickness 0.35, so faces are at Z=±0.175) */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[2.0, 2.0, 0.35, 128]} />
@@ -141,11 +141,11 @@ export default function AP3DMonogram({ className = '' }: { className?: string })
           <Environment preset="city" />
           <APCoin />
           
-          {/* Controls locked since coin rotates automatically */}
+          {/* Controls unlocked so user can grab and spin the coin */}
           <OrbitControls 
             enableZoom={false} 
             enablePan={false} 
-            enableRotate={false} 
+            enableRotate={true} 
             makeDefault 
           />
         </Suspense>
