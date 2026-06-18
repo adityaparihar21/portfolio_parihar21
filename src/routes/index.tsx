@@ -82,10 +82,11 @@ function Preloader({ monogram }: { monogram: string }) {
 
   return (
     <motion.div
-      initial={{ opacity: 1, filter: "brightness(1) contrast(1)" }}
-      exit={{ opacity: 0, filter: "brightness(3) contrast(2)", scale: 1.05 }}
-      transition={{ duration: 1, ease: "easeInOut" }}
+      initial={{ y: 0 }}
+      exit={{ y: "-100%" }}
+      transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1] }}
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black overflow-hidden cursor-none"
+      onMouseMove={handleMouseMove}
     >
       {/* Cloud Video Background */}
       <motion.div
