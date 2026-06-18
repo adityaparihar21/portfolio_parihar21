@@ -9,6 +9,7 @@ import { ChevronDown, Instagram, Youtube, Github, Linkedin, Mail, ArrowRight, Vo
 
 import { siteData } from "@/lib/site-data";
 import { useContent } from "@/lib/use-content";
+import { domeGalleryImages } from "@/lib/domeGalleryImages";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -1462,7 +1463,7 @@ function Index() {
         </div>
         {/* The DomeGallery itself is fully interactive */}
         <div className="w-full h-full cursor-grab active:cursor-grabbing">
-          <DomeGallery />
+          <DomeGallery images={domeGalleryImages} />
         </div>
       </section>
 
