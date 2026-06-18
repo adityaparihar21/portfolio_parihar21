@@ -3,45 +3,52 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Text3D, Center, Environment, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
-/* ── Warm-cream serif "AP" minted on a 3D Coin ── */
+/* ── Antique Gold "AP" Minted Coin ── */
 function APCoin() {
-  // Shared material for the coin and text to look like a solid minted piece
+  // Rich, slightly worn antique gold material
   const coinMaterial = (
     <meshStandardMaterial
-      color="#EDE0CA"
-      metalness={0.82}
-      roughness={0.18}
-      envMapIntensity={2.2}
+      color="#D4AF37"          // Classic old gold tone
+      metalness={0.88}
+      roughness={0.32}         // Slightly rougher to look like an old minted coin
+      envMapIntensity={2.5}
     />
   );
 
   return (
-    <group>
+    // Scale down the entire coin by 0.75 to prevent the WebGL invisible frame from cropping it!
+    <group scale={0.75}>
       {/* The Solid Coin Base */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[2.0, 2.0, 0.25, 64]} />
         {coinMaterial}
       </mesh>
 
-      {/* The Raised Outer Lip of the Coin */}
+      {/* The Thick Raised Outer Lip of the Coin */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[1.9, 0.15, 64, 64]} />
         {coinMaterial}
       </mesh>
+      
+      {/* The Inner Decorative Thin Ring (Classic old coin style) */}
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[1.7, 0.04, 32, 64]} />
+        {coinMaterial}
+      </mesh>
 
       {/* Front Minted Text */}
-      <group position={[0.2, 0, 0.08]}>
+      <group position={[0.15, 0, 0.06]}>
         <Center>
           <Text3D
             font="/fonts/gentilis_bold.typeface.json"
-            size={1.3}
-            height={0.1} // Depth of the embossed text
+            size={1.1}
+            height={0.15} // Thick extrusion
             curveSegments={20}
             bevelEnabled
-            bevelThickness={0.02}
-            bevelSize={0.015}
+            bevelThickness={0.04} // Heavy bevel to catch light like a stamped coin
+            bevelSize={0.03}
             bevelOffset={0}
-            bevelSegments={4}
+            bevelSegments={8}
           >
             AP
             {coinMaterial}
@@ -50,19 +57,19 @@ function APCoin() {
       </group>
 
       {/* Back Minted Text (Flipped 180 degrees) */}
-      <group position={[-0.2, 0, -0.08]}>
+      <group position={[-0.15, 0, -0.06]}>
         <group rotation={[0, Math.PI, 0]}>
           <Center>
             <Text3D
               font="/fonts/gentilis_bold.typeface.json"
-              size={1.3}
-              height={0.1}
+              size={1.1}
+              height={0.15}
               curveSegments={20}
               bevelEnabled
-              bevelThickness={0.02}
-              bevelSize={0.015}
+              bevelThickness={0.04}
+              bevelSize={0.03}
               bevelOffset={0}
-              bevelSegments={4}
+              bevelSegments={8}
             >
               AP
               {coinMaterial}
