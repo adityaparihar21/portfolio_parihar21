@@ -111,9 +111,9 @@ function Preloader({ monogram }: { monogram: string }) {
 
   return (
     <motion.div
-      initial={{ y: 0 }}
-      exit={{ y: "-100%" }}
-      transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1] }}
+      initial={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: "-30%" }}
+      transition={{ duration: 1.4, ease: [0.76, 0, 0.24, 1] }}
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black overflow-hidden cursor-none"
     >
       {/* Cloud Video Background */}
@@ -1431,9 +1431,9 @@ function Index() {
       </AnimatePresence>
       <motion.div 
         className="relative min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary"
-        initial={{ y: "100vh" }}
-        animate={{ y: isLoading ? "100vh" : 0 }}
-        transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1] }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isLoading ? 0 : 1 }}
+        transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
       >
         <Header data={data} />
         <Hero 
