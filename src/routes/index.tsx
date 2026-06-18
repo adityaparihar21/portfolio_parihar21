@@ -99,11 +99,11 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
         // Fade out text UI quickly
         gsap.to(".preloader-content", { opacity: 0, duration: 0.8, ease: "power2.out" });
         
-        // NEBULA DUST: Expand the canvas so the dust cloud can sweep across the screen
+        // SHATTER SUPERNOVA: Expand the canvas so shards fly across the entire screen
         gsap.to(".preloader-monogram", {
-          scale: 3, // 3x scale prevents heavy pixelation while allowing the cloud to escape the small box
+          scale: 8, // Expand container massively so WebGL clipping doesn't hide the explosion
           duration: 2.5,
-          ease: "power2.in" 
+          ease: "power3.in" // Accelerates outward
         });
 
         gsap.to(".preloader-monogram", {
