@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useRef } from "react";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
 import { ChevronDown, Instagram, Youtube, Github, Linkedin, Mail, ArrowRight, Volume2, VolumeX, Menu, X, Loader2 } from "lucide-react";
 
 import { siteData } from "@/lib/site-data";
@@ -42,16 +42,32 @@ const staggerParent = {
 /* ---------------- Preloader ---------------- */
 function Preloader({ monogram }: { monogram: string }) {
   const [index, setIndex] = useState(0);
-  const words = ["Code.", "Vision.", "Cinematography.", monogram];
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const words = ["Code.", "Vision.", "Cinematography."];
+
+  const mouseX = useMotionValue(typeof window !== "undefined" ? window.innerWidth / 2 : 0);
+  const mouseY = useMotionValue(typeof window !== "undefined" ? window.innerHeight / 2 : 0);
+
+  // Smooth mouse movement
+  const springX = useSpring(mouseX, { stiffness: 100, damping: 30 });
+  const springY = useSpring(mouseY, { stiffness: 100, damping: 30 });
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
     };
+    const handleTouchMove = (e: TouchEvent) => {
+      mouseX.set(e.touches[0].clientX);
+      mouseY.set(e.touches[0].clientY);
+    };
+
     window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+    window.addEventListener("touchmove", handleTouchMove);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("touchmove", handleTouchMove);
+    };
+  }, [mouseX, mouseY]);
 
   useEffect(() => {
     if (index < words.length - 1) {
@@ -65,29 +81,39 @@ function Preloader({ monogram }: { monogram: string }) {
       initial={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black overflow-hidden cursor-none"
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black overflow-hidden"
     >
       {/* Interactive Spotlight */}
       <motion.div 
-        className="pointer-events-none absolute inset-0 z-0 opacity-60"
-        animate={{
-          background: `radial-gradient(circle 600px at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.07), transparent 80%)`
+        className="pointer-events-none absolute z-0 h-[800px] w-[800px] rounded-full opacity-30"
+        style={{
+          x: springX,
+          y: springY,
+          translateX: "-50%",
+          translateY: "-50%",
+          background: "radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 60%)"
         }}
-        transition={{ type: "tween", ease: "backOut", duration: 0.15 }}
       />
 
-      <div className="z-10 flex flex-col items-center gap-8 md:gap-10 pointer-events-none">
-        <div className="h-32 flex items-center justify-center">
+      <div className="z-10 flex flex-col items-center gap-4 pointer-events-none">
+        <motion.span
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1, ease: EASE_OUT_EXPO }}
+          className="font-serif text-7xl md:text-9xl italic tracking-wide text-foreground drop-shadow-2xl"
+        >
+          {monogram}
+        </motion.span>
+
+        <div className="h-6 flex items-center justify-center">
           <AnimatePresence mode="wait">
             <motion.span
               key={index}
-              initial={{ opacity: 0, y: 15, filter: "blur(8px)" }}
+              initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              exit={{ opacity: 0, y: -15, filter: "blur(8px)" }}
+              exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
               transition={{ duration: 0.4, ease: EASE_OUT_EXPO }}
-              className={`font-serif tracking-wide text-foreground drop-shadow-2xl ${
-                index === words.length - 1 ? "text-7xl md:text-9xl italic" : "text-4xl md:text-6xl text-foreground/80"
-              }`}
+              className="font-serif text-sm md:text-lg tracking-[0.3em] uppercase text-muted-foreground/70"
             >
               {words[index]}
             </motion.span>
@@ -98,7 +124,7 @@ function Preloader({ monogram }: { monogram: string }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 1 }}
-          className="h-[2px] w-24 md:w-32 overflow-hidden bg-white/10 rounded-full"
+          className="mt-6 h-[2px] w-24 md:w-32 overflow-hidden bg-white/10 rounded-full"
         >
           <motion.div
             initial={{ x: "-100%" }}
