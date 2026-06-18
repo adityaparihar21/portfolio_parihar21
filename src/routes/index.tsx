@@ -4,7 +4,6 @@ import { motion, useScroll, useTransform, AnimatePresence, useMotionValue, useSp
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CanvasSequence } from "../components/CanvasSequence";
-import { WebGLTransition, WebGLTransitionRef } from "../components/WebGLTransition";
 import { ChevronDown, Instagram, Youtube, Github, Linkedin, Mail, ArrowRight, Volume2, VolumeX, Menu, X, Loader2 } from "lucide-react";
 
 import { siteData } from "@/lib/site-data";
@@ -48,7 +47,6 @@ function Preloader({ monogram, triggerTransition, onComplete }: { monogram: stri
   const [index, setIndex] = useState(0);
   const words = ["Code.", "Vision.", "Cinematography."];
   const videoRef = useRef<HTMLVideoElement>(null);
-  const webGLRef = useRef<WebGLTransitionRef>(null);
 
   // Smooth mouse tracking for the light spotlight
   const mouseX = useMotionValue(typeof window !== "undefined" ? window.innerWidth / 2 : 0);
@@ -88,11 +86,14 @@ function Preloader({ monogram, triggerTransition, onComplete }: { monogram: stri
         // Fade out monogram and text
         gsap.to(".preloader-content", { opacity: 0, duration: 0.8, ease: "power2.out" });
         
-        if (webGLRef.current) {
-          await webGLRef.current.startTransition();
-        }
-        
-        onComplete();
+        // Massive cinematic zoom-in through the clouds to reveal the hero section underneath
+        gsap.to(".preloader-bg", { 
+          scale: 15, 
+          opacity: 0, 
+          duration: 1.8, 
+          ease: "power3.inOut",
+          onComplete: onComplete 
+        });
       };
       runTransition();
     }
@@ -105,8 +106,22 @@ function Preloader({ monogram, triggerTransition, onComplete }: { monogram: stri
       transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black overflow-hidden cursor-none"
     >
-      {/* WebGL Background */}
-      <WebGLTransition ref={webGLRef} />
+      {/* Cloud Video Background */}
+      <motion.div
+        initial={{ opacity: 0, scale: 1, y: 0 }}
+        animate={{ opacity: 1, scale: 2.5, y: "-15%" }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 5, ease: "easeOut" }}
+        className="preloader-bg absolute inset-0 z-0 pointer-events-none origin-center"
+      >
+        <img
+          src="/preloader_clouds_v2.jpg"
+          alt="Cinematic Clouds"
+          className="h-full w-full object-cover opacity-80"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent" />
+      </motion.div>
       
       {/* Interactive Spotlight */}
       <motion.div 
@@ -276,30 +291,17 @@ function Hero({
     >
       <motion.div style={{ y, scale }} className="absolute inset-0">
         {isVideo ? (
-          mediaUrl === "/DARK.mp4" ? (
-            <CanvasSequence
-              folderPath="/hero-seq"
-              frameCount={320}
-              fps={15}
-              width={1280}
-              height={546}
-              className="h-[115%] w-full object-cover"
-              onReady={onMediaReady}
-              scrollScrub={false}
-            />
-          ) : (
-            <video
-              src={mediaUrl}
-              poster={mediaUrl.substring(0, mediaUrl.lastIndexOf('.')) + '_poster.jpg'}
-              autoPlay
-              loop
-              muted={isMuted}
-              playsInline
-              onCanPlayThrough={onMediaReady}
-              onLoadedData={onMediaReady}
-              className="h-[115%] w-full object-cover"
-            />
-          )
+          <video
+            src={mediaUrl}
+            poster={mediaUrl.substring(0, mediaUrl.lastIndexOf('.')) + '_poster.jpg'}
+            autoPlay
+            loop
+            muted={isMuted}
+            playsInline
+            onCanPlayThrough={onMediaReady}
+            onLoadedData={onMediaReady}
+            className="h-[115%] w-full object-cover"
+          />
         ) : (
           <img
             src={mediaUrl}
@@ -315,7 +317,20 @@ function Hero({
       />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
 
-
+      {/* Mute/Unmute toggle button */}
+      {isVideo && (
+        <button
+          onClick={() => setActiveAudioId(isMuted ? "hero" : null)}
+          className="absolute right-6 bottom-24 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-foreground/20 bg-background/15 text-foreground backdrop-blur-md transition-all hover:bg-background/30 hover:scale-105 active:scale-95 md:right-12 md:bottom-32"
+          aria-label={isMuted ? "Unmute video" : "Mute video"}
+        >
+          {isMuted ? (
+            <VolumeX className="h-5 w-5" strokeWidth={1.5} />
+          ) : (
+            <Volume2 className="h-5 w-5" strokeWidth={1.5} />
+          )}
+        </button>
+      )}
 
       <motion.div
         style={{ y: contentY }}
