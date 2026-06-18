@@ -380,7 +380,7 @@ function ProjectMedia({
           ref={videoRef}
           src={src}
           poster={poster}
-          preload="none"
+          preload="metadata"
           loop
           muted={activeAudioId !== id}
           playsInline
@@ -1213,12 +1213,27 @@ function Index() {
   const data = useContent();
   const [activeAudioId, setActiveAudioId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [mediaReady, setMediaReady] = useState(false);
+  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
 
-  // Fallback timeout to ensure site loads even if media is slow
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 4000);
-    return () => clearTimeout(timer);
+    // Enforce a minimum loading time of 3.5 seconds to let other videos buffer
+    const minTimer = setTimeout(() => setMinTimeElapsed(true), 3500);
+    // Absolute maximum loading time of 7 seconds (fallback)
+    const maxTimer = setTimeout(() => setIsLoading(false), 7000);
+    
+    return () => {
+      clearTimeout(minTimer);
+      clearTimeout(maxTimer);
+    };
   }, []);
+
+  useEffect(() => {
+    // Only dismiss the loading screen if the hero video is ready AND 3.5 seconds have passed
+    if (mediaReady && minTimeElapsed) {
+      setIsLoading(false);
+    }
+  }, [mediaReady, minTimeElapsed]);
 
   return (
     <>
@@ -1231,7 +1246,7 @@ function Index() {
           data={data} 
           activeAudioId={activeAudioId} 
           setActiveAudioId={setActiveAudioId} 
-          onMediaReady={() => setIsLoading(false)}
+          onMediaReady={() => setMediaReady(true)}
         />
       <SelectedWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
       <Clients data={data} />
