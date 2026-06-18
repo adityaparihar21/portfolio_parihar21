@@ -220,24 +220,18 @@ function Header({ data, isLoading }: { data: ReturnType<typeof useContent>; isLo
       <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-6 md:px-12">
         <a href="#top" className="flex items-center gap-2" onClick={() => setMenuOpen(false)}>
           <motion.div
-            className="origin-top-left mix-blend-screen"
-            initial={{ 
-              y: "35vh",
-              x: "calc(50vw - 32px - 50%)", 
-              scale: 5, 
-              opacity: 0,
-            }}
-            animate={{ 
-              y: isLoading ? "35vh" : 0, 
-              x: isLoading ? "calc(50vw - 32px - 50%)" : 0,
-              scale: isLoading ? 5 : 1, 
-              opacity: 1,
-            }}
+            layout
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ 
-              duration: 2.2, 
-              ease: [0.25, 1, 0.5, 1],
+              layout: { duration: 1.8, ease: [0.25, 1, 0.5, 1] },
               opacity: { duration: 1 }
             }}
+            className={`mix-blend-screen origin-top-left overflow-hidden rounded-md flex items-center justify-center ${
+              isLoading 
+                ? "fixed inset-0 m-auto w-[250px] h-[250px] md:w-[350px] md:h-[350px]" 
+                : "relative w-[50px] h-[50px] md:w-[60px] md:h-[60px]"
+            }`}
           >
             <video 
               src="/newap.MOV" 
@@ -245,7 +239,7 @@ function Header({ data, isLoading }: { data: ReturnType<typeof useContent>; isLo
               muted 
               loop 
               playsInline 
-              className="w-[120px] object-contain pointer-events-none"
+              className="w-full h-full object-cover pointer-events-none"
             />
           </motion.div>
         </a>
