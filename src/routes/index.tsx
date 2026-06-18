@@ -1151,8 +1151,15 @@ function CreativeTools({ data }: { data: ReturnType<typeof useContent> }) {
   );
 }
 
-/* ---------------- Worked With ---------------- */
-function WorkedWith({ data }: { data: ReturnType<typeof useContent> }) {
+function WorkedWith({
+  data,
+  activeAudioId,
+  setActiveAudioId,
+}: {
+  data: ReturnType<typeof useContent>;
+  activeAudioId: string | null;
+  setActiveAudioId: (id: string | null) => void;
+}) {
   if (!data.workedWith) return null;
   const { eyebrow, title, brands } = data.workedWith;
   return (
@@ -1179,13 +1186,25 @@ function WorkedWith({ data }: { data: ReturnType<typeof useContent> }) {
           {brands.map((brand, i) => {
             const content = (
               <>
-                <div className="h-20 w-full flex items-center justify-start">
-                  <img
-                    src={brand.logo}
-                    alt={brand.name}
-                    loading="lazy"
-                    className="h-full w-auto object-contain max-w-[80%] transition-transform duration-500 group-hover:scale-[1.03]"
-                  />
+                <div className="h-20 w-full flex items-center justify-start overflow-hidden">
+                  {brand.logo.match(/\.(mp4|webm|ogg|mov|m4v)$/i) ? (
+                    <div className="h-full w-auto max-w-[80%] rounded-md transition-transform duration-500 group-hover:scale-[1.03]">
+                      <ProjectMedia 
+                        src={brand.logo}
+                        title={brand.name}
+                        id={`brand-${i}`}
+                        activeAudioId={activeAudioId}
+                        setActiveAudioId={setActiveAudioId}
+                      />
+                    </div>
+                  ) : (
+                    <img
+                      src={brand.logo}
+                      alt={brand.name}
+                      loading="lazy"
+                      className="h-full w-auto object-contain max-w-[80%] transition-transform duration-500 group-hover:scale-[1.03]"
+                    />
+                  )}
                 </div>
                 <div className="flex flex-col gap-3">
                   <h3 className="font-serif text-3xl italic tracking-wide text-foreground group-hover:text-primary transition-colors flex items-center justify-between">
@@ -1278,7 +1297,7 @@ function Index() {
       <Certifications data={data} />
       <CreativeWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
       <UPESWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
-      <WorkedWith data={data} />
+      <WorkedWith data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
       <CreativeTools data={data} />
       <About data={data} />
       <Testimonial data={data} />
