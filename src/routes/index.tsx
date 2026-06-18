@@ -116,14 +116,14 @@ function Preloader({ monogram }: { monogram: string }) {
       />
 
       <div className="z-10 flex flex-col items-center gap-4 pointer-events-none">
-        <motion.span
+        <motion.h1
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, ease: EASE_OUT_EXPO }}
-          className="font-serif text-7xl md:text-9xl italic tracking-wide text-foreground drop-shadow-2xl"
+          className="inline-block px-4 py-2 font-serif text-7xl md:text-9xl italic tracking-wide text-foreground drop-shadow-2xl leading-none"
         >
           {monogram}
-        </motion.span>
+        </motion.h1>
 
         <div className="h-6 flex items-center justify-center">
           <AnimatePresence mode="wait">
