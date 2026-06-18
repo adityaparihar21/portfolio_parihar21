@@ -4,7 +4,6 @@ import { motion, useScroll, useTransform, AnimatePresence, useMotionValue, useSp
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CanvasSequence } from "../components/CanvasSequence";
-import { ThreeMonogram } from "../components/ThreeMonogram";
 import { ChevronDown, Instagram, Youtube, Github, Linkedin, Mail, ArrowRight, Volume2, VolumeX, Menu, X, Loader2 } from "lucide-react";
 
 import { siteData } from "@/lib/site-data";
@@ -130,7 +129,7 @@ function Preloader({ monogram }: { monogram: string }) {
           transition={{ duration: 1, ease: EASE_OUT_EXPO }}
           className="inline-block px-4 py-2 font-serif text-7xl md:text-9xl italic tracking-wide text-foreground drop-shadow-2xl leading-none"
         >
-          {data.brand.monogram}
+          AP
         </motion.h1>
 
         <div className="h-6 flex items-center justify-center">
