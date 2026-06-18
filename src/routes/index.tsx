@@ -107,7 +107,7 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
       initial={{ opacity: 1, scale: 1, filter: "blur(0px) brightness(1)" }}
       exit={{ opacity: 0, filter: "blur(10px) brightness(1.2)" }}
       transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black overflow-hidden cursor-none"
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black overflow-hidden"
     >
       {/* Cloud Video Background */}
       <motion.div
@@ -142,16 +142,18 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
         }}
       />
 
-      <div className="z-10 flex flex-col items-center gap-4 preloader-content">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.85 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
-          className="w-[260px] h-[160px] md:w-[420px] md:h-[240px] drop-shadow-2xl pointer-events-none"
-        >
-          <AP3DMonogram />
-        </motion.div>
+      {/* 3D Monogram - Exactly Centered */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.85 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-[260px] h-[160px] md:w-[420px] md:h-[240px] drop-shadow-2xl pointer-events-none"
+      >
+        <AP3DMonogram />
+      </motion.div>
 
+      {/* Loading & Enter UI - Positioned at Bottom */}
+      <div className="absolute bottom-20 md:bottom-28 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center w-full px-6 preloader-content">
         <AnimatePresence mode="wait">
           {!showEnter ? (
             /* Loading state */
@@ -172,7 +174,7 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.35, ease: EASE_OUT_EXPO }}
-                    className="font-serif text-xs tracking-[0.35em] uppercase text-muted-foreground/50 italic"
+                    className="font-serif text-xs md:text-sm tracking-[0.35em] uppercase text-muted-foreground/50 italic"
                   >
                     {words[index]}
                   </motion.span>
@@ -190,7 +192,7 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
               </div>
             </motion.div>
           ) : (
-            /* Enter state — CSS ring animation, no per-second re-renders */
+            /* Enter state */
             <motion.div
               key="enter"
               initial={{ opacity: 0, y: 12 }}
@@ -199,64 +201,24 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
               transition={{ duration: 0.7, ease: EASE_OUT_EXPO }}
               className="flex flex-col items-center gap-6 mt-1"
             >
-              {/* Ring + button */}
-              <div className="relative flex items-center justify-center">
-                {/* CSS-animated SVG ring — no React re-renders, no glitch */}
-                <svg
-                  width="130" height="130"
-                  className="absolute rotate-[-90deg]"
-                  style={{ top: '50%', left: '50%', transform: 'translate(-50%,-50%) rotate(-90deg)' }}
-                >
-                  {/* Track */}
-                  <circle cx="65" cy="65" r="56" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
-                  {/* Animated gold arc — pure CSS, zero JS per frame */}
-                  <circle
-                    cx="65" cy="65" r="56"
-                    fill="none"
-                    stroke="oklch(0.78 0.09 80)"
-                    strokeWidth="1.5"
-                    strokeDasharray="351.9"
-                    strokeDashoffset="0"
-                    strokeLinecap="round"
-                    className="countdown-ring-animate"
-                  />
-                </svg>
-
-                {/* Button */}
-                <button
-                  onClick={onEnter}
-                  className="relative z-10 flex flex-col items-center justify-center w-[112px] h-[112px] rounded-full cursor-pointer group transition-all duration-500 hover:scale-105 active:scale-95"
-                  style={{
-                    background: 'radial-gradient(circle, rgba(30,24,18,0.85) 60%, rgba(20,16,12,0.6) 100%)',
-                    border: '1px solid rgba(212,175,90,0.2)',
-                    boxShadow: '0 0 40px rgba(180,140,60,0.08), inset 0 0 20px rgba(0,0,0,0.4)',
-                  }}
-                >
-                  {/* Top label */}
-                  <span className="font-sans text-[8px] tracking-[0.4em] uppercase text-primary/40 group-hover:text-primary/70 transition-colors duration-300 mb-2">
-                    Enter
-                  </span>
-                  {/* Monogram */}
-                  <span
-                    className="font-serif text-[2.2rem] italic leading-none text-foreground/90 group-hover:text-foreground transition-colors duration-300"
-                    style={{ textShadow: '0 2px 20px rgba(212,175,90,0.2)' }}
-                  >
-                    AP
-                  </span>
-                  {/* Bottom countdown */}
-                  <span className="font-sans text-[7px] tracking-[0.3em] uppercase text-muted-foreground/25 mt-2 group-hover:text-muted-foreground/40 transition-colors duration-300">
-                    {countdown}s
-                  </span>
-                </button>
-              </div>
+              {/* Button */}
+              <button
+                onClick={onEnter}
+                className="relative overflow-hidden px-10 py-4 border border-primary/20 bg-background/50 backdrop-blur-sm transition-all duration-500 hover:scale-[1.02] hover:bg-primary/10 hover:border-primary/40 active:scale-95 group rounded-sm shadow-[0_0_30px_rgba(212,175,90,0.05)]"
+              >
+                <div className="absolute inset-0 bg-primary/5 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+                <span className="relative z-10 font-sans text-[10px] md:text-xs tracking-[0.4em] uppercase text-primary/80 group-hover:text-primary transition-colors duration-300">
+                  Enter Site
+                </span>
+              </button>
 
               {/* Thin line divider + label */}
-              <div className="flex items-center gap-4">
-                <div className="h-px w-12 bg-white/10" />
-                <span className="font-sans text-[9px] tracking-[0.35em] uppercase text-muted-foreground/25">
+              <div className="flex items-center gap-4 opacity-70">
+                <div className="h-px w-10 md:w-16 bg-white/10" />
+                <span className="font-sans text-[9px] tracking-[0.35em] uppercase text-muted-foreground/40">
                   auto in {countdown}s
                 </span>
-                <div className="h-px w-12 bg-white/10" />
+                <div className="h-px w-10 md:w-16 bg-white/10" />
               </div>
             </motion.div>
           )}
