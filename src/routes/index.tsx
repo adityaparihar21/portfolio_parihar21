@@ -219,7 +219,7 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
             >
               <button
                 onClick={onEnter}
-                className="relative overflow-hidden px-12 py-3 border border-transparent bg-foreground transition-all duration-500 hover:scale-[1.03] hover:bg-foreground/90 active:scale-95 group rounded-sm shadow-[0_4px_30px_rgba(237,224,202,0.15)] cursor-pointer"
+                className="relative overflow-hidden px-12 py-3 border border-transparent bg-foreground transition-all duration-500 hover:scale-[1.03] hover:bg-foreground/90 active:scale-95 group rounded-full shadow-[0_4px_30px_rgba(237,224,202,0.15)] cursor-pointer"
               >
                 <div className="absolute inset-0 bg-primary/10 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-500 ease-out" />
                 <span className="relative z-10 font-serif text-[11px] md:text-xs tracking-[0.35em] uppercase text-background group-hover:text-background/80 transition-colors duration-300 font-medium">
