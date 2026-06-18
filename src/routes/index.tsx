@@ -191,15 +191,9 @@ function Header({ data, isLoading }: { data: ReturnType<typeof useContent>; isLo
     >
       <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-6 md:px-12">
         <a href="#top" className="flex items-center gap-2" onClick={() => setMenuOpen(false)}>
-          <CanvasSequence
-            folderPath="/monogram-seq"
-            frameCount={146}
-            fps={30}
-            width={400}
-            height={225}
-            className="w-20 h-20 object-cover mix-blend-screen -ml-6"
-            scrollScrub={true}
-          />
+          <span className="font-serif text-2xl italic text-foreground inline-block">
+            {data.brand.monogram}
+          </span>
         </a>
         <nav className="hidden items-center gap-10 md:flex">
           {data.brand.nav.map((item, i) => (
