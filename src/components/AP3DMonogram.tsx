@@ -128,8 +128,9 @@ function GlassSupernova({ triggerTransition }: { triggerTransition?: boolean }) 
       const elapsed = (performance.now() - startTime.current) / 1000;
       
       shards.forEach((shard, i) => {
-        // High explosive burst speed that tapers off slightly
-        const currentSpeed = shard.speed * Math.max(0.2, (1.0 - elapsed * 0.3));
+        // Ease-in shattering: Start very slow, and violently accelerate over time
+        const acceleration = Math.pow(elapsed * 1.5, 3); // Cubed for aggressive ease-in curve
+        const currentSpeed = shard.speed * (0.05 + acceleration);
         shard.pos.addScaledVector(shard.dir, currentSpeed);
         
         shard.rot.x += shard.rx;

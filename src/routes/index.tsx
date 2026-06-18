@@ -99,11 +99,17 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
         // Fade out text UI quickly
         gsap.to(".preloader-content", { opacity: 0, duration: 0.8, ease: "power2.out" });
         
-        // SHATTER SUPERNOVA: The 3D component handles the explosion, we just fade the canvas at the very end
+        // SHATTER SUPERNOVA: Expand the canvas so shards fly across the entire screen
+        gsap.to(".preloader-monogram", {
+          scale: 8, // Expand container massively so WebGL clipping doesn't hide the explosion
+          duration: 2.5,
+          ease: "power3.in" // Accelerates outward
+        });
+
         gsap.to(".preloader-monogram", {
           opacity: 0, 
-          duration: 1.0,
-          delay: 1.5, // Fade out only after shards have exploded
+          duration: 0.5,
+          delay: 2.0, // Fade out only right at the end of the explosion
           ease: "power2.inOut"
         });
 
