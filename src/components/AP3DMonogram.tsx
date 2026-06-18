@@ -134,8 +134,8 @@ export default function AP3DMonogram({ className = '', triggerTransition = false
           positions[i * 3 + 1] = tempPosition.y;
           positions[i * 3 + 2] = tempPosition.z;
           
-          // Spherical outward velocity
-          const speed = 0.5 + Math.random() * 2.0;
+          // Spherical outward velocity (toned down so it forms a dense cloud)
+          const speed = 0.1 + Math.random() * 0.8;
           velocities[i * 3] = (Math.random() - 0.5) * speed;
           velocities[i * 3 + 1] = (Math.random() - 0.5) * speed;
           velocities[i * 3 + 2] = (Math.random() - 0.5) * speed;
