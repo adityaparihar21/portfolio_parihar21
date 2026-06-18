@@ -46,7 +46,7 @@ const staggerParent = {
 };
 
 /* ---------------- Preloader ---------------- */
-function Preloader({ monogram, triggerTransition, onComplete }: { monogram: string, triggerTransition: boolean, onComplete: () => void }) {
+function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter, countdown }: { monogram: string, triggerTransition: boolean, onComplete: () => void, showEnter: boolean, onEnter: () => void, countdown: number }) {
   const [index, setIndex] = useState(0);
   const words = ["Code.", "Vision.", "Cinematography."];
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -142,44 +142,113 @@ function Preloader({ monogram, triggerTransition, onComplete }: { monogram: stri
         }}
       />
 
-      <div className="z-10 flex flex-col items-center gap-4 pointer-events-none preloader-content">
+      <div className="z-10 flex flex-col items-center gap-4 preloader-content">
         <motion.div
           initial={{ opacity: 0, scale: 0.85 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
-          className="w-[260px] h-[160px] md:w-[420px] md:h-[240px] drop-shadow-2xl"
+          className="w-[260px] h-[160px] md:w-[420px] md:h-[240px] drop-shadow-2xl pointer-events-none"
         >
           <AP3DMonogram />
         </motion.div>
 
-        <div className="h-6 flex items-center justify-center">
-          <AnimatePresence mode="wait">
-            <motion.span
-              key={index}
-              initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
-              transition={{ duration: 0.4, ease: EASE_OUT_EXPO }}
-              className="font-serif text-sm md:text-lg tracking-[0.3em] uppercase text-muted-foreground/70"
+        <AnimatePresence mode="wait">
+          {!showEnter ? (
+            /* Loading state: cycling words + progress bar */
+            <motion.div
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4 }}
+              className="flex flex-col items-center gap-4 pointer-events-none"
             >
-              {words[index]}
-            </motion.span>
-          </AnimatePresence>
-        </div>
-        
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 1 }}
-          className="mt-6 h-[2px] w-48 md:w-80 lg:w-[450px] overflow-hidden bg-white/10 rounded-full"
-        >
-          <motion.div
-            initial={{ x: "-100%" }}
-            animate={{ x: "100%" }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-            className="h-full w-full bg-primary"
-          />
-        </motion.div>
+              <div className="h-6 flex items-center justify-center">
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={index}
+                    initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
+                    transition={{ duration: 0.4, ease: EASE_OUT_EXPO }}
+                    className="font-serif text-sm md:text-lg tracking-[0.3em] uppercase text-muted-foreground/70"
+                  >
+                    {words[index]}
+                  </motion.span>
+                </AnimatePresence>
+              </div>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5, duration: 1 }}
+                className="mt-2 h-[2px] w-48 md:w-80 lg:w-[450px] overflow-hidden bg-white/10 rounded-full"
+              >
+                <motion.div
+                  initial={{ x: "-100%" }}
+                  animate={{ x: "100%" }}
+                  transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+                  className="h-full w-full bg-primary"
+                />
+              </motion.div>
+            </motion.div>
+          ) : (
+            /* Enter button state */
+            <motion.div
+              key="enter"
+              initial={{ opacity: 0, y: 16, scale: 0.92 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
+              className="flex flex-col items-center gap-5 mt-2"
+            >
+              {/* Countdown ring + Enter button */}
+              <div className="relative flex items-center justify-center">
+                {/* SVG countdown ring */}
+                <svg
+                  width="120" height="120"
+                  className="absolute -inset-0 rotate-[-90deg]"
+                  style={{ filter: 'drop-shadow(0 0 8px rgba(212,175,90,0.5))' }}
+                >
+                  <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="2" />
+                  <circle
+                    cx="60" cy="60" r="52"
+                    fill="none"
+                    stroke="#D4AF5A"
+                    strokeWidth="2"
+                    strokeDasharray={`${2 * Math.PI * 52}`}
+                    strokeDashoffset={`${2 * Math.PI * 52 * (1 - countdown / 10)}`}
+                    strokeLinecap="round"
+                    style={{ transition: 'stroke-dashoffset 1s linear' }}
+                  />
+                </svg>
+                {/* The button itself */}
+                <button
+                  onClick={onEnter}
+                  className="relative z-10 flex flex-col items-center justify-center w-[104px] h-[104px] rounded-full border border-primary/40 bg-black/30 backdrop-blur-sm text-foreground transition-all duration-300 hover:bg-primary/20 hover:border-primary hover:scale-105 active:scale-95 cursor-pointer group"
+                  style={{ boxShadow: '0 0 30px rgba(212,175,90,0.15)' }}
+                >
+                  <span className="font-serif text-[10px] tracking-[0.35em] uppercase text-primary/70 mb-1 group-hover:text-primary transition-colors">
+                    Enter
+                  </span>
+                  <span className="font-serif text-3xl italic text-foreground drop-shadow-lg leading-none">
+                    AP
+                  </span>
+                  <span className="font-mono text-[9px] text-muted-foreground/40 mt-1">
+                    {countdown}s
+                  </span>
+                </button>
+              </div>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.6 }}
+                className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground/30 font-light"
+              >
+                Auto-enter in {countdown}s
+              </motion.p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   );
@@ -1384,34 +1453,51 @@ function Index() {
   const [mediaReady, setMediaReady] = useState(false);
   const [minTimeElapsed, setMinTimeElapsed] = useState(false);
   const [isPreloaderMounted, setIsPreloaderMounted] = useState(true);
+  const [showEnter, setShowEnter] = useState(false);
+  const [countdown, setCountdown] = useState(10);
+
+  // Handle Enter button press
+  const handleEnter = () => setIsLoading(false);
 
   useEffect(() => {
-    // Clear hash on mount so browser doesn't forcefully auto-scroll to an anchor (like #work) on refresh
+    // Clear hash on mount
     if (typeof window !== "undefined" && window.location.hash) {
       window.history.replaceState(null, '', window.location.pathname);
     }
-
-    // Enforce a minimum loading time of 2.5 seconds to let other videos buffer
-    const minTimer = setTimeout(() => setMinTimeElapsed(true), 2500);
-    // Absolute maximum loading time of 4.5 seconds (fallback)
-    const maxTimer = setTimeout(() => setIsLoading(false), 4500);
-    
-    return () => {
-      clearTimeout(maxTimer);
-    };
+    // Absolute maximum: if nothing happens in 15s, force entry
+    const maxTimer = setTimeout(() => setIsLoading(false), 15000);
+    return () => clearTimeout(maxTimer);
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => setMinTimeElapsed(true), 1200);
+    // Minimum display time of 2.5s so the preloader is actually seen
+    const timer = setTimeout(() => setMinTimeElapsed(true), 2500);
     return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
-    // Only dismiss the loading screen if the hero video is ready AND 2.5 seconds have passed
-    if (mediaReady && minTimeElapsed) {
-      setIsLoading(false);
+    // Show enter button once media is buffered AND min time passed
+    if (mediaReady && minTimeElapsed && !showEnter) {
+      setShowEnter(true);
     }
-  }, [mediaReady, minTimeElapsed]);
+  }, [mediaReady, minTimeElapsed, showEnter]);
+
+  // 10-second countdown once enter button appears
+  useEffect(() => {
+    if (!showEnter) return;
+    setCountdown(10);
+    const interval = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setIsLoading(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [showEnter]);
 
   useEffect(() => {
     if (isLoading) {
@@ -1434,6 +1520,9 @@ function Index() {
             monogram={data.brand.monogram} 
             triggerTransition={!isLoading}
             onComplete={() => setIsPreloaderMounted(false)}
+            showEnter={showEnter}
+            onEnter={handleEnter}
+            countdown={countdown}
           />
         )}
       </AnimatePresence>
