@@ -91,12 +91,12 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
         // Fade out monogram and text
         gsap.to(".preloader-content", { opacity: 0, duration: 0.8, ease: "power2.out" });
         
-        // Massive cinematic zoom-in through the clouds to reveal the hero section underneath
+        // Smooth fade out and slight zoom for the new interior video
         gsap.to(".preloader-bg", { 
-          scale: 15, 
+          scale: 1.1, 
           opacity: 0, 
-          duration: 3.75, 
-          ease: "power3.inOut",
+          duration: 2.5, 
+          ease: "power2.inOut",
           onComplete: () => {
             // Fade out and stop the audio cleanly
             gsap.to(audio, { 
@@ -124,24 +124,25 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
     >
       {/* Cloud Video Background */}
       <motion.div
-        initial={{ opacity: 0, scale: 1, y: 0 }}
-        animate={{ opacity: 1, scale: 2.5, y: "-15%" }}
+        initial={{ opacity: 0, scale: 1.05 }}
+        animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 3.75, ease: "easeOut" }}
+        transition={{ duration: 3, ease: "easeOut" }}
         className="preloader-bg absolute inset-0 z-0 pointer-events-none origin-center"
       >
         <video
           ref={videoRef}
-          src="/preloader_clouds_v2.mp4"
+          src="/loadingpagebg.mp4"
           autoPlay
           loop
           muted
           playsInline
-          preload="auto"
-          className="h-full w-full object-cover opacity-80"
+          className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent" />
+        {/* Dark dimming overlay to ensure the 3D monogram and text pop against the bright flowers */}
+        <div className="absolute inset-0 bg-black/40 z-[1]" />
+        {/* Additional gradient at the bottom for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-[2]" />
       </motion.div>
       
       {/* Interactive Spotlight */}
