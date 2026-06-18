@@ -4,7 +4,6 @@ import { motion, useScroll, useTransform, AnimatePresence, useMotionValue, useSp
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CanvasSequence } from "../components/CanvasSequence";
-import GhostCursor from "../components/GhostCursor";
 import { ChevronDown, Instagram, Youtube, Github, Linkedin, Mail, ArrowRight, Volume2, VolumeX, Menu, X, Loader2 } from "lucide-react";
 
 import { siteData } from "@/lib/site-data";
@@ -125,7 +124,6 @@ function Preloader({ monogram, triggerTransition, onComplete }: { monogram: stri
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent" />
-        <GhostCursor />
       </motion.div>
       
       {/* Interactive Spotlight */}
