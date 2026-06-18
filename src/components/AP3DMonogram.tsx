@@ -96,6 +96,20 @@ function GlassSupernova({ triggerTransition }: { triggerTransition?: boolean }) 
   }, []);
 
   useEffect(() => {
+    // Pre-initialize matrices so they exist in GPU memory before explosion
+    if (meshRef.current) {
+      shards.forEach((shard, i) => {
+        dummy.position.copy(shard.pos);
+        dummy.rotation.copy(shard.rot);
+        dummy.scale.set(1, 1, 1);
+        dummy.updateMatrix();
+        meshRef.current!.setMatrixAt(i, dummy.matrix);
+      });
+      meshRef.current.instanceMatrix.needsUpdate = true;
+    }
+  }, [shards, dummy]);
+
+  useEffect(() => {
     if (triggerTransition) {
        setExploded(true);
        startTime.current = performance.now();
@@ -103,7 +117,7 @@ function GlassSupernova({ triggerTransition }: { triggerTransition?: boolean }) 
        if (flashLightRef.current) {
           gsap.fromTo(flashLightRef.current, 
             { intensity: 0 }, 
-            { intensity: 500, duration: 0.15, yoyo: true, repeat: 1, ease: "power4.out" }
+            { intensity: 10000, duration: 0.15, yoyo: true, repeat: 1, ease: "power4.out" }
           );
        }
     }
@@ -139,19 +153,17 @@ function GlassSupernova({ triggerTransition }: { triggerTransition?: boolean }) 
   return (
     <>
       <pointLight ref={flashLightRef} position={[0, 0, 1]} intensity={0} color="#ffffff" distance={30} />
-      {exploded && (
-        <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
-          <tetrahedronGeometry args={[0.06, 0]} />
-          <meshPhysicalMaterial 
-            color="#E8DCC8" 
-            metalness={1.0} 
-            roughness={0.1} 
-            transmission={0.9} 
-            thickness={0.5} 
-            envMapIntensity={3.0} 
-          />
-        </instancedMesh>
-      )}
+      <instancedMesh ref={meshRef} args={[undefined, undefined, count]} visible={exploded}>
+        <tetrahedronGeometry args={[0.08, 0]} />
+        <meshStandardMaterial 
+          color="#FFD700" 
+          emissive="#CCAA00"
+          emissiveIntensity={0.5}
+          metalness={0.9} 
+          roughness={0.1} 
+          envMapIntensity={4.0} 
+        />
+      </instancedMesh>
     </>
   );
 }
