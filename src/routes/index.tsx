@@ -122,12 +122,15 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
       transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black overflow-hidden"
     >
-      {/* Cloud Video Background */}
+      {/* Interior Video Background */}
       <motion.div
-        initial={{ opacity: 0, scale: 1.05 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, scale: 1.0 }}
+        animate={{ opacity: 1, scale: 1.15 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 3, ease: "easeOut" }}
+        transition={{ 
+          opacity: { duration: 3, ease: "easeOut" },
+          scale: { duration: 25, ease: "linear", repeat: Infinity, repeatType: "reverse" }
+        }}
         className="preloader-bg absolute inset-0 z-0 pointer-events-none origin-center"
       >
         <video
