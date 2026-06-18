@@ -6,7 +6,7 @@ import * as THREE from 'three';
 /* ── Warm-cream serif "AP" mesh ── */
 function APText() {
   return (
-    <group>
+    <group position={[0.15, 0, 0]}>
       <Center>
         <Text3D
           font="/fonts/gentilis_bold.typeface.json"
