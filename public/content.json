@@ -133,6 +133,14 @@
         "description": "Creative vlog of the trip - CHAKRATA DAY TRIP <span class=\"font-serif italic\">'with da boys'</span>",
         "image": "/chakrata.mp4",
         "href": "https://www.instagram.com/reel/DZR8lnFvI5t/"
+      },
+      {
+        "id": "para-in-doon",
+        "category": "Creative Edit • Event",
+        "title": "PARA IN DOON",
+        "description": "A high-energy, cinematic reel covering Paradox's electrifying performance live at the Mall of Dehradun.",
+        "image": "/mall_of_dehradun_paradox.mp4",
+        "href": "https://www.instagram.com/reel/DFNemWePr8q/"
       }
     ]
   },
@@ -326,13 +334,13 @@
       {
         "name": "Paradox",
         "description": "Tanishq Singh (Paradox), a versatile Indian hip-hop artist and MTV Hustle 2.0 runner-up, celebrated for blending melodic rap with regional influences.",
-        "logo": "/mall_of_dehradun_paradox.mp4",
+        "logo": "/logos/paradox.jpg",
         "href": "https://www.instagram.com/reel/DFNemWePr8q/"
       },
       {
         "name": "Mall of Dehradun",
         "description": "A premier shopping and entertainment destination in Uttarakhand, offering a mix of international retail brands, dining options, and multiplex experiences.",
-        "logo": "/mall_of_dehradun_paradox.mp4",
+        "logo": "/logos/mall_of_dehradun.jpg",
         "href": "https://www.instagram.com/reel/DFNemWePr8q/"
       },
       {
