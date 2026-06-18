@@ -86,10 +86,10 @@ function Preloader({ monogram }: { monogram: string }) {
       {/* Cloud Video Background */}
       <motion.div
         initial={{ opacity: 0, scale: 1 }}
-        animate={{ opacity: 0.55, scale: 1.15 }}
+        animate={{ opacity: 0.65, scale: 1.15 }}
         exit={{ opacity: 0, scale: 1.25 }}
         transition={{ duration: 4, ease: "easeOut" }}
-        className="absolute inset-0 z-0 pointer-events-none mix-blend-screen"
+        className="absolute inset-0 z-0 pointer-events-none"
       >
         <video
           src="/preloader_clouds_v2.mp4"
