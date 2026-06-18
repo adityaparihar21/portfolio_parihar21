@@ -55,6 +55,10 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
   const springX = useSpring(mouseX, { stiffness: 50, damping: 20 });
   const springY = useSpring(mouseY, { stiffness: 50, damping: 20 });
 
+  // Parallax for fog - moves slightly in opposite direction of mouse
+  const fogX = useTransform(springX, [0, typeof window !== "undefined" ? window.innerWidth : 1000], [40, -40]);
+  const fogY = useTransform(springY, [0, typeof window !== "undefined" ? window.innerHeight : 800], [40, -40]);
+
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       mouseX.set(e.clientX);
@@ -137,6 +141,23 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
           translateX: "-50%",
           translateY: "-50%",
           background: "radial-gradient(circle, rgba(224, 185, 80, 0.15) 0%, rgba(224, 185, 80, 0.05) 30%, transparent 60%)"
+        }}
+      />
+
+      {/* Fog Parallax Overlay */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.6 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 4, ease: "easeOut" }}
+        className="pointer-events-none absolute inset-[-100px] z-[5] mix-blend-screen opacity-60"
+        style={{
+          x: fogX,
+          y: fogY,
+          backgroundImage: "url('/fog.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat"
         }}
       />
 
