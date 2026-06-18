@@ -129,65 +129,108 @@ function APCoin() {
   const coinRef = useRef<THREE.Group>(null);
   const { normalMap, roughnessMap, aoMap } = useGoldTextures();
 
-  // Smooth auto-rotation
+  // Entrance animation state
+  const entranceRef = useRef({ elapsed: 0, done: false });
+  const TARGET_SCALE = 0.15; // Compact logo size — similar to a premium brand logo on big screens
+
+  // Smooth entrance + auto-rotation with ramp-up
   useFrame((state, delta) => {
-    if (coinRef.current) {
-      coinRef.current.rotation.y += delta * 0.8;
+    if (!coinRef.current) return;
+
+    const entrance = entranceRef.current;
+    entrance.elapsed += delta;
+
+    if (!entrance.done) {
+      // Spring-like scale entrance over ~1.8s
+      const t = Math.min(entrance.elapsed / 1.8, 1);
+      // Overshoot spring curve: rises past 1.0, bounces back
+      const spring = t < 0.6
+        ? t / 0.6 * 1.15 // overshoot to 115%
+        : 1.15 - 0.15 * ((t - 0.6) / 0.4); // settle back to 100%
+      const finalSpring = t >= 1 ? 1 : spring;
+      const s = finalSpring * TARGET_SCALE;
+      coinRef.current.scale.set(s, s, s);
+
+      if (t >= 1) entrance.done = true;
     }
+
+    // Rotation: ramp up from 0 to full speed over 2.5s
+    const rotRamp = Math.min(entrance.elapsed / 2.5, 1);
+    // Ease-out cubic for smooth acceleration
+    const rotSpeed = rotRamp * rotRamp * (3 - 2 * rotRamp) * 0.6;
+    coinRef.current.rotation.y += delta * rotSpeed;
   });
 
-  // Shared PBR gold material props
-  const goldMaterialProps = {
-    color: '#C8A34A',
+  // ── Coin body: warm, deep antique gold ──
+  const coinBodyProps = {
+    color: '#B8912D',           // Deep warm gold — aged, rich
     metalness: 1,
-    roughness: 0.35,
-    clearcoat: 0.15,
-    clearcoatRoughness: 0.5,
+    roughness: 0.38,
+    clearcoat: 0.12,
+    clearcoatRoughness: 0.6,
     reflectivity: 1,
-    envMapIntensity: 2.5,
+    envMapIntensity: 2.8,
     normalMap,
-    normalScale: new THREE.Vector2(0.3, 0.3),
+    normalScale: new THREE.Vector2(0.35, 0.35),
     roughnessMap,
     aoMap,
-    aoMapIntensity: 0.6,
+    aoMapIntensity: 0.7,
+  };
+
+  // ── Rim: slightly brighter, polished gold (worn edges catch more light) ──
+  const coinRimProps = {
+    ...coinBodyProps,
+    color: '#D4A840',           // Brighter polished gold on raised edges
+    roughness: 0.25,            // Smoother — rims get polished from handling
+    clearcoat: 0.2,
+    envMapIntensity: 3.0,
+  };
+
+  // ── Text: brightest gold, freshly minted look ──
+  const coinTextProps = {
+    ...coinBodyProps,
+    color: '#DDB94E',           // Bright warm gold on stamped lettering
+    roughness: 0.3,
+    clearcoat: 0.18,
+    envMapIntensity: 3.2,
   };
 
   return (
-    <group scale={0.18} ref={coinRef}>
+    <group scale={0} ref={coinRef}> {/* Starts at 0, spring-animated to TARGET_SCALE */}
       {/* The Solid Coin Base */}
       <mesh rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[2.0, 2.0, 0.35, 128]} />
-        <meshPhysicalMaterial {...goldMaterialProps} />
+        <meshPhysicalMaterial {...coinBodyProps} />
       </mesh>
 
       {/* Edge Grooves */}
       <mesh rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[2.005, 2.005, 0.35, 128, 1, true]} />
-        <meshPhysicalMaterial {...goldMaterialProps} />
+        <meshPhysicalMaterial {...coinBodyProps} />
       </mesh>
 
       {/* Front Raised Outer Rim */}
       <mesh position={[0, 0, 0.175]} castShadow receiveShadow>
         <torusGeometry args={[1.92, 0.08, 32, 128]} />
-        <meshPhysicalMaterial {...goldMaterialProps} />
+        <meshPhysicalMaterial {...coinRimProps} />
       </mesh>
 
       {/* Back Raised Outer Rim */}
       <mesh position={[0, 0, -0.175]} castShadow receiveShadow>
         <torusGeometry args={[1.92, 0.08, 32, 128]} />
-        <meshPhysicalMaterial {...goldMaterialProps} />
+        <meshPhysicalMaterial {...coinRimProps} />
       </mesh>
 
       {/* Front Inner Decorative Ring */}
       <mesh position={[0, 0, 0.175]} castShadow receiveShadow>
         <torusGeometry args={[1.7, 0.03, 16, 128]} />
-        <meshPhysicalMaterial {...goldMaterialProps} />
+        <meshPhysicalMaterial {...coinRimProps} />
       </mesh>
 
       {/* Back Inner Decorative Ring */}
       <mesh position={[0, 0, -0.175]} castShadow receiveShadow>
         <torusGeometry args={[1.7, 0.03, 16, 128]} />
-        <meshPhysicalMaterial {...goldMaterialProps} />
+        <meshPhysicalMaterial {...coinRimProps} />
       </mesh>
 
       {/* Front Minted Text */}
@@ -205,7 +248,7 @@ function APCoin() {
             bevelSegments={8}
           >
             AP
-            <meshPhysicalMaterial {...goldMaterialProps} />
+            <meshPhysicalMaterial {...coinTextProps} />
           </Text3D>
         </Center>
       </group>
@@ -226,7 +269,7 @@ function APCoin() {
               bevelSegments={8}
             >
               AP
-              <meshPhysicalMaterial {...goldMaterialProps} />
+              <meshPhysicalMaterial {...coinTextProps} />
             </Text3D>
           </Center>
         </group>
