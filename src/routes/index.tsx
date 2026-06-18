@@ -215,6 +215,28 @@ function Header({ data }: { data: ReturnType<typeof useContent> }) {
   );
 }
 
+/* ---------------- Mist Background ---------------- */
+function MistBackground() {
+  return (
+    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden mix-blend-screen opacity-30">
+      <motion.div
+        animate={{ x: ["0%", "-50%"] }}
+        transition={{ duration: 90, repeat: Infinity, ease: "linear" }}
+        className="absolute top-0 left-0 flex h-full w-[200vw]"
+      >
+        <div 
+          className="h-full w-full flex-shrink-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: 'url(/mist.png)' }}
+        />
+        <div 
+          className="h-full w-full flex-shrink-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: 'url(/mist.png)' }}
+        />
+      </motion.div>
+    </div>
+  );
+}
+
 /* ---------------- Hero ---------------- */
 function Hero({
   data,
@@ -1353,7 +1375,8 @@ function Index() {
       <AnimatePresence>
         {isLoading && <Preloader monogram={data.brand.monogram} />}
       </AnimatePresence>
-      <main className="bg-background text-foreground antialiased">
+      <div className="relative min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary">
+      <MistBackground />
         <Header data={data} />
         <Hero 
           data={data} 
@@ -1371,7 +1394,7 @@ function Index() {
       <About data={data} />
       <Testimonial data={data} />
       <CallToAction data={data} />
-      </main>
+      </div>
     </>
   );
 }
