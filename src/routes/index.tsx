@@ -95,20 +95,14 @@ function Preloader({ monogram }: { monogram: string }) {
         transition={{ duration: 5, ease: "easeOut" }}
         className="absolute inset-0 z-0 pointer-events-none origin-center"
       >
-        <video
-          ref={videoRef}
-          src="/preloader_clouds_v2.mp4"
-          autoPlay
-          muted
-          loop
-          playsInline
-          webkit-playsinline="true"
-          disablePictureInPicture
+        <img
+          src="/preloader_clouds_v2.jpg"
+          alt="Cinematic Clouds"
           className="h-full w-full object-cover opacity-80"
         />
-        {/* Cinematic Film Grain Overlay */}
+        {/* Cinematic Film Grain Overlay (Ultra-Subtle) */}
         <div 
-          className="absolute inset-0 z-0 opacity-[0.15] mix-blend-normal pointer-events-none" 
+          className="absolute inset-0 z-0 opacity-[0.04] mix-blend-normal pointer-events-none" 
           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
         />
         {/* Subtle, reduced vignette */}
@@ -1365,6 +1359,11 @@ function Index() {
   const [minTimeElapsed, setMinTimeElapsed] = useState(false);
 
   useEffect(() => {
+    // Clear hash on mount so browser doesn't forcefully auto-scroll to an anchor (like #work) on refresh
+    if (typeof window !== "undefined" && window.location.hash) {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+
     // Enforce a minimum loading time of 2.5 seconds to let other videos buffer
     const minTimer = setTimeout(() => setMinTimeElapsed(true), 2500);
     // Absolute maximum loading time of 4.5 seconds (fallback)
