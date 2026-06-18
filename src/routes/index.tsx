@@ -81,8 +81,28 @@ function Preloader({ monogram }: { monogram: string }) {
       initial={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black overflow-hidden"
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black overflow-hidden cursor-none"
     >
+      {/* Cloud Video Background */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.4 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 1.5, ease: "easeOut" }}
+        className="absolute inset-0 z-0 pointer-events-none mix-blend-screen"
+      >
+        <video
+          src="/preloader_clouds.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black/20" />
+      </motion.div>
+
       {/* Interactive Spotlight */}
       <motion.div 
         className="pointer-events-none absolute z-0 h-[800px] w-[800px] rounded-full opacity-30"
@@ -215,27 +235,7 @@ function Header({ data }: { data: ReturnType<typeof useContent> }) {
   );
 }
 
-/* ---------------- Mist Background ---------------- */
-function MistBackground() {
-  return (
-    <div className="pointer-events-none fixed inset-0 z-20 overflow-hidden mix-blend-screen opacity-[0.35]">
-      <motion.div
-        animate={{ x: ["0%", "-50%"] }}
-        transition={{ duration: 90, repeat: Infinity, ease: "linear" }}
-        className="absolute top-0 left-0 flex h-full w-[200vw]"
-      >
-        <div 
-          className="h-full w-full flex-shrink-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url(/mist.png)' }}
-        />
-        <div 
-          className="h-full w-full flex-shrink-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url(/mist.png)' }}
-        />
-      </motion.div>
-    </div>
-  );
-}
+
 
 /* ---------------- Hero ---------------- */
 function Hero({
@@ -1376,7 +1376,6 @@ function Index() {
         {isLoading && <Preloader monogram={data.brand.monogram} />}
       </AnimatePresence>
       <div className="relative min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary">
-      <MistBackground />
         <Header data={data} />
         <Hero 
           data={data} 
