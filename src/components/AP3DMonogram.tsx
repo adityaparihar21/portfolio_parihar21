@@ -234,7 +234,7 @@ function APCoin() {
       </mesh>
 
       {/* Front Minted Text */}
-      <group position={[0.15, 0, 0.175]}>
+      <group position={[0, 0, 0.175]}>
         <Center>
           <Text3D
             font="/fonts/gentilis_bold.typeface.json"
@@ -254,7 +254,7 @@ function APCoin() {
       </group>
 
       {/* Back Minted Text (Flipped 180 degrees) */}
-      <group position={[-0.15, 0, -0.175]}>
+      <group position={[0, 0, -0.175]}>
         <group rotation={[0, Math.PI, 0]}>
           <Center>
             <Text3D
@@ -360,6 +360,7 @@ export default function AP3DMonogram({ className = '' }: { className?: string })
             enableZoom={false}
             enablePan={false}
             enableRotate={true}
+            target={[0, 0, 0]}
             makeDefault
           />
         </Suspense>
