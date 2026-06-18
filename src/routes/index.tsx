@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform, AnimatePresence, useMotionValue, useSp
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CanvasSequence } from "../components/CanvasSequence";
+import { ThreeMonogram } from "../components/ThreeMonogram";
 import { ChevronDown, Instagram, Youtube, Github, Linkedin, Mail, ArrowRight, Volume2, VolumeX, Menu, X, Loader2 } from "lucide-react";
 
 import { siteData } from "@/lib/site-data";
@@ -55,53 +56,21 @@ function Preloader({ monogram }: { monogram: string }) {
   const springY = useSpring(mouseY, { stiffness: 50, damping: 20 });
 
   useEffect(() => {
-    // Play cinematic zoom-in whoosh
-    const rumble = new Audio("/preloader_whoosh.mp3");
-    rumble.volume = 0.6;
-    
-    let hasPlayed = false;
-    const playAudio = () => {
-      if (!hasPlayed) {
-        rumble.play().then(() => {
-          hasPlayed = true;
-        }).catch(() => {});
-      }
-    };
-
-    // Try playing immediately (works if page was refreshed)
-    playAudio();
-
     const handleMouseMove = (e: MouseEvent) => {
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
-      playAudio(); // Also triggers audio if blocked initially
     };
     const handleTouchMove = (e: TouchEvent) => {
       mouseX.set(e.touches[0].clientX);
       mouseY.set(e.touches[0].clientY);
-      playAudio();
     };
 
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("touchmove", handleTouchMove);
-    window.addEventListener("click", playAudio);
     
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("touchmove", handleTouchMove);
-      window.removeEventListener("click", playAudio);
-      
-      // Smoothly fade out the rumble when preloader exits
-      let vol = rumble.volume;
-      const fadeInterval = setInterval(() => {
-        if (vol > 0.05) {
-          vol -= 0.05;
-          rumble.volume = vol;
-        } else {
-          clearInterval(fadeInterval);
-          rumble.pause();
-        }
-      }, 50);
     };
   }, [mouseX, mouseY]);
 
@@ -161,15 +130,7 @@ function Preloader({ monogram }: { monogram: string }) {
           transition={{ duration: 1, ease: EASE_OUT_EXPO }}
           className="flex justify-center items-center"
         >
-          <CanvasSequence
-            folderPath="/monogram-seq"
-            frameCount={146}
-            fps={30}
-            width={400}
-            height={225}
-            className="w-[300px] h-[300px] object-cover mix-blend-screen"
-            scrollScrub={false}
-          />
+          <ThreeMonogram />
         </motion.div>
 
         <div className="h-6 flex items-center justify-center">
