@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { ChevronDown, Instagram, Youtube, Github, Linkedin, Mail, ArrowRight, Volume2, VolumeX, Menu, X } from "lucide-react";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { ChevronDown, Instagram, Youtube, Github, Linkedin, Mail, ArrowRight, Volume2, VolumeX, Menu, X, Loader2 } from "lucide-react";
 
 import { siteData } from "@/lib/site-data";
 import { useContent } from "@/lib/use-content";
@@ -38,6 +38,36 @@ const staggerParent = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.12, delayChildren: 0.05 } },
 };
+
+/* ---------------- Preloader ---------------- */
+function Preloader({ monogram }: { monogram: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.8, ease: EASE_OUT_EXPO }}
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black"
+    >
+      <motion.div
+        animate={{ opacity: [0.5, 1, 0.5], scale: [0.98, 1, 0.98] }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        className="flex flex-col items-center gap-6"
+      >
+        <span className="font-serif text-5xl italic text-foreground">
+          {monogram}
+        </span>
+        <div className="h-0.5 w-12 overflow-hidden bg-white/10 rounded-full">
+          <motion.div
+            initial={{ x: "-100%" }}
+            animate={{ x: "100%" }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            className="h-full w-full bg-primary"
+          />
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
 
 /* ---------------- Header ---------------- */
 function Header({ data }: { data: ReturnType<typeof useContent> }) {
@@ -121,10 +151,12 @@ function Hero({
   data,
   activeAudioId,
   setActiveAudioId,
+  onMediaReady,
 }: {
   data: ReturnType<typeof useContent>;
   activeAudioId: string | null;
   setActiveAudioId: (id: string | null) => void;
+  onMediaReady?: () => void;
 }) {
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 800], [0, 200]);
@@ -155,12 +187,15 @@ function Hero({
             loop
             muted={isMuted}
             playsInline
+            onCanPlayThrough={onMediaReady}
+            onLoadedData={onMediaReady}
             className="h-[115%] w-full object-cover"
           />
         ) : (
           <img
             src={mediaUrl}
             alt=""
+            onLoad={onMediaReady}
             className="h-[115%] w-full object-cover"
           />
         )}
@@ -1177,11 +1212,27 @@ function WorkedWith({ data }: { data: ReturnType<typeof useContent> }) {
 function Index() {
   const data = useContent();
   const [activeAudioId, setActiveAudioId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fallback timeout to ensure site loads even if media is slow
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 4000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <main className="bg-background text-foreground antialiased">
-      <Header data={data} />
-      <Hero data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
+    <>
+      <AnimatePresence>
+        {isLoading && <Preloader monogram={data.brand.monogram} />}
+      </AnimatePresence>
+      <main className="bg-background text-foreground antialiased">
+        <Header data={data} />
+        <Hero 
+          data={data} 
+          activeAudioId={activeAudioId} 
+          setActiveAudioId={setActiveAudioId} 
+          onMediaReady={() => setIsLoading(false)}
+        />
       <SelectedWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
       <Clients data={data} />
       <Certifications data={data} />
@@ -1192,6 +1243,7 @@ function Index() {
       <About data={data} />
       <Testimonial data={data} />
       <CallToAction data={data} />
-    </main>
+      </main>
+    </>
   );
 }
