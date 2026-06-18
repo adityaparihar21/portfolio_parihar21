@@ -1,8 +1,7 @@
-import { useRef, Suspense, useMemo, useState, useEffect } from 'react';
+import { useRef, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Text3D, Center, Environment, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
-import gsap from 'gsap';
 
 /* ── Warm-cream serif "AP" mesh ── */
 function APText() {
@@ -65,112 +64,8 @@ function DynamicLights() {
   );
 }
 
-/* ── Glass Supernova Shatter Effect ── */
-function GlassSupernova({ triggerTransition }: { triggerTransition?: boolean }) {
-  const count = 400;
-  const meshRef = useRef<THREE.InstancedMesh>(null);
-  const flashLightRef = useRef<THREE.PointLight>(null);
-  const [exploded, setExploded] = useState(false);
-  const startTime = useRef(0);
-  
-  const dummy = useMemo(() => new THREE.Object3D(), []);
-  const shards = useMemo(() => {
-    const data = [];
-    for (let i = 0; i < count; i++) {
-      // Spawn clustered around the AP logo center
-      const x = (Math.random() - 0.5) * 2.5;
-      const y = (Math.random() - 0.5) * 1.5;
-      const z = (Math.random() - 0.5) * 0.5;
-      
-      // Explode heavily outwards towards the camera
-      const dir = new THREE.Vector3(x * 1.5, y * 1.5, z + 2.0).normalize();
-      const speed = 0.08 + Math.random() * 0.25;
-      
-      const rx = (Math.random() - 0.5) * 0.8;
-      const ry = (Math.random() - 0.5) * 0.8;
-      const rz = (Math.random() - 0.5) * 0.8;
-      
-      data.push({ pos: new THREE.Vector3(x, y, z), dir, speed, rx, ry, rz, rot: new THREE.Euler() });
-    }
-    return data;
-  }, []);
-
-  useEffect(() => {
-    // Pre-initialize matrices so they exist in GPU memory before explosion
-    if (meshRef.current) {
-      shards.forEach((shard, i) => {
-        dummy.position.copy(shard.pos);
-        dummy.rotation.copy(shard.rot);
-        dummy.scale.set(1, 1, 1);
-        dummy.updateMatrix();
-        meshRef.current!.setMatrixAt(i, dummy.matrix);
-      });
-      meshRef.current.instanceMatrix.needsUpdate = true;
-    }
-  }, [shards, dummy]);
-
-  useEffect(() => {
-    if (triggerTransition) {
-       setExploded(true);
-       startTime.current = performance.now();
-       
-       if (flashLightRef.current) {
-          gsap.fromTo(flashLightRef.current, 
-            { intensity: 0 }, 
-            { intensity: 10000, duration: 0.15, yoyo: true, repeat: 1, ease: "power4.out" }
-          );
-       }
-    }
-  }, [triggerTransition]);
-
-  useFrame(() => {
-    if (exploded && meshRef.current) {
-      const elapsed = (performance.now() - startTime.current) / 1000;
-      
-      shards.forEach((shard, i) => {
-        // Ease-in shattering: Start very slow, and violently accelerate over time
-        const acceleration = Math.pow(elapsed * 1.5, 3); // Cubed for aggressive ease-in curve
-        const currentSpeed = shard.speed * (0.05 + acceleration);
-        shard.pos.addScaledVector(shard.dir, currentSpeed);
-        
-        shard.rot.x += shard.rx;
-        shard.rot.y += shard.ry;
-        shard.rot.z += shard.rz;
-        
-        dummy.position.copy(shard.pos);
-        dummy.rotation.copy(shard.rot);
-        
-        // Shrink to dust
-        const scale = Math.max(0, 1.0 - elapsed * 0.5);
-        dummy.scale.set(scale, scale, scale);
-        
-        dummy.updateMatrix();
-        meshRef.current!.setMatrixAt(i, dummy.matrix);
-      });
-      meshRef.current.instanceMatrix.needsUpdate = true;
-    }
-  });
-
-  return (
-    <>
-      <pointLight ref={flashLightRef} position={[0, 0, 1]} intensity={0} color="#ffffff" distance={30} />
-      <instancedMesh ref={meshRef} args={[undefined, undefined, count]} visible={exploded}>
-        <tetrahedronGeometry args={[0.08, 0]} />
-        <meshStandardMaterial 
-          color="#FFD700" 
-          emissive="#CCAA00"
-          emissiveIntensity={0.5}
-          metalness={0.9} 
-          roughness={0.1} 
-          envMapIntensity={4.0} 
-        />
-      </instancedMesh>
-    </>
-  );
-}
-
 /* ── Main exported component ── */
-export default function AP3DMonogram({ className = '', triggerTransition = false }: { className?: string, triggerTransition?: boolean }) {
+export default function AP3DMonogram({ className = '' }: { className?: string }) {
   return (
     <div className={`w-full h-full cursor-grab active:cursor-grabbing ${className}`}>
       <Canvas
@@ -182,16 +77,11 @@ export default function AP3DMonogram({ className = '', triggerTransition = false
         <Suspense fallback={null}>
           <DynamicLights />
           <Environment preset="apartment" />
-          
-          {/* Hide solid text immediately when explosion starts */}
-          {!triggerTransition && <APText />}
-          
-          <GlassSupernova triggerTransition={triggerTransition} />
-          
+          <APText />
           <OrbitControls 
             enableZoom={false} 
             enablePan={false} 
-            autoRotate={!triggerTransition} 
+            autoRotate 
             autoRotateSpeed={2} 
             makeDefault 
           />

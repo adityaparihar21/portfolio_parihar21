@@ -89,30 +89,11 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
         audioRef.current.volume = 0.85;
       }
       audioRef.current.play().catch(e => console.warn("Audio playback blocked", e));
-      
-      // Play speedy spin/whoosh sound effect
-      const spinAudio = new Audio('/coin_flip.mp3');
-      spinAudio.volume = 0.6;
-      spinAudio.play().catch(e => console.warn("Spin audio blocked", e));
 
       const runTransition = async () => {
-        // Fade out text UI quickly
+        // Fade out monogram and text
         gsap.to(".preloader-content", { opacity: 0, duration: 0.8, ease: "power2.out" });
         
-        // SHATTER SUPERNOVA: Expand the canvas so shards fly across the entire screen
-        gsap.to(".preloader-monogram", {
-          scale: 8, // Expand container massively so WebGL clipping doesn't hide the explosion
-          duration: 2.5,
-          ease: "power3.in" // Accelerates outward
-        });
-
-        gsap.to(".preloader-monogram", {
-          opacity: 0, 
-          duration: 0.5,
-          delay: 2.0, // Fade out only right at the end of the explosion
-          ease: "power2.inOut"
-        });
-
         // Smooth fade out and slight zoom for the new interior video
         gsap.to(".preloader-bg", { 
           scale: 1.1, 
@@ -189,16 +170,14 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
       />
 
       {/* 3D Monogram - Exactly Centered */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-[280px] h-[160px] md:w-[460px] md:h-[280px] lg:w-[560px] lg:h-[340px]">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.85 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
-          className="preloader-monogram w-full h-full origin-center"
-        >
-          <AP3DMonogram triggerTransition={triggerTransition} />
-        </motion.div>
-      </div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.85 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-[280px] h-[160px] md:w-[460px] md:h-[280px] lg:w-[560px] lg:h-[340px] drop-shadow-2xl"
+      >
+        <AP3DMonogram />
+      </motion.div>
 
       {/* Loading & Enter UI - Positioned at Bottom */}
       <div className="absolute bottom-20 md:bottom-28 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-6 w-full px-6 preloader-content pointer-events-none">
