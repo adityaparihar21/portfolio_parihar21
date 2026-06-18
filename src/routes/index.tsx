@@ -114,9 +114,12 @@ function Preloader({ monogram, triggerTransition, onComplete }: { monogram: stri
         transition={{ duration: 5, ease: "easeOut" }}
         className="preloader-bg absolute inset-0 z-0 pointer-events-none origin-center"
       >
-        <img
-          src="/preloader_clouds_v2.jpg"
-          alt="Cinematic Clouds"
+        <video
+          src="/preloader_clouds_v2.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
           className="h-full w-full object-cover opacity-80"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
