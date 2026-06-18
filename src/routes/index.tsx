@@ -93,6 +93,7 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
       const runTransition = async () => {
         // Fade out monogram and text
         gsap.to(".preloader-content", { opacity: 0, duration: 0.8, ease: "power2.out" });
+        gsap.to(".preloader-coin", { opacity: 0, scale: 1.1, duration: 1.5, ease: "power2.inOut" });
         
         // Smooth fade out and slight zoom for the new interior video
         gsap.to(".preloader-bg", { 
@@ -174,7 +175,7 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
         initial={{ opacity: 0, scale: 0.85 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
-        className="absolute inset-0 z-10 drop-shadow-2xl pointer-events-auto"
+        className="preloader-coin absolute inset-0 z-10 drop-shadow-2xl pointer-events-auto"
       >
         <AP3DMonogram />
       </motion.div>
