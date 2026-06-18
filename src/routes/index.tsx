@@ -219,33 +219,35 @@ function Header({ data, isLoading }: { data: ReturnType<typeof useContent>; isLo
     >
       <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-6 md:px-12">
         <a href="#top" className="flex items-center gap-2" onClick={() => setMenuOpen(false)}>
-          <motion.span 
-            className="font-serif text-2xl italic text-foreground inline-block origin-center"
+          <motion.div
+            className="origin-top-left mix-blend-screen"
             initial={{ 
-              y: "40vh",
+              y: "35vh",
               x: "calc(50vw - 32px - 50%)", 
-              scale: 4.5, 
+              scale: 5, 
               opacity: 0,
-              rotateY: 540,
-              rotateX: 20
             }}
             animate={{ 
-              y: isLoading ? "40vh" : 0, 
+              y: isLoading ? "35vh" : 0, 
               x: isLoading ? "calc(50vw - 32px - 50%)" : 0,
-              scale: isLoading ? 4.5 : 1, 
+              scale: isLoading ? 5 : 1, 
               opacity: 1,
-              rotateY: isLoading ? 540 : 0,
-              rotateX: isLoading ? 20 : 0
             }}
             transition={{ 
-              duration: 2, 
+              duration: 2.2, 
               ease: [0.25, 1, 0.5, 1],
               opacity: { duration: 1 }
             }}
-            style={{ transformPerspective: 1200, transformStyle: "preserve-3d" }}
           >
-            {data.brand.monogram}
-          </motion.span>
+            <video 
+              src="/apmonogram.mp4" 
+              autoPlay 
+              muted 
+              loop 
+              playsInline 
+              className="w-[120px] object-contain pointer-events-none"
+            />
+          </motion.div>
         </a>
         <nav className="hidden items-center gap-10 md:flex">
           {data.brand.nav.map((item, i) => (
@@ -1423,13 +1425,17 @@ function Index() {
     const maxTimer = setTimeout(() => setIsLoading(false), 4500);
     
     return () => {
-      clearTimeout(minTimer);
       clearTimeout(maxTimer);
     };
   }, []);
 
   useEffect(() => {
-    // Only dismiss the loading screen if the hero video is ready AND 2.5 seconds have passed
+    const timer = setTimeout(() => setMinTimeElapsed(true), 4500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    // Only dismiss the loading screen if the hero video is ready AND min time passed
     if (mediaReady && minTimeElapsed) {
       setIsLoading(false);
       
