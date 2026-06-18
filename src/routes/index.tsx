@@ -112,7 +112,7 @@ function Preloader({ monogram }: { monogram: string }) {
   return (
     <motion.div
       initial={{ opacity: 1, scale: 1, filter: "blur(0px) brightness(1)" }}
-      exit={{ opacity: 0, scale: 8, filter: "blur(20px) brightness(2)" }}
+      exit={{ opacity: 0, filter: "blur(10px) brightness(1.2)" }}
       transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black overflow-hidden cursor-none"
     >
@@ -120,7 +120,7 @@ function Preloader({ monogram }: { monogram: string }) {
       <motion.div
         initial={{ opacity: 0, scale: 1, y: 0 }}
         animate={{ opacity: 1, scale: 2.5, y: "-15%" }}
-        exit={{ opacity: 0, scale: 6, y: "-25%", filter: "blur(20px)" }}
+        exit={{ opacity: 0, filter: "blur(10px)" }}
         transition={{ duration: 5, ease: "easeOut" }}
         className="absolute inset-0 z-0 pointer-events-none origin-center"
       >
@@ -1404,7 +1404,7 @@ function Index() {
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => setMinTimeElapsed(true), 2500);
+    const timer = setTimeout(() => setMinTimeElapsed(true), 1200);
     return () => clearTimeout(timer);
   }, []);
 
