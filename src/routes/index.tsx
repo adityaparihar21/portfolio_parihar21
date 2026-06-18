@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform, AnimatePresence, useMotionValue, useSp
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CanvasSequence } from "../components/CanvasSequence";
+import { WebGLTransition, WebGLTransitionRef } from "../components/WebGLTransition";
 import { ChevronDown, Instagram, Youtube, Github, Linkedin, Mail, ArrowRight, Volume2, VolumeX, Menu, X, Loader2 } from "lucide-react";
 
 import { siteData } from "@/lib/site-data";
@@ -43,10 +44,11 @@ const staggerParent = {
 };
 
 /* ---------------- Preloader ---------------- */
-function Preloader({ monogram }: { monogram: string }) {
+function Preloader({ monogram, triggerTransition, onComplete }: { monogram: string, triggerTransition: boolean, onComplete: () => void }) {
   const [index, setIndex] = useState(0);
   const words = ["Code.", "Vision.", "Cinematography."];
   const videoRef = useRef<HTMLVideoElement>(null);
+  const webGLRef = useRef<WebGLTransitionRef>(null);
 
   // Smooth mouse tracking for the light spotlight
   const mouseX = useMotionValue(typeof window !== "undefined" ? window.innerWidth / 2 : 0);
@@ -80,6 +82,22 @@ function Preloader({ monogram }: { monogram: string }) {
     }
   }, [index, words.length]);
 
+  useEffect(() => {
+    if (triggerTransition) {
+      const runTransition = async () => {
+        // Fade out monogram and text
+        gsap.to(".preloader-content", { opacity: 0, duration: 0.8, ease: "power2.out" });
+        
+        if (webGLRef.current) {
+          await webGLRef.current.startTransition();
+        }
+        
+        onComplete();
+      };
+      runTransition();
+    }
+  }, [triggerTransition, onComplete]);
+
   return (
     <motion.div
       initial={{ opacity: 1, scale: 1, filter: "blur(0px) brightness(1)" }}
@@ -87,29 +105,9 @@ function Preloader({ monogram }: { monogram: string }) {
       transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black overflow-hidden cursor-none"
     >
-      {/* Cloud Video Background */}
-      <motion.div
-        initial={{ opacity: 0, scale: 1, y: 0 }}
-        animate={{ opacity: 1, scale: 2.5, y: "-15%" }}
-        exit={{ opacity: 0, filter: "blur(10px)" }}
-        transition={{ duration: 5, ease: "easeOut" }}
-        className="absolute inset-0 z-0 pointer-events-none origin-center"
-      >
-        <img
-          src="/preloader_clouds_v2.jpg"
-          alt="Cinematic Clouds"
-          className="h-full w-full object-cover opacity-80"
-        />
-        {/* Cinematic Film Grain Overlay (Ultra-Subtle) */}
-        <div 
-          className="absolute inset-0 z-0 opacity-[0.04] mix-blend-normal pointer-events-none" 
-          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
-        />
-        {/* Subtle, reduced vignette */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent" />
-      </motion.div>
-
+      {/* WebGL Background */}
+      <WebGLTransition ref={webGLRef} />
+      
       {/* Interactive Spotlight */}
       <motion.div 
         className="pointer-events-none absolute z-0 h-[800px] w-[800px] rounded-full opacity-40"
@@ -122,7 +120,7 @@ function Preloader({ monogram }: { monogram: string }) {
         }}
       />
 
-      <div className="z-10 flex flex-col items-center gap-4 pointer-events-none">
+      <div className="z-10 flex flex-col items-center gap-4 pointer-events-none preloader-content">
         <motion.h1
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -1357,6 +1355,7 @@ function Index() {
   const [isLoading, setIsLoading] = useState(true);
   const [mediaReady, setMediaReady] = useState(false);
   const [minTimeElapsed, setMinTimeElapsed] = useState(false);
+  const [isPreloaderMounted, setIsPreloaderMounted] = useState(true);
 
   useEffect(() => {
     // Clear hash on mount so browser doesn't forcefully auto-scroll to an anchor (like #work) on refresh
@@ -1402,7 +1401,13 @@ function Index() {
   return (
     <div className="bg-black min-h-screen">
       <AnimatePresence>
-        {isLoading && <Preloader monogram={data.brand.monogram} />}
+        {isPreloaderMounted && (
+          <Preloader 
+            monogram={data.brand.monogram} 
+            triggerTransition={!isLoading}
+            onComplete={() => setIsPreloaderMounted(false)}
+          />
+        )}
       </AnimatePresence>
       <motion.div 
         className="relative min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary"
