@@ -195,7 +195,7 @@ function Preloader({ monogram }: { monogram: string }) {
 }
 
 /* ---------------- Header ---------------- */
-function Header({ data }: { data: ReturnType<typeof useContent> }) {
+function Header({ data, isLoading }: { data: ReturnType<typeof useContent>; isLoading: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -219,9 +219,29 @@ function Header({ data }: { data: ReturnType<typeof useContent> }) {
     >
       <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-6 md:px-12">
         <a href="#top" className="flex items-center gap-2" onClick={() => setMenuOpen(false)}>
-          <span className="font-serif text-2xl italic text-foreground">
+          <motion.span 
+            className="font-serif text-2xl italic text-foreground"
+            initial={{ 
+              y: "45vh", 
+              scale: 4, 
+              opacity: 0,
+              rotateX: 15
+            }}
+            animate={{ 
+              y: isLoading ? "45vh" : 0, 
+              scale: isLoading ? 4 : 1, 
+              opacity: isLoading ? 0 : 1,
+              rotateX: isLoading ? 15 : 0
+            }}
+            transition={{ 
+              duration: 1.8, 
+              ease: [0.76, 0, 0.24, 1],
+              delay: isLoading ? 0 : 0.3
+            }}
+            style={{ transformPerspective: 800 }}
+          >
             {data.brand.monogram}
-          </span>
+          </motion.span>
         </a>
         <nav className="hidden items-center gap-10 md:flex">
           {data.brand.nav.map((item, i) => (
@@ -1431,15 +1451,8 @@ function Index() {
       </AnimatePresence>
       <motion.div 
         className="relative min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary"
-        initial={{ opacity: 0, scale: 0.92, filter: "blur(8px)" }}
-        animate={{ 
-          opacity: isLoading ? 0 : 1, 
-          scale: isLoading ? 0.92 : 1, 
-          filter: isLoading ? "blur(8px)" : "blur(0px)" 
-        }}
-        transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
       >
-        <Header data={data} />
+        <Header data={data} isLoading={isLoading} />
         <Hero 
           data={data} 
           activeAudioId={activeAudioId} 
