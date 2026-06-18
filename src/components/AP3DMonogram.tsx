@@ -196,7 +196,7 @@ function APCoin() {
   };
 
   return (
-    <group scale={0} ref={coinRef}> {/* Starts at 0, spring-animated to TARGET_SCALE */}
+    <group scale={0} ref={coinRef} position={[0.15, 0, 0]}> {/* Nudged right to optically center the AP text */}
       {/* The Solid Coin Base */}
       <mesh rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[2.0, 2.0, 0.35, 128]} />
