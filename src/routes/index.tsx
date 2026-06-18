@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useRef } from "react";
 import { motion, useScroll, useTransform, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { CanvasSequence } from "../components/CanvasSequence";
 import { ChevronDown, Instagram, Youtube, Github, Linkedin, Mail, ArrowRight, Volume2, VolumeX, Menu, X, Loader2 } from "lucide-react";
 
 import { siteData } from "@/lib/site-data";
@@ -152,14 +155,22 @@ function Preloader({ monogram }: { monogram: string }) {
       />
 
       <div className="z-10 flex flex-col items-center gap-4 pointer-events-none">
-        <motion.h1
+        <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, ease: EASE_OUT_EXPO }}
-          className="inline-block px-4 py-2 font-serif text-7xl md:text-9xl italic tracking-wide text-foreground drop-shadow-2xl leading-none"
+          className="flex justify-center items-center"
         >
-          {monogram}
-        </motion.h1>
+          <CanvasSequence
+            folderPath="/monogram-seq"
+            frameCount={300}
+            fps={30}
+            width={400}
+            height={225}
+            className="w-[300px] h-[300px] object-cover mix-blend-screen"
+            scrollScrub={false}
+          />
+        </motion.div>
 
         <div className="h-6 flex items-center justify-center">
           <AnimatePresence mode="wait">
@@ -219,9 +230,15 @@ function Header({ data, isLoading }: { data: ReturnType<typeof useContent>; isLo
     >
       <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-6 md:px-12">
         <a href="#top" className="flex items-center gap-2" onClick={() => setMenuOpen(false)}>
-          <span className="font-serif text-2xl italic text-foreground inline-block">
-            {data.brand.monogram}
-          </span>
+          <CanvasSequence
+            folderPath="/monogram-seq"
+            frameCount={300}
+            fps={30}
+            width={400}
+            height={225}
+            className="w-20 h-20 object-cover mix-blend-screen -ml-6"
+            scrollScrub={true}
+          />
         </a>
         <nav className="hidden items-center gap-10 md:flex">
           {data.brand.nav.map((item, i) => (
@@ -307,17 +324,30 @@ function Hero({
     >
       <motion.div style={{ y, scale }} className="absolute inset-0">
         {isVideo ? (
-          <video
-            src={mediaUrl}
-            poster={mediaUrl.substring(0, mediaUrl.lastIndexOf('.')) + '_poster.jpg'}
-            autoPlay
-            loop
-            muted={isMuted}
-            playsInline
-            onCanPlayThrough={onMediaReady}
-            onLoadedData={onMediaReady}
-            className="h-[115%] w-full object-cover"
-          />
+          mediaUrl === "/DARK.mp4" ? (
+            <CanvasSequence
+              folderPath="/hero-seq"
+              frameCount={75}
+              fps={15}
+              width={720}
+              height={307}
+              className="h-[115%] w-full object-cover"
+              onReady={onMediaReady}
+              scrollScrub={false}
+            />
+          ) : (
+            <video
+              src={mediaUrl}
+              poster={mediaUrl.substring(0, mediaUrl.lastIndexOf('.')) + '_poster.jpg'}
+              autoPlay
+              loop
+              muted={isMuted}
+              playsInline
+              onCanPlayThrough={onMediaReady}
+              onLoadedData={onMediaReady}
+              className="h-[115%] w-full object-cover"
+            />
+          )
         ) : (
           <img
             src={mediaUrl}
