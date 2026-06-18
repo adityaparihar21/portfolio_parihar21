@@ -99,14 +99,12 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
         // Fade out text UI quickly
         gsap.to(".preloader-content", { opacity: 0, duration: 0.8, ease: "power2.out" });
         
-        // WARP SPEED MONOGRAM: Spin wildly and shoot directly into the camera lens!
+        // SHATTER SUPERNOVA: The 3D component handles the explosion, we just fade the canvas at the very end
         gsap.to(".preloader-monogram", {
-          scale: 150, // Massive scale to fly "through" the hole
-          rotation: 720, // Spin wildly
           opacity: 0, 
-          transformOrigin: "62% 48%", // Aiming perfectly for the hole in the 'P'
-          duration: 2.5,
-          ease: "power3.in" // Start slow, accelerate to warp speed
+          duration: 1.0,
+          delay: 1.5, // Fade out only after shards have exploded
+          ease: "power2.inOut"
         });
 
         // Smooth fade out and slight zoom for the new interior video
@@ -192,7 +190,7 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
           transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
           className="preloader-monogram w-full h-full origin-center"
         >
-          <AP3DMonogram />
+          <AP3DMonogram triggerTransition={triggerTransition} />
         </motion.div>
       </div>
 
