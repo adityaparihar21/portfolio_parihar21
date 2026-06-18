@@ -303,6 +303,7 @@ function Hero({
             loop
             muted={isMuted}
             playsInline
+            preload="auto"
             onCanPlayThrough={onMediaReady}
             onLoadedData={onMediaReady}
             className="h-[115%] w-full object-cover"
