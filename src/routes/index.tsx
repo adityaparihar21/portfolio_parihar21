@@ -163,7 +163,7 @@ function Preloader({ monogram }: { monogram: string }) {
         >
           <CanvasSequence
             folderPath="/monogram-seq"
-            frameCount={300}
+            frameCount={146}
             fps={30}
             width={400}
             height={225}
@@ -232,7 +232,7 @@ function Header({ data, isLoading }: { data: ReturnType<typeof useContent>; isLo
         <a href="#top" className="flex items-center gap-2" onClick={() => setMenuOpen(false)}>
           <CanvasSequence
             folderPath="/monogram-seq"
-            frameCount={300}
+            frameCount={146}
             fps={30}
             width={400}
             height={225}
