@@ -82,18 +82,18 @@ function Preloader({ monogram }: { monogram: string }) {
 
   return (
     <motion.div
-      initial={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
+      initial={{ opacity: 1, filter: "brightness(1) contrast(1)" }}
+      exit={{ opacity: 0, filter: "brightness(3) contrast(2)", scale: 1.05 }}
+      transition={{ duration: 1, ease: "easeInOut" }}
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black overflow-hidden cursor-none"
     >
       {/* Cloud Video Background */}
       <motion.div
-        initial={{ opacity: 0, scale: 1 }}
-        animate={{ opacity: 1, scale: 1.15 }}
-        exit={{ opacity: 0, scale: 1.25 }}
-        transition={{ duration: 4, ease: "easeOut" }}
-        className="absolute inset-0 z-0 pointer-events-none"
+        initial={{ opacity: 0, scale: 1, y: 0 }}
+        animate={{ opacity: 1, scale: 2.5, y: "-15%" }}
+        exit={{ opacity: 0, scale: 6, y: "-25%", filter: "blur(20px)" }}
+        transition={{ duration: 5, ease: "easeOut" }}
+        className="absolute inset-0 z-0 pointer-events-none origin-center"
       >
         <video
           ref={videoRef}
