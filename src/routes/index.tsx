@@ -165,7 +165,7 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
         initial={{ opacity: 0, scale: 0.85 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-[260px] h-[160px] md:w-[420px] md:h-[240px] drop-shadow-2xl"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-[280px] h-[160px] md:w-[460px] md:h-[280px] lg:w-[560px] lg:h-[340px] drop-shadow-2xl"
       >
         <AP3DMonogram />
       </motion.div>
