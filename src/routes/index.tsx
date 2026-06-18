@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CanvasSequence } from "../components/CanvasSequence";
 import DomeGallery from "../components/DomeGallery";
+import AP3DMonogram from "../components/AP3DMonogram";
 import { ChevronDown, Instagram, Youtube, Github, Linkedin, Mail, ArrowRight, Volume2, VolumeX, Menu, X, Loader2 } from "lucide-react";
 
 import { siteData } from "@/lib/site-data";
@@ -142,14 +143,14 @@ function Preloader({ monogram, triggerTransition, onComplete }: { monogram: stri
       />
 
       <div className="z-10 flex flex-col items-center gap-4 pointer-events-none preloader-content">
-        <motion.h1
-          initial={{ opacity: 0, scale: 0.95 }}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.85 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, ease: EASE_OUT_EXPO }}
-          className="inline-block px-4 py-2 font-serif text-7xl md:text-9xl italic tracking-wide text-foreground drop-shadow-2xl leading-none"
+          transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
+          className="w-[260px] h-[160px] md:w-[420px] md:h-[240px] drop-shadow-2xl"
         >
-          AP
-        </motion.h1>
+          <AP3DMonogram />
+        </motion.div>
 
         <div className="h-6 flex items-center justify-center">
           <AnimatePresence mode="wait">
