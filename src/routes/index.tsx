@@ -52,9 +52,9 @@ function Preloader({ monogram }: { monogram: string }) {
   const springY = useSpring(mouseY, { stiffness: 50, damping: 20 });
 
   useEffect(() => {
-    // Play cinematic atmospheric wind/rumble
-    const rumble = new Audio("/preloader_rumble.mp3");
-    rumble.volume = 0.5;
+    // Play cinematic zoom-in whoosh
+    const rumble = new Audio("/preloader_whoosh.mp3");
+    rumble.volume = 0.6;
     
     let hasPlayed = false;
     const playAudio = () => {
@@ -111,9 +111,9 @@ function Preloader({ monogram }: { monogram: string }) {
 
   return (
     <motion.div
-      initial={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: "-30%" }}
-      transition={{ duration: 1.4, ease: [0.76, 0, 0.24, 1] }}
+      initial={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+      exit={{ opacity: 0, y: "-40%", scale: 1.15, filter: "blur(12px)" }}
+      transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black overflow-hidden cursor-none"
     >
       {/* Cloud Video Background */}
@@ -1431,9 +1431,9 @@ function Index() {
       </AnimatePresence>
       <motion.div 
         className="relative min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: isLoading ? 0 : 1 }}
-        transition={{ duration: 1.4, ease: [0.76, 0, 0.24, 1] }}
+        initial={{ opacity: 0, scale: 1.03, filter: "blur(6px)" }}
+        animate={{ opacity: isLoading ? 0 : 1, scale: isLoading ? 1.03 : 1, filter: isLoading ? "blur(6px)" : "blur(0px)" }}
+        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
       >
         <Header data={data} />
         <Hero 
