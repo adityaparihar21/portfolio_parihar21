@@ -25,13 +25,13 @@ function APCoin() {
       </mesh>
 
       {/* The Thick Raised Outer Lip of the Coin */}
-      <mesh rotation={[Math.PI / 2, 0, 0]}>
+      <mesh>
         <torusGeometry args={[1.9, 0.15, 64, 64]} />
         {coinMaterial}
       </mesh>
       
       {/* The Inner Decorative Thin Ring (Classic old coin style) */}
-      <mesh rotation={[Math.PI / 2, 0, 0]}>
+      <mesh>
         <torusGeometry args={[1.7, 0.04, 32, 64]} />
         {coinMaterial}
       </mesh>
