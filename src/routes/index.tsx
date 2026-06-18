@@ -48,6 +48,7 @@ const staggerParent = {
 /* ---------------- Preloader ---------------- */
 function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter, countdown }: { monogram: string, triggerTransition: boolean, onComplete: () => void, showEnter: boolean, onEnter: () => void, countdown: number }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Smooth mouse tracking for the light spotlight
   const mouseX = useMotionValue(typeof window !== "undefined" ? window.innerWidth / 2 : 0);
@@ -82,10 +83,12 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
 
   useEffect(() => {
     if (triggerTransition) {
-      // Play cinematic riser SFX
-      const audio = new Audio('/riser.mp3');
-      audio.volume = 0.85;
-      audio.play().catch(e => console.warn("Audio playback blocked", e));
+      // Play cinematic riser SFX safely to prevent overlaps
+      if (!audioRef.current) {
+        audioRef.current = new Audio('/riser.mp3');
+        audioRef.current.volume = 0.85;
+      }
+      audioRef.current.play().catch(e => console.warn("Audio playback blocked", e));
 
       const runTransition = async () => {
         // Fade out monogram and text
@@ -95,15 +98,29 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
         gsap.to(".preloader-bg", { 
           scale: 1.1, 
           opacity: 0, 
-          duration: 3.0, // Perfectly synced to the 3.04s audio riser peak
+          duration: 2.5, 
           ease: "power2.inOut",
           onComplete: () => {
-            audio.pause();
+            if (audioRef.current) {
+              // Rapidly fade out audio so it never bleeds into home page
+              gsap.to(audioRef.current, {
+                volume: 0,
+                duration: 0.3,
+                onComplete: () => audioRef.current?.pause()
+              });
+            }
             onComplete();
           } 
         });
       };
       runTransition();
+
+      return () => {
+        // Cleanup function to prevent ghost audio if component unmounts
+        if (audioRef.current) {
+          audioRef.current.pause();
+        }
+      };
     }
   }, [triggerTransition, onComplete]);
 
