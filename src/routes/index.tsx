@@ -89,6 +89,11 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
         audioRef.current.volume = 0.85;
       }
       audioRef.current.play().catch(e => console.warn("Audio playback blocked", e));
+      
+      // Play speedy spin/whoosh sound effect
+      const spinAudio = new Audio('/coin_flip.mp3');
+      spinAudio.volume = 0.6;
+      spinAudio.play().catch(e => console.warn("Spin audio blocked", e));
 
       const runTransition = async () => {
         // Fade out text UI quickly
@@ -185,7 +190,7 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
           initial={{ opacity: 0, scale: 0.85 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
-          className="preloader-monogram w-full h-full drop-shadow-2xl origin-center"
+          className="preloader-monogram w-full h-full origin-center"
         >
           <AP3DMonogram />
         </motion.div>
