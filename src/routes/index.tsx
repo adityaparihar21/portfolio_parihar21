@@ -220,7 +220,7 @@ function Header({ data, isLoading }: { data: ReturnType<typeof useContent>; isLo
       <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-6 md:px-12">
         <a href="#top" className="flex items-center gap-2" onClick={() => setMenuOpen(false)}>
           <motion.div
-            className="origin-top-left mix-blend-screen"
+            className="origin-top-left"
             initial={{ 
               y: "35vh",
               x: "calc(50vw - 32px - 50%)", 
@@ -240,7 +240,7 @@ function Header({ data, isLoading }: { data: ReturnType<typeof useContent>; isLo
             }}
           >
             <video 
-              src="/apmonogram.mp4" 
+              src="/apmonogram.webm" 
               autoPlay 
               muted 
               loop 
@@ -1464,10 +1464,17 @@ function Index() {
       <AnimatePresence>
         {isLoading && <Preloader monogram={data.brand.monogram} />}
       </AnimatePresence>
+      <Header data={data} isLoading={isLoading} />
       <motion.div 
-        className="relative min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary"
+        className="relative min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary pt-24"
+        initial={{ opacity: 0, scale: 0.92, filter: "blur(8px)" }}
+        animate={{ 
+          opacity: isLoading ? 0 : 1, 
+          scale: isLoading ? 0.92 : 1, 
+          filter: isLoading ? "blur(8px)" : "blur(0px)" 
+        }}
+        transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
       >
-        <Header data={data} isLoading={isLoading} />
         <Hero 
           data={data} 
           activeAudioId={activeAudioId} 
