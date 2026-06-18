@@ -343,7 +343,8 @@
       {
         "name": "UPES",
         "description": "The University of Petroleum and Energy Studies, a prestigious private university in Dehradun recognized for its specialized, industry-aligned academic programs.",
-        "logo": "/logos/upes.jpg"
+        "logo": "/logos/upes.jpg",
+        "href": "#upes-social"
       }
     ]
   }
