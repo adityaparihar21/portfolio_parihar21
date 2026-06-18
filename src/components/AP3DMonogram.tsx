@@ -131,7 +131,8 @@ function APCoin() {
 
   // Entrance animation state
   const entranceRef = useRef({ elapsed: 0, done: false });
-  const TARGET_SCALE = 0.15; // Compact logo size — similar to a premium brand logo on big screens
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const TARGET_SCALE = isMobile ? 0.10 : 0.15; // Smaller on phones to prevent cropping
 
   // Smooth entrance + auto-rotation with ramp-up
   useFrame((state, delta) => {
@@ -196,7 +197,7 @@ function APCoin() {
   };
 
   return (
-    <group scale={0} ref={coinRef} position={[0.4, 0, 0]}> {/* Nudged right to optically center the AP text */}
+    <group scale={0} ref={coinRef}> {/* Centered perfectly at origin */}
       {/* The Solid Coin Base */}
       <mesh rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[2.0, 2.0, 0.35, 128]} />
@@ -361,6 +362,8 @@ export default function AP3DMonogram({ className = '' }: { className?: string })
             enablePan={false}
             enableRotate={true}
             target={[0, 0, 0]}
+            minPolarAngle={Math.PI / 2} // Lock to horizon
+            maxPolarAngle={Math.PI / 2} // Prevent flipping upside down
             makeDefault
           />
         </Suspense>
