@@ -41,30 +41,73 @@ const staggerParent = {
 
 /* ---------------- Preloader ---------------- */
 function Preloader({ monogram }: { monogram: string }) {
+  const [index, setIndex] = useState(0);
+  const words = ["Code.", "Vision.", "Cinematography.", monogram];
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
+  useEffect(() => {
+    if (index < words.length - 1) {
+      const timer = setTimeout(() => setIndex(index + 1), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [index, words.length]);
+
   return (
     <motion.div
       initial={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black"
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black overflow-hidden cursor-none"
     >
-      <motion.div
-        animate={{ opacity: [0.3, 1, 0.3], scale: [0.97, 1, 0.97] }}
-        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-        className="flex flex-col items-center gap-8 md:gap-10"
-      >
-        <span className="font-serif text-7xl md:text-9xl italic tracking-wide text-foreground drop-shadow-2xl">
-          {monogram}
-        </span>
-        <div className="h-[2px] w-24 md:w-32 overflow-hidden bg-white/10 rounded-full">
+      {/* Interactive Spotlight */}
+      <motion.div 
+        className="pointer-events-none absolute inset-0 z-0 opacity-60"
+        animate={{
+          background: `radial-gradient(circle 600px at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.07), transparent 80%)`
+        }}
+        transition={{ type: "tween", ease: "backOut", duration: 0.15 }}
+      />
+
+      <div className="z-10 flex flex-col items-center gap-8 md:gap-10 pointer-events-none">
+        <div className="h-32 flex items-center justify-center">
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={index}
+              initial={{ opacity: 0, y: 15, filter: "blur(8px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: -15, filter: "blur(8px)" }}
+              transition={{ duration: 0.4, ease: EASE_OUT_EXPO }}
+              className={`font-serif tracking-wide text-foreground drop-shadow-2xl ${
+                index === words.length - 1 ? "text-7xl md:text-9xl italic" : "text-4xl md:text-6xl text-foreground/80"
+              }`}
+            >
+              {words[index]}
+            </motion.span>
+          </AnimatePresence>
+        </div>
+        
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 1 }}
+          className="h-[2px] w-24 md:w-32 overflow-hidden bg-white/10 rounded-full"
+        >
           <motion.div
             initial={{ x: "-100%" }}
             animate={{ x: "100%" }}
             transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
             className="h-full w-full bg-primary"
           />
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </motion.div>
   );
 }
