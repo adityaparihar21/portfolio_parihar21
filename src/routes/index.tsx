@@ -92,7 +92,7 @@ function Preloader({ monogram }: { monogram: string }) {
         className="absolute inset-0 z-0 pointer-events-none mix-blend-screen"
       >
         <video
-          src="/preloader_clouds.mp4"
+          src="/preloader_clouds_v2.mp4"
           autoPlay
           muted
           loop
