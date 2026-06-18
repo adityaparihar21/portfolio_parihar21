@@ -28,7 +28,7 @@ function APCoin() {
   );
 
   return (
-    <group scale={0.55} ref={coinRef}>
+    <group scale={0.4} ref={coinRef}>
       {/* The Solid Coin Base (Thickness 0.35, so faces are at Z=±0.175) */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[2.0, 2.0, 0.35, 128]} />
@@ -130,7 +130,7 @@ export default function AP3DMonogram({ className = '' }: { className?: string })
   return (
     <div className={`w-full h-full cursor-grab active:cursor-grabbing ${className}`}>
       <Canvas
-        camera={{ position: [0, 0, 5.6], fov: 32 }}
+        camera={{ position: [0, 0, 5.6], fov: 40 }}
         gl={{ antialias: true, alpha: true }}
         style={{ background: 'transparent' }}
         dpr={typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 2) : 1}
