@@ -156,7 +156,7 @@ function Preloader({ monogram }: { monogram: string }) {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, ease: EASE_OUT_EXPO }}
-          className="inline-block px-4 py-2 font-serif text-7xl md:text-9xl italic tracking-wide text-transparent drop-shadow-2xl leading-none select-none"
+          className="inline-block px-4 py-2 font-serif text-7xl md:text-9xl italic tracking-wide text-foreground drop-shadow-2xl leading-none"
         >
           {monogram}
         </motion.h1>
@@ -211,7 +211,7 @@ function Header({ data, isLoading }: { data: ReturnType<typeof useContent>; isLo
       initial={{ y: -40, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
-      className={`fixed inset-x-0 top-0 z-[101] transition-all duration-500 ${
+      className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
         scrolled || menuOpen
           ? "backdrop-blur-xl bg-background/75 border-b border-border"
           : "bg-transparent"
@@ -219,29 +219,9 @@ function Header({ data, isLoading }: { data: ReturnType<typeof useContent>; isLo
     >
       <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-6 md:px-12">
         <a href="#top" className="flex items-center gap-2" onClick={() => setMenuOpen(false)}>
-          <motion.div
-            layout
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ 
-              layout: { duration: 1.8, ease: [0.25, 1, 0.5, 1] },
-              opacity: { duration: 1 }
-            }}
-            className={`mix-blend-screen origin-top-left overflow-hidden rounded-md flex items-center justify-center ${
-              isLoading 
-                ? "fixed inset-0 m-auto w-[250px] h-[250px] md:w-[350px] md:h-[350px]" 
-                : "relative w-[50px] h-[50px] md:w-[60px] md:h-[60px]"
-            }`}
-          >
-            <video 
-              src="/newap.MOV" 
-              autoPlay 
-              muted 
-              loop 
-              playsInline 
-              className="w-full h-full object-cover pointer-events-none"
-            />
-          </motion.div>
+          <span className="font-serif text-2xl italic text-foreground inline-block">
+            {data.brand.monogram}
+          </span>
         </a>
         <nav className="hidden items-center gap-10 md:flex">
           {data.brand.nav.map((item, i) => (
@@ -1424,19 +1404,14 @@ function Index() {
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => setMinTimeElapsed(true), 4500);
+    const timer = setTimeout(() => setMinTimeElapsed(true), 2500);
     return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
-    // Only dismiss the loading screen if the hero video is ready AND min time passed
+    // Only dismiss the loading screen if the hero video is ready AND 2.5 seconds have passed
     if (mediaReady && minTimeElapsed) {
       setIsLoading(false);
-      
-      // Play coin flip sfx on transition
-      const coin = new Audio("/coin_flip.mp3");
-      coin.volume = 0.5;
-      coin.play().catch(() => {});
     }
   }, [mediaReady, minTimeElapsed]);
 
@@ -1458,9 +1433,8 @@ function Index() {
       <AnimatePresence>
         {isLoading && <Preloader monogram={data.brand.monogram} />}
       </AnimatePresence>
-      <Header data={data} isLoading={isLoading} />
       <motion.div 
-        className="relative min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary pt-24"
+        className="relative min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary"
         initial={{ opacity: 0, scale: 0.92, filter: "blur(8px)" }}
         animate={{ 
           opacity: isLoading ? 0 : 1, 
@@ -1469,6 +1443,7 @@ function Index() {
         }}
         transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
       >
+        <Header data={data} isLoading={isLoading} />
         <Hero 
           data={data} 
           activeAudioId={activeAudioId} 
