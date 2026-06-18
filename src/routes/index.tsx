@@ -220,7 +220,7 @@ function Header({ data, isLoading }: { data: ReturnType<typeof useContent>; isLo
       <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-6 md:px-12">
         <a href="#top" className="flex items-center gap-2" onClick={() => setMenuOpen(false)}>
           <motion.div
-            className="origin-top-left"
+            className="origin-top-left mix-blend-screen"
             initial={{ 
               y: "35vh",
               x: "calc(50vw - 32px - 50%)", 
@@ -240,7 +240,7 @@ function Header({ data, isLoading }: { data: ReturnType<typeof useContent>; isLo
             }}
           >
             <video 
-              src="/apmonogram.webm" 
+              src="/apmonogram.mp4" 
               autoPlay 
               muted 
               loop 
