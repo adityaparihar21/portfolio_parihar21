@@ -147,13 +147,13 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
         initial={{ opacity: 0, scale: 0.85 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-[260px] h-[160px] md:w-[420px] md:h-[240px] drop-shadow-2xl pointer-events-none"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-[260px] h-[160px] md:w-[420px] md:h-[240px] drop-shadow-2xl"
       >
         <AP3DMonogram />
       </motion.div>
 
       {/* Loading & Enter UI - Positioned at Bottom */}
-      <div className="absolute bottom-20 md:bottom-28 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center w-full px-6 preloader-content">
+      <div className="absolute bottom-20 md:bottom-28 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center w-full px-6 preloader-content pointer-events-none">
         <AnimatePresence mode="wait">
           {!showEnter ? (
             /* Loading state */
@@ -187,7 +187,7 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
                   initial={{ x: "-100%" }}
                   animate={{ x: "100%" }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", repeatDelay: 0.4 }}
-                  className="h-full w-full bg-primary/60"
+                  className="h-full w-full bg-foreground/60"
                 />
               </div>
             </motion.div>
@@ -199,15 +199,15 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.7, ease: EASE_OUT_EXPO }}
-              className="flex flex-col items-center gap-6 mt-1"
+              className="flex flex-col items-center gap-6 mt-1 pointer-events-auto"
             >
               {/* Button */}
               <button
                 onClick={onEnter}
-                className="relative overflow-hidden px-10 py-4 border border-primary/20 bg-background/50 backdrop-blur-sm transition-all duration-500 hover:scale-[1.02] hover:bg-primary/10 hover:border-primary/40 active:scale-95 group rounded-sm shadow-[0_0_30px_rgba(212,175,90,0.05)]"
+                className="relative overflow-hidden px-10 py-4 border border-white/20 bg-black/40 backdrop-blur-md transition-all duration-500 hover:scale-[1.02] hover:bg-white/10 hover:border-white/40 active:scale-95 group rounded-sm shadow-[0_0_30px_rgba(255,255,255,0.05)] cursor-pointer"
               >
-                <div className="absolute inset-0 bg-primary/5 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-500 ease-out" />
-                <span className="relative z-10 font-sans text-[10px] md:text-xs tracking-[0.4em] uppercase text-primary/80 group-hover:text-primary transition-colors duration-300">
+                <div className="absolute inset-0 bg-white/5 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+                <span className="relative z-10 font-sans text-[10px] md:text-xs tracking-[0.4em] uppercase text-white/80 group-hover:text-white transition-colors duration-300">
                   Enter Site
                 </span>
               </button>

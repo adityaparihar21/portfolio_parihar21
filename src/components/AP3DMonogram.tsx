@@ -1,31 +1,12 @@
-import { useRef, useEffect, Suspense } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Text3D, Center, Environment } from '@react-three/drei';
+import { useRef, Suspense } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Text3D, Center, Environment, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
 /* ── Warm-cream serif "AP" mesh ── */
-function APText({ mouseX, mouseY }: { mouseX: React.MutableRefObject<number>; mouseY: React.MutableRefObject<number> }) {
-  const groupRef = useRef<THREE.Group>(null);
-  const { size } = useThree();
-
-  useFrame((state) => {
-    if (!groupRef.current) return;
-    const t = state.clock.elapsedTime;
-
-    // Slow, graceful Y rotation — cinematic pendulum feel
-    const targetY = Math.sin(t * 0.22) * 0.3;
-    const targetX = Math.sin(t * 0.14) * 0.06;
-
-    // Mouse parallax — subtle
-    const mx = (mouseX.current / (size.width || 1) - 0.5) * 0.35;
-    const my = -(mouseY.current / (size.height || 1) - 0.5) * 0.2;
-
-    groupRef.current.rotation.y += ((targetY + mx) - groupRef.current.rotation.y) * 0.04;
-    groupRef.current.rotation.x += ((targetX + my) - groupRef.current.rotation.x) * 0.04;
-  });
-
+function APText() {
   return (
-    <group ref={groupRef}>
+    <group>
       <Center>
         <Text3D
           font="/fonts/gentilis_bold.typeface.json"
@@ -85,19 +66,8 @@ function DynamicLights() {
 
 /* ── Main exported component ── */
 export default function AP3DMonogram({ className = '' }: { className?: string }) {
-  const mouseX = useRef(0);
-  const mouseY = useRef(0);
-
-  useEffect(() => {
-    const onMove = (e: MouseEvent) => { mouseX.current = e.clientX; mouseY.current = e.clientY; };
-    const onTouch = (e: TouchEvent) => { mouseX.current = e.touches[0].clientX; mouseY.current = e.touches[0].clientY; };
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('touchmove', onTouch, { passive: true });
-    return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('touchmove', onTouch); };
-  }, []);
-
   return (
-    <div className={`w-full h-full ${className}`}>
+    <div className={`w-full h-full cursor-grab active:cursor-grabbing ${className}`}>
       <Canvas
         camera={{ position: [0, 0, 4.8], fov: 42 }}
         gl={{ antialias: true, alpha: true }}
@@ -107,7 +77,14 @@ export default function AP3DMonogram({ className = '' }: { className?: string })
         <Suspense fallback={null}>
           <DynamicLights />
           <Environment preset="apartment" />
-          <APText mouseX={mouseX} mouseY={mouseY} />
+          <APText />
+          <OrbitControls 
+            enableZoom={false} 
+            enablePan={false} 
+            autoRotate 
+            autoRotateSpeed={2} 
+            makeDefault 
+          />
         </Suspense>
       </Canvas>
     </div>
