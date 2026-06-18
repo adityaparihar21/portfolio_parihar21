@@ -156,7 +156,7 @@ function Preloader({ monogram }: { monogram: string }) {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, ease: EASE_OUT_EXPO }}
-          className="inline-block px-4 py-2 font-serif text-7xl md:text-9xl italic tracking-wide text-foreground drop-shadow-2xl leading-none"
+          className="inline-block px-4 py-2 font-serif text-7xl md:text-9xl italic tracking-wide text-transparent drop-shadow-2xl leading-none select-none"
         >
           {monogram}
         </motion.h1>
@@ -211,7 +211,7 @@ function Header({ data, isLoading }: { data: ReturnType<typeof useContent>; isLo
       initial={{ y: -40, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
+      className={`fixed inset-x-0 top-0 z-[101] transition-all duration-500 ${
         scrolled || menuOpen
           ? "backdrop-blur-xl bg-background/75 border-b border-border"
           : "bg-transparent"
@@ -220,25 +220,29 @@ function Header({ data, isLoading }: { data: ReturnType<typeof useContent>; isLo
       <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-6 md:px-12">
         <a href="#top" className="flex items-center gap-2" onClick={() => setMenuOpen(false)}>
           <motion.span 
-            className="font-serif text-2xl italic text-foreground"
+            className="font-serif text-2xl italic text-foreground inline-block origin-center"
             initial={{ 
-              y: "45vh", 
-              scale: 4, 
+              y: "40vh",
+              x: "calc(50vw - 32px - 50%)", 
+              scale: 4.5, 
               opacity: 0,
-              rotateX: 15
+              rotateY: 540,
+              rotateX: 20
             }}
             animate={{ 
-              y: isLoading ? "45vh" : 0, 
-              scale: isLoading ? 4 : 1, 
-              opacity: isLoading ? 0 : 1,
-              rotateX: isLoading ? 15 : 0
+              y: isLoading ? "40vh" : 0, 
+              x: isLoading ? "calc(50vw - 32px - 50%)" : 0,
+              scale: isLoading ? 4.5 : 1, 
+              opacity: 1,
+              rotateY: isLoading ? 540 : 0,
+              rotateX: isLoading ? 20 : 0
             }}
             transition={{ 
-              duration: 1.8, 
-              ease: [0.76, 0, 0.24, 1],
-              delay: isLoading ? 0 : 0.3
+              duration: 2, 
+              ease: [0.25, 1, 0.5, 1],
+              opacity: { duration: 1 }
             }}
-            style={{ transformPerspective: 800 }}
+            style={{ transformPerspective: 1200, transformStyle: "preserve-3d" }}
           >
             {data.brand.monogram}
           </motion.span>
@@ -1428,6 +1432,11 @@ function Index() {
     // Only dismiss the loading screen if the hero video is ready AND 2.5 seconds have passed
     if (mediaReady && minTimeElapsed) {
       setIsLoading(false);
+      
+      // Play coin flip sfx on transition
+      const coin = new Audio("/coin_flip.mp3");
+      coin.volume = 0.5;
+      coin.play().catch(() => {});
     }
   }, [mediaReady, minTimeElapsed]);
 
