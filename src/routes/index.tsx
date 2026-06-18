@@ -122,6 +122,7 @@ function Preloader({ monogram, triggerTransition, onComplete }: { monogram: stri
           loop
           muted
           playsInline
+          preload="auto"
           className="h-full w-full object-cover opacity-80"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -454,20 +455,25 @@ function ProjectMedia({
     const containerRef = useRef<HTMLDivElement>(null);
     const [isHovered, setIsHovered] = useState(false);
     const [inView, setInView] = useState(false);
+    const [hasEnteredView, setHasEnteredView] = useState(false);
 
     useEffect(() => {
       const observer = new IntersectionObserver(
         ([entry]) => {
-          setInView(entry.isIntersecting);
+          const isIntersecting = entry.isIntersecting;
+          setInView(isIntersecting);
+          if (isIntersecting && !hasEnteredView) {
+            setHasEnteredView(true); // Only flip once — start loading src
+          }
         },
-        { threshold: 0.15 }
+        { threshold: 0.1, rootMargin: "200px" } // Start loading 200px before it enters view
       );
 
       if (containerRef.current) {
         observer.observe(containerRef.current);
       }
       return () => observer.disconnect();
-    }, []);
+    }, [hasEnteredView]);
 
     useEffect(() => {
       const video = videoRef.current;
@@ -495,9 +501,9 @@ function ProjectMedia({
       >
         <video
           ref={videoRef}
-          src={src}
+          src={hasEnteredView ? src : undefined} // Don't load src until near viewport
           poster={poster}
-          preload="metadata"
+          preload={hasEnteredView ? "auto" : "none"} // none = 0 bytes downloaded until needed
           loop
           muted={activeAudioId !== id}
           playsInline
