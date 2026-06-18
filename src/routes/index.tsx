@@ -153,55 +153,73 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
       </motion.div>
 
       {/* Loading & Enter UI - Positioned at Bottom */}
-      <div className="absolute bottom-20 md:bottom-28 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center w-full px-6 preloader-content pointer-events-none">
-        <AnimatePresence mode="wait">
-          {!showEnter ? (
-            /* Loading state */
-            <motion.div
-              key="loading"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.5 }}
-              className="flex flex-col items-center gap-5 pointer-events-none"
-            >
-              {/* Cycling descriptor words */}
-              <div className="h-5 flex items-center justify-center overflow-hidden">
-                <AnimatePresence mode="wait">
-                  <motion.span
-                    key={index}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.35, ease: EASE_OUT_EXPO }}
-                    className="font-serif text-xs md:text-sm tracking-[0.35em] uppercase text-muted-foreground/50 italic"
-                  >
-                    {words[index]}
-                  </motion.span>
-                </AnimatePresence>
-              </div>
+      <div className="absolute bottom-20 md:bottom-28 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-6 w-full px-6 preloader-content pointer-events-none">
+        
+        {/* ALWAYS VISIBLE: Cycling words + Timer bar */}
+        <div className="flex flex-col items-center gap-5">
+          {/* Cycling descriptor words */}
+          <div className="h-5 flex items-center justify-center overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={index}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.35, ease: EASE_OUT_EXPO }}
+                className="font-serif text-xs md:text-sm tracking-[0.35em] uppercase text-muted-foreground/50 italic"
+              >
+                {words[index]}
+              </motion.span>
+            </AnimatePresence>
+          </div>
 
-              {/* Thin shimmer bar */}
-              <div className="h-px w-32 md:w-56 overflow-hidden bg-white/8">
+          {/* Timer bar / Divider */}
+          <div className="flex items-center gap-4 opacity-70">
+            <div className="h-px w-10 md:w-20 bg-white/10" />
+            <AnimatePresence mode="wait">
+              {!showEnter ? (
+                /* Thin shimmer bar while loading */
                 <motion.div
-                  initial={{ x: "-100%" }}
-                  animate={{ x: "100%" }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", repeatDelay: 0.4 }}
-                  className="h-full w-full bg-foreground/60"
-                />
-              </div>
-            </motion.div>
-          ) : (
-            /* Enter state */
+                  key="shimmer"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="h-px w-24 md:w-32 overflow-hidden bg-white/8 relative"
+                >
+                  <motion.div
+                    initial={{ x: "-100%" }}
+                    animate={{ x: "100%" }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", repeatDelay: 0.4 }}
+                    className="absolute inset-0 h-full w-full bg-foreground/60"
+                  />
+                </motion.div>
+              ) : (
+                /* 10s countdown text */
+                <motion.span
+                  key="countdown"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="font-sans text-[9px] tracking-[0.35em] uppercase text-muted-foreground/40 whitespace-nowrap"
+                >
+                  auto in {countdown}s
+                </motion.span>
+              )}
+            </AnimatePresence>
+            <div className="h-px w-10 md:w-20 bg-white/10" />
+          </div>
+        </div>
+
+        {/* ENTER BUTTON: Fades in below the timer bar */}
+        <AnimatePresence>
+          {showEnter && (
             <motion.div
               key="enter"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.7, ease: EASE_OUT_EXPO }}
-              className="flex flex-col items-center gap-6 mt-1 pointer-events-auto"
+              className="mt-2 pointer-events-auto"
             >
-              {/* Button */}
               <button
                 onClick={onEnter}
                 className="relative overflow-hidden px-10 py-4 border border-white/20 bg-black/40 backdrop-blur-md transition-all duration-500 hover:scale-[1.02] hover:bg-white/10 hover:border-white/40 active:scale-95 group rounded-sm shadow-[0_0_30px_rgba(255,255,255,0.05)] cursor-pointer"
@@ -211,18 +229,10 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
                   Enter Site
                 </span>
               </button>
-
-              {/* Thin line divider + label */}
-              <div className="flex items-center gap-4 opacity-70">
-                <div className="h-px w-10 md:w-16 bg-white/10" />
-                <span className="font-sans text-[9px] tracking-[0.35em] uppercase text-muted-foreground/40">
-                  auto in {countdown}s
-                </span>
-                <div className="h-px w-10 md:w-16 bg-white/10" />
-              </div>
             </motion.div>
           )}
         </AnimatePresence>
+
       </div>
     </motion.div>
   );
