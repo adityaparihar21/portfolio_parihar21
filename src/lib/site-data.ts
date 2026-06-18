@@ -65,6 +65,7 @@ export type SiteData = {
       name: string;
       description: string;
       logo: string;
+      href?: string;
     }[];
   };
   clients: { eyebrow: string; title: string; logos: string[] };

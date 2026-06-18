@@ -1176,33 +1176,58 @@ function WorkedWith({ data }: { data: ReturnType<typeof useContent> }) {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16">
-          {brands.map((brand, i) => (
-            <motion.div
-              key={brand.name}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.8, delay: i * 0.1, ease: EASE_OUT_EXPO }}
-              className="flex flex-col gap-6 group bg-card/25 border border-border/40 rounded-3xl p-8 transition-all duration-500 hover:border-primary/50 hover:bg-card/40 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 cursor-default"
-            >
-              <div className="h-20 w-full flex items-center justify-start">
-                <img
-                  src={brand.logo}
-                  alt={brand.name}
-                  loading="lazy"
-                  className="h-full w-auto object-contain max-w-[80%] transition-transform duration-500 group-hover:scale-[1.03]"
-                />
-              </div>
-              <div className="flex flex-col gap-3">
-                <h3 className="font-serif text-3xl italic tracking-wide text-foreground group-hover:text-primary transition-colors">
-                  {brand.name}
-                </h3>
-                <p className="text-sm font-light leading-relaxed text-muted-foreground">
-                  {brand.description}
-                </p>
-              </div>
-            </motion.div>
-          ))}
+          {brands.map((brand, i) => {
+            const content = (
+              <>
+                <div className="h-20 w-full flex items-center justify-start">
+                  <img
+                    src={brand.logo}
+                    alt={brand.name}
+                    loading="lazy"
+                    className="h-full w-auto object-contain max-w-[80%] transition-transform duration-500 group-hover:scale-[1.03]"
+                  />
+                </div>
+                <div className="flex flex-col gap-3">
+                  <h3 className="font-serif text-3xl italic tracking-wide text-foreground group-hover:text-primary transition-colors flex items-center justify-between">
+                    {brand.name}
+                    {brand.href && <ArrowRight className="h-5 w-5 opacity-0 transition-opacity group-hover:opacity-100" strokeWidth={1.5} />}
+                  </h3>
+                  <p className="text-sm font-light leading-relaxed text-muted-foreground">
+                    {brand.description}
+                  </p>
+                </div>
+              </>
+            );
+
+            const className = `flex flex-col gap-6 group bg-card/25 border border-border/40 rounded-3xl p-8 transition-all duration-500 hover:border-primary/50 hover:bg-card/40 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 ${brand.href ? 'cursor-pointer' : 'cursor-default'}`;
+
+            return brand.href ? (
+              <motion.a
+                key={brand.name}
+                href={brand.href}
+                target="_blank"
+                rel="noreferrer"
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.8, delay: i * 0.1, ease: EASE_OUT_EXPO }}
+                className={className}
+              >
+                {content}
+              </motion.a>
+            ) : (
+              <motion.div
+                key={brand.name}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.8, delay: i * 0.1, ease: EASE_OUT_EXPO }}
+                className={className}
+              >
+                {content}
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>
