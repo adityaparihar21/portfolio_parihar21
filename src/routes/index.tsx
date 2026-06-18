@@ -154,98 +154,110 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
 
         <AnimatePresence mode="wait">
           {!showEnter ? (
-            /* Loading state: cycling words + progress bar */
+            /* Loading state */
             <motion.div
               key="loading"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.4 }}
-              className="flex flex-col items-center gap-4 pointer-events-none"
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.5 }}
+              className="flex flex-col items-center gap-5 pointer-events-none"
             >
-              <div className="h-6 flex items-center justify-center">
+              {/* Cycling descriptor words */}
+              <div className="h-5 flex items-center justify-center overflow-hidden">
                 <AnimatePresence mode="wait">
                   <motion.span
                     key={index}
-                    initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
-                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                    exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
-                    transition={{ duration: 0.4, ease: EASE_OUT_EXPO }}
-                    className="font-serif text-sm md:text-lg tracking-[0.3em] uppercase text-muted-foreground/70"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.35, ease: EASE_OUT_EXPO }}
+                    className="font-serif text-xs tracking-[0.35em] uppercase text-muted-foreground/50 italic"
                   >
                     {words[index]}
                   </motion.span>
                 </AnimatePresence>
               </div>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5, duration: 1 }}
-                className="mt-2 h-[2px] w-48 md:w-80 lg:w-[450px] overflow-hidden bg-white/10 rounded-full"
-              >
+
+              {/* Thin shimmer bar */}
+              <div className="h-px w-32 md:w-56 overflow-hidden bg-white/8">
                 <motion.div
                   initial={{ x: "-100%" }}
                   animate={{ x: "100%" }}
-                  transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-                  className="h-full w-full bg-primary"
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", repeatDelay: 0.4 }}
+                  className="h-full w-full bg-primary/60"
                 />
-              </motion.div>
+              </div>
             </motion.div>
           ) : (
-            /* Enter button state */
+            /* Enter state — CSS ring animation, no per-second re-renders */
             <motion.div
               key="enter"
-              initial={{ opacity: 0, y: 16, scale: 0.92 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
-              className="flex flex-col items-center gap-5 mt-2"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.7, ease: EASE_OUT_EXPO }}
+              className="flex flex-col items-center gap-6 mt-1"
             >
-              {/* Countdown ring + Enter button */}
+              {/* Ring + button */}
               <div className="relative flex items-center justify-center">
-                {/* SVG countdown ring */}
+                {/* CSS-animated SVG ring — no React re-renders, no glitch */}
                 <svg
-                  width="120" height="120"
-                  className="absolute -inset-0 rotate-[-90deg]"
-                  style={{ filter: 'drop-shadow(0 0 8px rgba(212,175,90,0.5))' }}
+                  width="130" height="130"
+                  className="absolute rotate-[-90deg]"
+                  style={{ top: '50%', left: '50%', transform: 'translate(-50%,-50%) rotate(-90deg)' }}
                 >
-                  <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="2" />
+                  {/* Track */}
+                  <circle cx="65" cy="65" r="56" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
+                  {/* Animated gold arc — pure CSS, zero JS per frame */}
                   <circle
-                    cx="60" cy="60" r="52"
+                    cx="65" cy="65" r="56"
                     fill="none"
-                    stroke="#D4AF5A"
-                    strokeWidth="2"
-                    strokeDasharray={`${2 * Math.PI * 52}`}
-                    strokeDashoffset={`${2 * Math.PI * 52 * (1 - countdown / 10)}`}
+                    stroke="oklch(0.78 0.09 80)"
+                    strokeWidth="1.5"
+                    strokeDasharray="351.9"
+                    strokeDashoffset="0"
                     strokeLinecap="round"
-                    style={{ transition: 'stroke-dashoffset 1s linear' }}
+                    className="countdown-ring-animate"
                   />
                 </svg>
-                {/* The button itself */}
+
+                {/* Button */}
                 <button
                   onClick={onEnter}
-                  className="relative z-10 flex flex-col items-center justify-center w-[104px] h-[104px] rounded-full border border-primary/40 bg-black/30 backdrop-blur-sm text-foreground transition-all duration-300 hover:bg-primary/20 hover:border-primary hover:scale-105 active:scale-95 cursor-pointer group"
-                  style={{ boxShadow: '0 0 30px rgba(212,175,90,0.15)' }}
+                  className="relative z-10 flex flex-col items-center justify-center w-[112px] h-[112px] rounded-full cursor-pointer group transition-all duration-500 hover:scale-105 active:scale-95"
+                  style={{
+                    background: 'radial-gradient(circle, rgba(30,24,18,0.85) 60%, rgba(20,16,12,0.6) 100%)',
+                    border: '1px solid rgba(212,175,90,0.2)',
+                    boxShadow: '0 0 40px rgba(180,140,60,0.08), inset 0 0 20px rgba(0,0,0,0.4)',
+                  }}
                 >
-                  <span className="font-serif text-[10px] tracking-[0.35em] uppercase text-primary/70 mb-1 group-hover:text-primary transition-colors">
+                  {/* Top label */}
+                  <span className="font-sans text-[8px] tracking-[0.4em] uppercase text-primary/40 group-hover:text-primary/70 transition-colors duration-300 mb-2">
                     Enter
                   </span>
-                  <span className="font-serif text-3xl italic text-foreground drop-shadow-lg leading-none">
+                  {/* Monogram */}
+                  <span
+                    className="font-serif text-[2.2rem] italic leading-none text-foreground/90 group-hover:text-foreground transition-colors duration-300"
+                    style={{ textShadow: '0 2px 20px rgba(212,175,90,0.2)' }}
+                  >
                     AP
                   </span>
-                  <span className="font-mono text-[9px] text-muted-foreground/40 mt-1">
+                  {/* Bottom countdown */}
+                  <span className="font-sans text-[7px] tracking-[0.3em] uppercase text-muted-foreground/25 mt-2 group-hover:text-muted-foreground/40 transition-colors duration-300">
                     {countdown}s
                   </span>
                 </button>
               </div>
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3, duration: 0.6 }}
-                className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground/30 font-light"
-              >
-                Auto-enter in {countdown}s
-              </motion.p>
+
+              {/* Thin line divider + label */}
+              <div className="flex items-center gap-4">
+                <div className="h-px w-12 bg-white/10" />
+                <span className="font-sans text-[9px] tracking-[0.35em] uppercase text-muted-foreground/25">
+                  auto in {countdown}s
+                </span>
+                <div className="h-px w-12 bg-white/10" />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -253,6 +265,7 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
     </motion.div>
   );
 }
+
 
 /* ---------------- Header ---------------- */
 function Header({ data, isLoading }: { data: ReturnType<typeof useContent>; isLoading: boolean }) {

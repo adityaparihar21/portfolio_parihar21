@@ -1,9 +1,9 @@
 import { useRef, useEffect, Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Text3D, Center, Environment, MeshTransmissionMaterial } from '@react-three/drei';
+import { Text3D, Center, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 
-/* ── Gold metallic "AP" mesh ── */
+/* ── Warm-cream serif "AP" mesh ── */
 function APText({ mouseX, mouseY }: { mouseX: React.MutableRefObject<number>; mouseY: React.MutableRefObject<number> }) {
   const groupRef = useRef<THREE.Group>(null);
   const { size } = useThree();
@@ -12,38 +12,39 @@ function APText({ mouseX, mouseY }: { mouseX: React.MutableRefObject<number>; mo
     if (!groupRef.current) return;
     const t = state.clock.elapsedTime;
 
-    // Slow auto-rotation on Y axis
-    groupRef.current.rotation.y = Math.sin(t * 0.25) * 0.35;
-    groupRef.current.rotation.x = Math.cos(t * 0.18) * 0.08;
+    // Slow, graceful Y rotation — cinematic pendulum feel
+    const targetY = Math.sin(t * 0.22) * 0.3;
+    const targetX = Math.sin(t * 0.14) * 0.06;
 
-    // Subtle mouse parallax influence
-    const tx = (mouseX.current / size.width - 0.5) * 0.4;
-    const ty = -(mouseY.current / size.height - 0.5) * 0.25;
-    groupRef.current.rotation.y += tx * 0.5;
-    groupRef.current.rotation.x += ty * 0.5;
+    // Mouse parallax — subtle
+    const mx = (mouseX.current / (size.width || 1) - 0.5) * 0.35;
+    const my = -(mouseY.current / (size.height || 1) - 0.5) * 0.2;
+
+    groupRef.current.rotation.y += ((targetY + mx) - groupRef.current.rotation.y) * 0.04;
+    groupRef.current.rotation.x += ((targetX + my) - groupRef.current.rotation.x) * 0.04;
   });
 
   return (
     <group ref={groupRef}>
       <Center>
         <Text3D
-          font="/fonts/optimer_bold.typeface.json"
-          size={1.6}
-          height={0.45}          // extrusion depth
-          curveSegments={24}
+          font="/fonts/gentilis_bold.typeface.json"
+          size={1.5}
+          height={0.38}
+          curveSegments={20}
           bevelEnabled
-          bevelThickness={0.04}
-          bevelSize={0.03}
+          bevelThickness={0.035}
+          bevelSize={0.022}
           bevelOffset={0}
-          bevelSegments={8}
+          bevelSegments={6}
         >
           AP
-          {/* Gold-chrome PBR material */}
+          {/* Warm cream-pearl material — matches site foreground */}
           <meshStandardMaterial
-            color="#D4AF5A"
-            metalness={1}
-            roughness={0.12}
-            envMapIntensity={2.5}
+            color="#EDE0CA"          // warm cream — site's foreground tone
+            metalness={0.82}
+            roughness={0.18}
+            envMapIntensity={2.2}
           />
         </Text3D>
       </Center>
@@ -51,33 +52,33 @@ function APText({ mouseX, mouseY }: { mouseX: React.MutableRefObject<number>; mo
   );
 }
 
-/* ── Animated point lights for drama ── */
+/* ── Cinematic moody lights matching the dark warm site palette ── */
 function DynamicLights() {
-  const light1 = useRef<THREE.PointLight>(null);
-  const light2 = useRef<THREE.PointLight>(null);
+  const warm = useRef<THREE.PointLight>(null);
+  const cool = useRef<THREE.PointLight>(null);
 
   useFrame(({ clock }) => {
     const t = clock.elapsedTime;
-    if (light1.current) {
-      light1.current.position.x = Math.sin(t * 0.6) * 4;
-      light1.current.position.y = Math.cos(t * 0.4) * 3;
+    if (warm.current) {
+      warm.current.position.x = Math.sin(t * 0.45) * 3.5;
+      warm.current.position.y = Math.cos(t * 0.35) * 2.5;
     }
-    if (light2.current) {
-      light2.current.position.x = Math.cos(t * 0.5) * -4;
-      light2.current.position.y = Math.sin(t * 0.7) * 2;
+    if (cool.current) {
+      cool.current.position.x = Math.cos(t * 0.38) * -3;
+      cool.current.position.y = Math.sin(t * 0.52) * 1.8;
     }
   });
 
   return (
     <>
-      {/* Key warm gold light */}
-      <pointLight ref={light1} position={[3, 3, 3]} intensity={40} color="#FFD580" />
-      {/* Cool fill light from below */}
-      <pointLight ref={light2} position={[-3, -2, 2]} intensity={20} color="#AACCFF" />
-      {/* Rim / back light */}
-      <pointLight position={[0, 0, -4]} intensity={15} color="#E8B86D" />
-      {/* Ambient */}
-      <ambientLight intensity={0.3} color="#FFE8B0" />
+      {/* Warm amber key light — matches site's gold primary */}
+      <pointLight ref={warm} position={[3, 3, 3]} intensity={35} color="#C8A96E" />
+      {/* Cool desaturated fill */}
+      <pointLight ref={cool} position={[-3, -1, 2]} intensity={12} color="#D4CFC8" />
+      {/* Soft rim from behind */}
+      <pointLight position={[0, 1, -3.5]} intensity={18} color="#B8A070" />
+      {/* Very soft ambient so darks aren't pitch black */}
+      <ambientLight intensity={0.15} color="#E8DCC8" />
     </>
   );
 }
@@ -88,34 +89,24 @@ export default function AP3DMonogram({ className = '' }: { className?: string })
   const mouseY = useRef(0);
 
   useEffect(() => {
-    const handleMove = (e: MouseEvent) => {
-      mouseX.current = e.clientX;
-      mouseY.current = e.clientY;
-    };
-    const handleTouch = (e: TouchEvent) => {
-      mouseX.current = e.touches[0].clientX;
-      mouseY.current = e.touches[0].clientY;
-    };
-    window.addEventListener('mousemove', handleMove);
-    window.addEventListener('touchmove', handleTouch);
-    return () => {
-      window.removeEventListener('mousemove', handleMove);
-      window.removeEventListener('touchmove', handleTouch);
-    };
+    const onMove = (e: MouseEvent) => { mouseX.current = e.clientX; mouseY.current = e.clientY; };
+    const onTouch = (e: TouchEvent) => { mouseX.current = e.touches[0].clientX; mouseY.current = e.touches[0].clientY; };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('touchmove', onTouch, { passive: true });
+    return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('touchmove', onTouch); };
   }, []);
 
   return (
-    <div className={`w-full h-full ${className}`} style={{ touchAction: 'none' }}>
+    <div className={`w-full h-full ${className}`}>
       <Canvas
-        camera={{ position: [0, 0, 5], fov: 45 }}
+        camera={{ position: [0, 0, 4.8], fov: 42 }}
         gl={{ antialias: true, alpha: true }}
         style={{ background: 'transparent' }}
-        dpr={[1, 2]}
+        dpr={typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 2) : 1}
       >
         <Suspense fallback={null}>
           <DynamicLights />
-          {/* HDR environment for realistic metallic reflections */}
-          <Environment preset="city" />
+          <Environment preset="apartment" />
           <APText mouseX={mouseX} mouseY={mouseY} />
         </Suspense>
       </Canvas>

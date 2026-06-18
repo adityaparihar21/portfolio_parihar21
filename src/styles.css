@@ -197,3 +197,13 @@
   scrollbar-width: thin;
   scrollbar-color: oklch(0.78 0.09 80 / 20%) transparent;
 }
+
+/* Preloader countdown ring — pure CSS animation avoids re-render glitch */
+@keyframes countdown-ring {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: 326.7; } /* 2π × 52 */
+}
+
+.countdown-ring-animate {
+  animation: countdown-ring 10s linear forwards;
+}
