@@ -138,15 +138,15 @@ function APCoin() {
   useFrame((state, delta) => {
     if (!coinRef.current) return;
 
-    if (!entrance.current.done) {
+    if (!entranceRef.current.done) {
       // Set scale immediately instead of pop-up
       coinRef.current.scale.set(TARGET_SCALE, TARGET_SCALE, TARGET_SCALE);
-      entrance.current.done = true;
+      entranceRef.current.done = true;
     }
 
     // Rotation: ramp up from 0 to full speed over 1.5s
-    entrance.current.elapsed += delta;
-    const rotRamp = Math.min(entrance.current.elapsed / 1.5, 1);
+    entranceRef.current.elapsed += delta;
+    const rotRamp = Math.min(entranceRef.current.elapsed / 1.5, 1);
     // Smooth ease-out for rotation start
     const rotSpeed = rotRamp * (2 - rotRamp) * 0.6;
     coinRef.current.rotation.y += delta * rotSpeed;
