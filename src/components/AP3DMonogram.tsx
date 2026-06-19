@@ -142,8 +142,8 @@ function APCoin() {
     entrance.elapsed += delta;
 
     if (!entrance.done) {
-      // Spring-like scale entrance over ~1.8s
-      const t = Math.min(entrance.elapsed / 1.8, 1);
+      // Spring-like scale entrance over ~0.6s (much faster)
+      const t = Math.min(entrance.elapsed / 0.6, 1);
       // Overshoot spring curve: rises past 1.0, bounces back
       const spring = t < 0.6
         ? t / 0.6 * 1.15 // overshoot to 115%
@@ -155,8 +155,8 @@ function APCoin() {
       if (t >= 1) entrance.done = true;
     }
 
-    // Rotation: ramp up from 0 to full speed over 2.5s
-    const rotRamp = Math.min(entrance.elapsed / 2.5, 1);
+    // Rotation: ramp up from 0 to full speed over 1.0s
+    const rotRamp = Math.min(entrance.elapsed / 1.0, 1);
     // Ease-out cubic for smooth acceleration
     const rotSpeed = rotRamp * rotRamp * (3 - 2 * rotRamp) * 0.6;
     coinRef.current.rotation.y += delta * rotSpeed;
@@ -362,8 +362,8 @@ export default function AP3DMonogram({ className = '' }: { className?: string })
             enablePan={false}
             enableRotate={true}
             target={[0, 0, 0]}
-            minPolarAngle={Math.PI / 2} // Lock to horizon
-            maxPolarAngle={Math.PI / 2} // Prevent flipping upside down
+            minPolarAngle={Math.PI / 2 - 0.4} // Allow slight upward tilt (drifting)
+            maxPolarAngle={Math.PI / 2 + 0.4} // Allow slight downward tilt
             makeDefault
           />
         </Suspense>
