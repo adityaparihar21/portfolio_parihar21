@@ -355,8 +355,6 @@ export default function AP3DMonogram({ className = '' }: { className?: string })
             enablePan={false}
             enableRotate={true}
             target={[0.28, 0, 0]}
-            minPolarAngle={Math.PI / 2 - 0.4} // Allow slight upward tilt (drifting)
-            maxPolarAngle={Math.PI / 2 + 0.4} // Allow slight downward tilt
             makeDefault
           />
         </Suspense>
