@@ -335,14 +335,14 @@ export default function AP3DMonogram({ className = '' }: { className?: string })
           {/* Studio HDRI for strong, clean gold reflections */}
           <Environment preset="studio" />
 
-          {/* 3D focal point strictly centered */}
-          <group position={[0, 0, 0]}>
+          {/* Visually center the 3D focal point (counteracting layout shift) */}
+          <group position={[0.28, 0, 0]}>
             <APCoin />
           </group>
 
           {/* Contact shadow grounds the coin instead of floating */}
           <ContactShadows
-            position={[0, -1.3, 0]}
+            position={[0.28, -1.3, 0]}
             opacity={0.35}
             blur={2}
             scale={10}
@@ -354,7 +354,7 @@ export default function AP3DMonogram({ className = '' }: { className?: string })
             enableZoom={false}
             enablePan={false}
             enableRotate={true}
-            target={[0, 0, 0]}
+            target={[0.28, 0, 0]}
             minPolarAngle={Math.PI / 2 - 0.4} // Allow slight upward tilt (drifting)
             maxPolarAngle={Math.PI / 2 + 0.4} // Allow slight downward tilt
             makeDefault
