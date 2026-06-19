@@ -267,6 +267,7 @@ function Hero({
   activeAudioId,
   setActiveAudioId,
   onMediaReady,
+  isLoading,
 }: {
   data: ReturnType<typeof useContent>;
   activeAudioId: string | null;
