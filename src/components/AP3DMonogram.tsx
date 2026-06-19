@@ -439,6 +439,13 @@ export default function AP3DMonogram({
   hoverMode?: 'none' | 'creative' | 'engineering';
 }) {
   const [hovered, setHovered] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   return (
     <div 
