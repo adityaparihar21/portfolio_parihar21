@@ -154,13 +154,14 @@ function Preloader({
     >
       {/* Interior Video Background - Awakens when videoVisible is true */}
       <motion.div
-        initial={{ opacity: 0, scale: 1.0 }}
-        animate={{ opacity: videoVisible ? 1 : 0, scale: 1.15 }}
-        exit={{ opacity: 0 }}
-        transition={{ 
-          opacity: { duration: 2.0, ease: "easeOut" },
-          scale: { duration: 25, ease: "linear", repeat: Infinity, repeatType: "reverse" }
+        initial={{ opacity: 0 }}
+        animate={{ opacity: videoVisible ? 1 : 0 }}
+        style={{
+          scale: 1.15 - scrollProgress * 0.15,
+          y: scrollProgress * -50,
+          filter: `blur(${scrollProgress * 6}px) brightness(${1 - scrollProgress * 0.3})`
         }}
+        exit={{ opacity: 0 }}
         className="preloader-bg absolute inset-0 z-0 pointer-events-none origin-center"
       >
         <video
