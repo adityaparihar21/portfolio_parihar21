@@ -19,10 +19,6 @@
       {
         "label": "About",
         "href": "#about"
-      },
-      {
-        "label": "Contact",
-        "href": "#contact"
       }
     ]
   },
@@ -36,7 +32,7 @@
     },
     "secondaryCta": {
       "label": "GitHub Profile",
-      "href": "https://github.com/adityaparihar21"
+      "href": "#"
     },
     "media": "/DARK.mp4"
   },
@@ -45,7 +41,7 @@
     "title": "Featured Engineering",
     "viewAll": {
       "label": "View All on GitHub",
-      "href": "https://github.com/adityaparihar21"
+      "href": "#"
     },
     "projects": [
       {
@@ -132,7 +128,7 @@
         "title": "Chakrata Day Trip",
         "description": "Creative vlog of the trip - CHAKRATA DAY TRIP <span class=\"font-serif italic\">'with da boys'</span>",
         "image": "/chakrata.mp4",
-        "href": "https://www.instagram.com/reel/DZR8lnFvI5t/"
+        "href": "#"
       },
       {
         "id": "para-in-doon",
@@ -220,7 +216,7 @@
         "title": "Claude 101",
         "description": "Certification demonstrating foundational understanding of Claude and Anthropic models.",
         "file": "/certificates/Claude 101.pdf",
-        "href": "https://www.linkedin.com/in/aditya-parihar-974b72281/details/certifications/"
+        "href": "#"
       },
       {
         "id": "claude-code-101",
@@ -228,7 +224,7 @@
         "title": "Claude Code 101",
         "description": "Certification for applying Claude in coding workflows and AI-assisted programming.",
         "file": "/certificates/Claude Code 101.pdf",
-        "href": "https://www.linkedin.com/in/aditya-parihar-974b72281/details/certifications/"
+        "href": "#"
       },
       {
         "id": "claude-code-in-action",
@@ -236,7 +232,7 @@
         "title": "Claude Code in Action",
         "description": "Certification for practical, hands-on implementation of Claude in software projects.",
         "file": "/certificates/Claude Code in Action.pdf",
-        "href": "https://www.linkedin.com/in/aditya-parihar-974b72281/details/certifications/"
+        "href": "#"
       },
       {
         "id": "claude-platform-101",
@@ -244,7 +240,7 @@
         "title": "Claude Platform 101",
         "description": "Certification covering the Anthropic platform architecture and integration basics.",
         "file": "/certificates/Claude Platform 101.pdf",
-        "href": "https://www.linkedin.com/in/aditya-parihar-974b72281/details/certifications/"
+        "href": "#"
       },
       {
         "id": "claude-anthropic-api",
@@ -252,7 +248,7 @@
         "title": "Claude with the Anthropic API",
         "description": "Certification for mastering the Anthropic API to build AI-driven applications.",
         "file": "/certificates/Claude with the Anthropic API.pdf",
-        "href": "https://www.linkedin.com/in/aditya-parihar-974b72281/details/certifications/"
+        "href": "#"
       },
       {
         "id": "claude-cowork",
@@ -260,7 +256,7 @@
         "title": "Introduction to Claude Cowork",
         "description": "Certification on leveraging Claude for collaborative tasks and productivity enhancement.",
         "file": "/certificates/Introduction to Claude Cowork.pdf",
-        "href": "https://www.linkedin.com/in/aditya-parihar-974b72281/details/certifications/"
+        "href": "#"
       }
     ]
   },
@@ -300,21 +296,8 @@
     "eyebrow": "Let's Build Together",
     "title": "Have a project in mind?",
     "description": "Open to collaborations, open-source contributions, and engineering opportunities.",
-    "email": "parihar21aditya@gmail.com",
-    "socials": [
-      {
-        "label": "GitHub",
-        "href": "https://github.com/adityaparihar21"
-      },
-      {
-        "label": "LinkedIn",
-        "href": "https://www.linkedin.com/in/aditya-parihar-974b72281"
-      },
-      {
-        "label": "Instagram",
-        "href": "https://www.instagram.com/parihar._.21"
-      }
-    ]
+    "email": "",
+    "socials": []
   },
   "workedWith": {
     "eyebrow": "Collaborations",
