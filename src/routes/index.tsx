@@ -46,7 +46,25 @@ const staggerParent = {
 };
 
 /* ---------------- Preloader ---------------- */
-function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter, countdown }: { monogram: string, triggerTransition: boolean, onComplete: () => void, showEnter: boolean, onEnter: () => void, countdown: number }) {
+function Preloader({
+  monogram,
+  triggerTransition,
+  onComplete,
+  showEnter,
+  onEnter,
+  countdown,
+  videoVisible,
+  wordsVisible,
+}: {
+  monogram: string;
+  triggerTransition: boolean;
+  onComplete: () => void;
+  showEnter: boolean;
+  onEnter: () => void;
+  countdown: number;
+  videoVisible: boolean;
+  wordsVisible: boolean;
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -132,13 +150,13 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
       transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black overflow-hidden"
     >
-      {/* Interior Video Background */}
+      {/* Interior Video Background - Awakens when videoVisible is true */}
       <motion.div
         initial={{ opacity: 0, scale: 1.0 }}
-        animate={{ opacity: 1, scale: 1.15 }}
+        animate={{ opacity: videoVisible ? 1 : 0, scale: 1.15 }}
         exit={{ opacity: 0 }}
         transition={{ 
-          opacity: { duration: 3, ease: "easeOut" },
+          opacity: { duration: 2.0, ease: "easeOut" },
           scale: { duration: 25, ease: "linear", repeat: Infinity, repeatType: "reverse" }
         }}
         className="preloader-bg absolute inset-0 z-0 pointer-events-none origin-center"
@@ -170,71 +188,71 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
         }}
       />
 
-      {/* 3D Monogram - Full Screen Canvas for perfect centering and unbound interaction */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
-        className="preloader-coin absolute inset-0 z-10 drop-shadow-2xl pointer-events-auto"
-      >
-        <AP3DMonogram />
-      </motion.div>
-
       {/* Loading & Enter UI - Positioned at Bottom */}
       <div className="absolute bottom-20 md:bottom-28 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-6 w-full px-6 preloader-content pointer-events-none">
         
         {/* ALWAYS VISIBLE: Cycling words + Timer bar */}
-        <div className="flex flex-col items-center gap-5">
-          {/* All descriptor words side by side on desktop, stacked on mobile */}
-          <div className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-4 overflow-hidden">
-            {["Code.", "Vision.", "Cinematography."].map((word, i) => (
-              <motion.span
-                key={word}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: i * 0.15, ease: EASE_OUT_EXPO }}
-                className="font-serif text-[11px] md:text-base tracking-[0.2em] md:tracking-[0.3em] uppercase text-foreground/90 italic drop-shadow-md"
-              >
-                {word}
-              </motion.span>
-            ))}
-          </div>
+        <AnimatePresence>
+          {wordsVisible && (
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.0, ease: EASE_OUT_EXPO }}
+              className="flex flex-col items-center gap-5 w-full pointer-events-none"
+            >
+              {/* All descriptor words side by side on desktop, stacked on mobile */}
+              <div className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-4 overflow-hidden">
+                {["Code.", "Vision.", "Cinematography."].map((word, i) => (
+                  <motion.span
+                    key={word}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: i * 0.15, ease: EASE_OUT_EXPO }}
+                    className="font-serif text-[11px] md:text-base tracking-[0.2em] md:tracking-[0.3em] uppercase text-foreground/90 italic drop-shadow-md"
+                  >
+                    {word}
+                  </motion.span>
+                ))}
+              </div>
 
-          {/* Timer bar / Divider */}
-          <div className="flex items-center gap-4 opacity-90">
-            <div className="h-px w-10 md:w-20 bg-foreground/30 shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
-            <AnimatePresence mode="wait">
-              {!showEnter ? (
-                /* Thin shimmer bar while loading */
-                <motion.div
-                  key="shimmer"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="h-px w-24 md:w-32 overflow-hidden bg-foreground/20 relative shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
-                >
-                  <motion.div
-                    initial={{ x: "-100%" }}
-                    animate={{ x: "100%" }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", repeatDelay: 0.4 }}
-                    className="absolute inset-0 h-full w-full bg-primary/90"
-                  />
-                </motion.div>
-              ) : (
-                /* 10s countdown text */
-                <motion.span
-                  key="countdown"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="font-serif text-[10px] md:text-xs tracking-[0.3em] uppercase text-foreground/90 italic whitespace-nowrap drop-shadow-md"
-                >
-                  auto in {countdown}s
-                </motion.span>
-              )}
-            </AnimatePresence>
-            <div className="h-px w-10 md:w-20 bg-foreground/30 shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
-          </div>
-        </div>
+              {/* Timer bar / Divider */}
+              <div className="flex items-center gap-4 opacity-90">
+                <div className="h-px w-10 md:w-20 bg-foreground/30 shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
+                <AnimatePresence mode="wait">
+                  {!showEnter ? (
+                    /* Thin shimmer bar while loading */
+                    <motion.div
+                      key="shimmer"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="h-px w-24 md:w-32 overflow-hidden bg-foreground/20 relative shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
+                    >
+                      <motion.div
+                        initial={{ x: "-100%" }}
+                        animate={{ x: "100%" }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", repeatDelay: 0.4 }}
+                        className="absolute inset-0 h-full w-full bg-primary/90"
+                      />
+                    </motion.div>
+                  ) : (
+                    /* 10s countdown text */
+                    <motion.span
+                      key="countdown"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="font-serif text-[10px] md:text-xs tracking-[0.3em] uppercase text-foreground/90 italic whitespace-nowrap drop-shadow-md"
+                    >
+                      auto in {countdown}s
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+                <div className="h-px w-10 md:w-20 bg-foreground/30 shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* ENTER BUTTON: Fades in below the timer bar */}
         <AnimatePresence>
@@ -290,10 +308,9 @@ function Header({ data, isLoading }: { data: ReturnType<typeof useContent>; isLo
       }`}
     >
       <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-6 md:px-12">
-        <a href="#top" className="flex items-center gap-2" onClick={() => setMenuOpen(false)}>
-          <span className="font-serif text-2xl italic text-foreground inline-block">
-            {data.brand.monogram}
-          </span>
+        <a href="#top" className="flex items-center gap-2 w-8 h-8 md:w-10 md:h-10" onClick={() => setMenuOpen(false)}>
+          {/* Invisible placeholder matching the flying coin's layout box */}
+          <div className="w-8 h-8 md:w-10 md:h-10" />
         </a>
         <nav className="hidden items-center gap-10 md:flex">
           {data.brand.nav.map((item, i) => (
@@ -1468,8 +1485,19 @@ function Index() {
   const [showEnter, setShowEnter] = useState(false);
   const [countdown, setCountdown] = useState(10);
 
+  // Staged timeline sequence states
+  const [videoVisible, setVideoVisible] = useState(false);
+  const [wordsVisible, setWordsVisible] = useState(false);
+
   // Handle Enter button press
   const handleEnter = () => setIsLoading(false);
+
+  // Scroll to top when clicking the navbar coin logo
+  const handleLogoClick = () => {
+    if (!isLoading) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     // Clear hash on mount
@@ -1482,13 +1510,24 @@ function Index() {
   }, []);
 
   useEffect(() => {
-    // Minimum display time of 2.5s so the preloader is actually seen
-    const timer = setTimeout(() => setMinTimeElapsed(true), 2500);
-    return () => clearTimeout(timer);
+    // 2.5s: Background video awakens
+    const videoTimer = setTimeout(() => setVideoVisible(true), 2500);
+
+    // 4.5s: Sequential words begin
+    const wordsTimer = setTimeout(() => setWordsVisible(true), 4500);
+
+    // 6.0s: Enter Site button appears
+    const buttonTimer = setTimeout(() => setMinTimeElapsed(true), 6000);
+
+    return () => {
+      clearTimeout(videoTimer);
+      clearTimeout(wordsTimer);
+      clearTimeout(buttonTimer);
+    };
   }, []);
 
   useEffect(() => {
-    // Show enter button once min time has passed (no longer blocking on media buffering to ensure it always appears quickly)
+    // Show enter button once min time has passed
     if (minTimeElapsed && !showEnter) {
       setShowEnter(true);
     }
@@ -1524,6 +1563,8 @@ function Index() {
     };
   }, [isLoading]);
 
+  const coinState = isLoading ? 'preloader' : 'navbar';
+
   return (
     <div className="bg-black min-h-screen">
       <AnimatePresence>
@@ -1535,9 +1576,28 @@ function Index() {
             showEnter={showEnter}
             onEnter={handleEnter}
             countdown={countdown}
+            videoVisible={videoVisible}
+            wordsVisible={wordsVisible}
           />
         )}
       </AnimatePresence>
+
+      {/* 3D Monogram - Globally positioned for seamless flight to Navbar logo placeholder */}
+      {(isPreloaderMounted || coinState === 'navbar') && (
+        <motion.div
+          layout
+          transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
+          onClick={handleLogoClick}
+          className={
+            coinState === 'preloader'
+              ? "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] md:w-[350px] md:h-[350px] z-[110] pointer-events-auto"
+              : "fixed left-6 md:left-[48px] top-6 translate-x-0 translate-y-0 w-8 h-8 md:w-10 md:h-10 z-[60] pointer-events-auto cursor-pointer"
+          }
+        >
+          <AP3DMonogram isMini={coinState === 'navbar'} />
+        </motion.div>
+      )}
+
       <motion.div 
         className="relative min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary"
         initial={{ opacity: 0, scale: 0.92, filter: "blur(8px)" }}
@@ -1555,29 +1615,29 @@ function Index() {
           setActiveAudioId={setActiveAudioId} 
           onMediaReady={() => setMediaReady(true)}
         />
-      <SelectedWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
-      <Clients data={data} />
-      <Certifications data={data} />
-      <CreativeWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
-      <UPESWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
-      <WorkedWith data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
-      <CreativeTools data={data} />
-      <About data={data} />
-      
-      {/* --- DOME GALLERY SECTION --- */}
-      <section className="relative w-full h-[100vh] bg-black overflow-hidden flex flex-col items-center justify-center border-t border-white/10">
-        <div className="absolute top-20 z-20 text-center pointer-events-none">
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tighter uppercase mb-4 opacity-90">Dome Gallery</h2>
-          <p className="text-xs md:text-sm text-gray-400 font-mono tracking-widest uppercase">Instagram Highlights & Posts</p>
-        </div>
-        {/* The DomeGallery itself is fully interactive */}
-        <div className="w-full h-full cursor-grab active:cursor-grabbing">
-          <DomeGallery images={domeGalleryImages} />
-        </div>
-      </section>
+        <SelectedWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
+        <Clients data={data} />
+        <Certifications data={data} />
+        <CreativeWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
+        <UPESWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
+        <WorkedWith data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
+        <CreativeTools data={data} />
+        <About data={data} />
+        
+        {/* --- DOME GALLERY SECTION --- */}
+        <section className="relative w-full h-[100vh] bg-black overflow-hidden flex flex-col items-center justify-center border-t border-white/10">
+          <div className="absolute top-20 z-20 text-center pointer-events-none">
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tighter uppercase mb-4 opacity-90">Dome Gallery</h2>
+            <p className="text-xs md:text-sm text-gray-400 font-mono tracking-widest uppercase">Instagram Highlights & Posts</p>
+          </div>
+          {/* The DomeGallery itself is fully interactive */}
+          <div className="w-full h-full cursor-grab active:cursor-grabbing">
+            <DomeGallery images={domeGalleryImages} />
+          </div>
+        </section>
 
-      <Testimonial data={data} />
-      <CallToAction data={data} />
+        <Testimonial data={data} />
+        <CallToAction data={data} />
       </motion.div>
     </div>
   );

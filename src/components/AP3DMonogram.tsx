@@ -125,31 +125,39 @@ function useGoldTextures() {
 }
 
 /* ── Antique Gold "AP" Minted Coin with PBR Textures ── */
-function APCoin() {
+function APCoin({ isMini, hovered }: { isMini: boolean; hovered: boolean }) {
   const coinRef = useRef<THREE.Group>(null);
   const { normalMap, roughnessMap, aoMap } = useGoldTextures();
 
   // Entrance animation state
   const entranceRef = useRef({ elapsed: 0, done: false });
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  const TARGET_SCALE = isMobile ? 0.08 : 0.12; // Smaller size to prevent cropping and fit design
+  // Make target scale slightly larger in full-screen preloader (0.16 desktop / 0.11 mobile) for cinematic effect
+  const TARGET_SCALE = isMini 
+    ? 0.16 
+    : (isMobile ? 0.11 : 0.16);
 
   // Smooth entrance + auto-rotation with ramp-up
   useFrame((state, delta) => {
     if (!coinRef.current) return;
 
-    if (!entranceRef.current.done) {
-      // Set scale immediately instead of pop-up
-      coinRef.current.scale.set(TARGET_SCALE, TARGET_SCALE, TARGET_SCALE);
-      entranceRef.current.done = true;
-    }
+    if (!isMini) {
+      if (!entranceRef.current.done) {
+        coinRef.current.scale.set(TARGET_SCALE, TARGET_SCALE, TARGET_SCALE);
+        entranceRef.current.done = true;
+      }
 
-    // Rotation: ramp up from 0 to full speed over 1.5s
-    entranceRef.current.elapsed += delta;
-    const rotRamp = Math.min(entranceRef.current.elapsed / 1.5, 1);
-    // Smooth ease-out for rotation start
-    const rotSpeed = rotRamp * (2 - rotRamp) * 0.6;
-    coinRef.current.rotation.y += delta * rotSpeed;
+      // Rotation: ramp up from 0 to full speed over 1.5s
+      entranceRef.current.elapsed += delta;
+      const rotRamp = Math.min(entranceRef.current.elapsed / 1.5, 1);
+      const rotSpeed = rotRamp * (2 - rotRamp) * 0.6;
+      coinRef.current.rotation.y += delta * rotSpeed;
+    } else {
+      // In navbar: fixed scale, fast spin on hover, slow drift otherwise
+      coinRef.current.scale.set(TARGET_SCALE, TARGET_SCALE, TARGET_SCALE);
+      const rotSpeed = hovered ? 3.2 : 0.45;
+      coinRef.current.rotation.y += delta * rotSpeed;
+    }
   });
 
   // ── Coin body: warm, deep antique gold ──
@@ -270,17 +278,38 @@ function APCoin() {
 }
 
 /* ── Cinematic Lighting with Shadow-Casting Key Light ── */
-function CinematicLights() {
+function CinematicLights({ isMini }: { isMini: boolean }) {
+  const sweepLightRef = useRef<THREE.DirectionalLight>(null);
+
+  useFrame((state) => {
+    if (sweepLightRef.current && !isMini) {
+      // Sweep light X position over the first 2.5 seconds
+      const elapsed = state.clock.getElapsedTime();
+      const x = -8 + Math.min(elapsed / 2.5, 1) * 16;
+      sweepLightRef.current.position.x = x;
+    }
+  });
+
   return (
     <>
-      <ambientLight intensity={0.08} />
+      <ambientLight intensity={isMini ? 0.28 : 0.08} />
+
+      {/* Sweep light for golden reflection pass */}
+      {!isMini && (
+        <directionalLight
+          ref={sweepLightRef}
+          position={[-8, 3, 4]}
+          intensity={8}
+          color="#ffd685"
+        />
+      )}
 
       {/* Key light with shadow casting */}
       <directionalLight
         position={[4, 4, 3]}
-        intensity={3}
+        intensity={isMini ? 4.5 : 3}
         color="#ffdf95"
-        castShadow
+        castShadow={!isMini}
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
         shadow-camera-near={0.1}
@@ -293,13 +322,13 @@ function CinematicLights() {
       />
 
       {/* Cool fill light */}
-      <pointLight position={[-3, 1, 3]} intensity={8} color="#ffffff" />
+      <pointLight position={[-3, 1, 3]} intensity={isMini ? 12 : 8} color="#ffffff" />
 
       {/* Golden rim light from below */}
-      <pointLight position={[0, -2, -3]} intensity={6} color="#a28d63" />
+      <pointLight position={[0, -2, -3]} intensity={isMini ? 10 : 6} color="#a28d63" />
 
       {/* Subtle top accent */}
-      <pointLight position={[0, 4, 0]} intensity={4} color="#ffeebb" />
+      <pointLight position={[0, 4, 0]} intensity={isMini ? 6 : 4} color="#ffeebb" />
     </>
   );
 }
@@ -319,42 +348,50 @@ function PostProcessing() {
 }
 
 /* ── Main exported component ── */
-export default function AP3DMonogram({ className = '' }: { className?: string }) {
+export default function AP3DMonogram({ className = '', isMini = false }: { className?: string; isMini?: boolean }) {
+  const [hovered, setHovered] = useState(false);
+
   return (
-    <div className={`w-full h-full cursor-grab active:cursor-grabbing ${className}`}>
+    <div 
+      className={`w-full h-full cursor-grab active:cursor-grabbing ${className}`}
+      onMouseEnter={() => isMini && setHovered(true)}
+      onMouseLeave={() => isMini && setHovered(false)}
+    >
       <Canvas
         camera={{ position: [0, 0, 4], fov: 35 }}
         gl={{ antialias: false, alpha: true, toneMapping: THREE.NoToneMapping }}
-        shadows
+        shadows={!isMini}
         style={{ background: 'transparent' }}
         dpr={typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 2) : 1}
       >
         <Suspense fallback={null}>
-          <CinematicLights />
+          <CinematicLights isMini={isMini} />
 
           {/* Studio HDRI for strong, clean gold reflections */}
           <Environment preset="studio" />
 
-          {/* Visually center the 3D focal point (counteracting layout shift) */}
-          <group position={[0.28, 0, 0]}>
-            <APCoin />
+          {/* Visually center the 3D focal point (counteracting layout shift in full-screen) */}
+          <group position={isMini ? [0, 0, 0] : [0.28, 0, 0]}>
+            <APCoin isMini={isMini} hovered={hovered} />
           </group>
 
-          {/* Contact shadow grounds the coin instead of floating */}
-          <ContactShadows
-            position={[0.28, -1.3, 0]}
-            opacity={0.35}
-            blur={2}
-            scale={10}
-            far={4}
-          />
+          {/* Contact shadow grounds the coin inside preloader (disable in navbar) */}
+          {!isMini && (
+            <ContactShadows
+              position={[0.28, -1.3, 0]}
+              opacity={0.35}
+              blur={2}
+              scale={10}
+              far={4}
+            />
+          )}
 
           {/* Interactive rotation controls */}
           <OrbitControls
             enableZoom={false}
             enablePan={false}
             enableRotate={true}
-            target={[0.28, 0, 0]}
+            target={isMini ? [0, 0, 0] : [0.28, 0, 0]}
             makeDefault
           />
         </Suspense>
