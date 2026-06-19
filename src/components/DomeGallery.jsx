@@ -112,10 +112,18 @@ export default function DomeGallery({
   const startPosRef = useRef(null);
   const draggingRef = useRef(false);
   const movedRef = useRef(false);
-  const inertiaRAF = useRef(null);
   const openingRef = useRef(false);
   const openStartedAtRef = useRef(0);
   const lastDragEndAt = useRef(0);
+
+  // Hybrid System Refs
+  const loopRAF = useRef(null);
+  const hoverActiveRef = useRef(false);
+  const mousePosRef = useRef({ x: 0, y: 0 });
+  const velocityRef = useRef({ x: 0, y: 0 });
+  const baseRotationRef = useRef({ x: 0, y: 0 });
+  const driftYRef = useRef(0);
+  const parallaxRef = useRef({ x: 0, y: 0 });
 
   const scrollLockedRef = useRef(false);
   const lockScroll = useCallback(() => {
@@ -235,55 +243,141 @@ export default function DomeGallery({
     applyTransform(rotationRef.current.x, rotationRef.current.y);
   }, []);
 
-  const stopInertia = useCallback(() => {
-    if (inertiaRAF.current) {
-      cancelAnimationFrame(inertiaRAF.current);
-      inertiaRAF.current = null;
-    }
-  }, []);
+  // Continuous loop managing Auto-Drift, Mouse Parallax, and Inertia
+  useEffect(() => {
+    let lastTime = performance.now();
 
-  const startInertia = useCallback(
-    (vx, vy) => {
-      const MAX_V = 1.4;
-      let vX = clamp(vx, -MAX_V, MAX_V) * 80;
-      let vY = clamp(vy, -MAX_V, MAX_V) * 80;
-      let frames = 0;
+    const step = (time) => {
+      const delta = Math.min((time - lastTime) / 1000, 0.1);
+      lastTime = time;
+
+      // Don't update rotation if modal is open
+      if (focusedElRef.current || rootRef.current?.getAttribute('data-enlarging') === 'true') {
+        loopRAF.current = requestAnimationFrame(step);
+        return;
+      }
+
+      // 1. Decelerate inertia velocity if active
       const d = clamp(dragDampening ?? 0.6, 0, 1);
-      const frictionMul = 0.94 + 0.055 * d;
+      const friction = 0.94 + 0.055 * d;
       const stopThreshold = 0.015 - 0.01 * d;
-      const maxFrames = Math.round(90 + 270 * d);
-      const step = () => {
-        vX *= frictionMul;
-        vY *= frictionMul;
-        if (Math.abs(vX) < stopThreshold && Math.abs(vY) < stopThreshold) {
-          inertiaRAF.current = null;
-          return;
+
+      if (Math.abs(velocityRef.current.x) > stopThreshold || Math.abs(velocityRef.current.y) > stopThreshold) {
+        velocityRef.current.x *= friction;
+        velocityRef.current.y *= friction;
+
+        baseRotationRef.current.x = clamp(
+          baseRotationRef.current.x - velocityRef.current.y / 200,
+          -maxVerticalRotationDeg,
+          maxVerticalRotationDeg
+        );
+        baseRotationRef.current.y = wrapAngleSigned(
+          baseRotationRef.current.y + velocityRef.current.x / 200
+        );
+      } else {
+        velocityRef.current = { x: 0, y: 0 };
+      }
+
+      // 2. Handle Auto-Drift
+      if (!draggingRef.current) {
+        if (!hoverActiveRef.current) {
+          // Slowly rotate on Y-axis
+          driftYRef.current = wrapAngleSigned(driftYRef.current + delta * 1.5); // 1.5 degrees per second
+          // Slowly bring X rotation back to 0 if not centered
+          baseRotationRef.current.x += (0 - baseRotationRef.current.x) * 0.025;
         }
-        if (++frames > maxFrames) {
-          inertiaRAF.current = null;
-          return;
-        }
-        const nextX = clamp(rotationRef.current.x - vY / 200, -maxVerticalRotationDeg, maxVerticalRotationDeg);
-        const nextY = wrapAngleSigned(rotationRef.current.y + vX / 200);
-        rotationRef.current = { x: nextX, y: nextY };
-        applyTransform(nextX, nextY);
-        inertiaRAF.current = requestAnimationFrame(step);
+      }
+
+      // 3. Handle Mouse-Tracking Parallax
+      const targetParallax = hoverActiveRef.current && !draggingRef.current
+        ? {
+            x: -mousePosRef.current.y * 3.5, // max 3.5 degrees vertical tilt
+            y: mousePosRef.current.x * 6.0    // max 6.0 degrees horizontal tilt
+          }
+        : { x: 0, y: 0 };
+
+      // Lerp parallax offsets
+      parallaxRef.current.x += (targetParallax.x - parallaxRef.current.x) * 0.07;
+      parallaxRef.current.y += (targetParallax.y - parallaxRef.current.y) * 0.07;
+
+      // 4. Combine and Apply Rotation
+      if (draggingRef.current) {
+        // Dragging takes absolute priority
+        rotationRef.current = {
+          x: baseRotationRef.current.x,
+          y: wrapAngleSigned(baseRotationRef.current.y + driftYRef.current)
+        };
+      } else {
+        rotationRef.current = {
+          x: clamp(baseRotationRef.current.x + parallaxRef.current.x, -maxVerticalRotationDeg, maxVerticalRotationDeg),
+          y: wrapAngleSigned(baseRotationRef.current.y + driftYRef.current + parallaxRef.current.y)
+        };
+      }
+
+      applyTransform(rotationRef.current.x, rotationRef.current.y);
+
+      loopRAF.current = requestAnimationFrame(step);
+    };
+
+    loopRAF.current = requestAnimationFrame(step);
+
+    return () => {
+      if (loopRAF.current) {
+        cancelAnimationFrame(loopRAF.current);
+      }
+    };
+  }, [maxVerticalRotationDeg, dragDampening]);
+
+  // Bind mouse-tracking events directly to the gallery area
+  useEffect(() => {
+    const main = mainRef.current;
+    if (!main) return;
+
+    const handleMouseMove = (e) => {
+      const rect = main.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+      mousePosRef.current = {
+        x: (x - 0.5) * 2,
+        y: (y - 0.5) * 2
       };
-      stopInertia();
-      inertiaRAF.current = requestAnimationFrame(step);
-    },
-    [dragDampening, maxVerticalRotationDeg, stopInertia]
-  );
+    };
+
+    const handleMouseEnter = () => {
+      hoverActiveRef.current = true;
+    };
+
+    const handleMouseLeave = () => {
+      hoverActiveRef.current = false;
+      mousePosRef.current = { x: 0, y: 0 };
+    };
+
+    main.addEventListener('mousemove', handleMouseMove);
+    main.addEventListener('mouseenter', handleMouseEnter);
+    main.addEventListener('mouseleave', handleMouseLeave);
+
+    return () => {
+      main.removeEventListener('mousemove', handleMouseMove);
+      main.removeEventListener('mouseenter', handleMouseEnter);
+      main.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, []);
 
   useGesture(
     {
       onDragStart: ({ event }) => {
         if (focusedElRef.current) return;
-        stopInertia();
+        velocityRef.current = { x: 0, y: 0 };
         const evt = event;
         draggingRef.current = true;
         movedRef.current = false;
-        startRotRef.current = { ...rotationRef.current };
+
+        // Reset drift and parallax, absorbing them into baseRotationRef so dragging has no jumps
+        baseRotationRef.current = { ...rotationRef.current };
+        driftYRef.current = 0;
+        parallaxRef.current = { x: 0, y: 0 };
+
+        startRotRef.current = { ...baseRotationRef.current };
         startPosRef.current = { x: evt.clientX, y: evt.clientY };
       },
       onDrag: ({ event, last, velocity = [0, 0], direction = [0, 0], movement }) => {
@@ -301,10 +395,10 @@ export default function DomeGallery({
           maxVerticalRotationDeg
         );
         const nextY = wrapAngleSigned(startRotRef.current.y + dxTotal / dragSensitivity);
-        if (rotationRef.current.x !== nextX || rotationRef.current.y !== nextY) {
-          rotationRef.current = { x: nextX, y: nextY };
-          applyTransform(nextX, nextY);
-        }
+        
+        baseRotationRef.current = { x: nextX, y: nextY };
+        rotationRef.current = { x: nextX, y: nextY };
+        
         if (last) {
           draggingRef.current = false;
           let [vMagX, vMagY] = velocity;
@@ -316,7 +410,13 @@ export default function DomeGallery({
             vx = clamp((mx / dragSensitivity) * 0.02, -1.2, 1.2);
             vy = clamp((my / dragSensitivity) * 0.02, -1.2, 1.2);
           }
-          if (Math.abs(vx) > 0.005 || Math.abs(vy) > 0.005) startInertia(vx, vy);
+          if (Math.abs(vx) > 0.005 || Math.abs(vy) > 0.005) {
+            const MAX_V = 1.4;
+            velocityRef.current = {
+              x: clamp(vx, -MAX_V, MAX_V) * 80,
+              y: clamp(vy, -MAX_V, MAX_V) * 80
+            };
+          }
           if (movedRef.current) lastDragEndAt.current = performance.now();
           movedRef.current = false;
         }
