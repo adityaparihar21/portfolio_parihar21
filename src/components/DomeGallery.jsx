@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useCallback } from 'react';
+import { useEffect, useMemo, useRef, useCallback, useState } from 'react';
 import { useGesture } from '@use-gesture/react';
 import './DomeGallery.css';
 
@@ -35,7 +35,7 @@ function buildItems(pool, seg) {
 
   const totalSlots = coords.length;
   if (pool.length === 0) {
-    return coords.map(c => ({ ...c, src: '', alt: '' }));
+    return coords.map(c => ({ ...c, src: '', thumb: '', alt: '' }));
   }
   if (pool.length > totalSlots) {
     console.warn(
@@ -45,9 +45,12 @@ function buildItems(pool, seg) {
 
   const normalizedImages = pool.map(image => {
     if (typeof image === 'string') {
-      return { src: image, alt: '' };
+      const thumb = image.replace(/\/DOMEGALLERY\//i, '/DOMEGALLERY_THUMBS/');
+      return { src: image, thumb, alt: '' };
     }
-    return { src: image.src || '', alt: image.alt || '' };
+    const src = image.src || '';
+    const thumb = src.replace(/\/DOMEGALLERY\//i, '/DOMEGALLERY_THUMBS/');
+    return { src, thumb, alt: image.alt || '' };
   });
 
   const usedImages = Array.from({ length: totalSlots }, (_, i) => normalizedImages[i % normalizedImages.length]);
@@ -68,6 +71,7 @@ function buildItems(pool, seg) {
   return coords.map((c, i) => ({
     ...c,
     src: usedImages[i].src,
+    thumb: usedImages[i].thumb,
     alt: usedImages[i].alt
   }));
 }
@@ -138,7 +142,21 @@ export default function DomeGallery({
     document.body.classList.remove('dg-scroll-lock');
   }, []);
 
-  const items = useMemo(() => buildItems(images, segments), [images, segments]);
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const effectiveSegments = useMemo(() => {
+    return isMobile ? Math.min(segments, 16) : segments;
+  }, [isMobile, segments]);
+
+  const items = useMemo(() => buildItems(images, effectiveSegments), [images, effectiveSegments]);
 
   const applyTransform = (xDeg, yDeg) => {
     const el = sphereRef.current;
@@ -539,7 +557,7 @@ export default function DomeGallery({
       const offsetY = getDataNumber(parent, 'offsetY', 0);
       const sizeX = getDataNumber(parent, 'sizeX', 2);
       const sizeY = getDataNumber(parent, 'sizeY', 2);
-      const parentRot = computeItemBaseRotation(offsetX, offsetY, sizeX, sizeY, segments);
+      const parentRot = computeItemBaseRotation(offsetX, offsetY, sizeX, sizeY, effectiveSegments);
       const parentY = normalizeAngle(parentRot.rotateY);
       const globalY = normalizeAngle(rotationRef.current.y);
       let rotY = -(parentY + globalY) % 360;
@@ -637,7 +655,7 @@ export default function DomeGallery({
         overlay.addEventListener('transitionend', onFirstEnd);
       }
     },
-    [enlargeTransitionMs, lockScroll, openedImageHeight, openedImageWidth, segments, unlockScroll]
+    [enlargeTransitionMs, lockScroll, openedImageHeight, openedImageWidth, effectiveSegments, unlockScroll]
   );
 
   const onTileClick = useCallback(
@@ -674,8 +692,8 @@ export default function DomeGallery({
       ref={rootRef}
       className="sphere-root"
       style={{
-        ['--segments-x']: segments,
-        ['--segments-y']: segments,
+        ['--segments-x']: effectiveSegments,
+        ['--segments-y']: effectiveSegments,
         ['--overlay-blur-color']: overlayBlurColor,
         ['--tile-radius']: imageBorderRadius,
         ['--enlarge-radius']: openedImageBorderRadius,
@@ -709,7 +727,7 @@ export default function DomeGallery({
                   onClick={onTileClick}
                   onPointerUp={onTilePointerUp}
                 >
-                  <img src={it.src} draggable={false} alt={it.alt} />
+                  <img src={it.thumb} loading="lazy" draggable={false} alt={it.alt} />
                 </div>
               </div>
             ))}
