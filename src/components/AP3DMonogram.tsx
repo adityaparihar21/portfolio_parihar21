@@ -371,27 +371,22 @@ function CinematicScrollScene({
 
     const t = Math.min(Math.max(smoothedProgress.current, 0), 1);
 
-    if (t <= 0.5) {
-      // --- STAGE 1 (0.0 -> 0.5): Coin falls flat to the floor & camera orbits to top view ---
-      const t1 = t / 0.5;
-      const e1 = t1 < 0.5 ? 4 * t1 * t1 * t1 : 1 - Math.pow(-2 * t1 + 2, 3) / 2; // cubic ease-in-out
+    if (t <= 0.4) {
+      // --- STAGE 1 (0.0 -> 0.4): Coin free falls flat to the floor (Camera stays front) ---
+      const t1 = t / 0.4;
+      const e1 = t1 * t1 * (3 - 2 * t1); // smoothstep ease-in-out for gravity fall
 
-      // Coin position Y: falls 0 -> -1.25
+      // Coin position Y: falls 0 -> -1.25, Coin tilt X: 0 -> pi/2
       if (coinGroupRef.current) {
         coinGroupRef.current.position.y = -1.25 * e1;
-        // Coin tilt X: 0 -> pi/2
         coinGroupRef.current.rotation.x = (Math.PI / 2) * e1;
         coinGroupRef.current.position.x = 0;
       }
 
-      // Camera position: orbit from front [0, 0, 4] to top [0, 3.0, 0.5]
-      camera.position.set(
-        0,
-        3.0 * e1,
-        4.0 - 3.5 * e1
-      );
+      // Camera position: remains at front view [0, 0, 7.5]
+      camera.position.set(0, 0, 7.5);
 
-      // Camera lookAt: track the falling coin center
+      // Camera lookAt: track the falling coin center to keep it framed
       camera.lookAt(0, -1.25 * e1, 0);
 
       // Shadow opacity: scales 0.08 -> 0.35 and sharpens as it touches floor
@@ -402,9 +397,9 @@ function CinematicScrollScene({
           }
         });
       }
-    } else {
-      // --- STAGE 2 (0.5 -> 1.0): Camera pushes down through the center of the coin ---
-      const t2 = (t - 0.5) / 0.5;
+    } else if (t <= 0.7) {
+      // --- STAGE 2 (0.4 -> 0.7): Camera orbits to top view ---
+      const t2 = (t - 0.4) / 0.3;
       const e2 = t2 * t2 * (3 - 2 * t2); // smoothstep ease-in-out
 
       // Coin stays flat on floor
@@ -414,21 +409,51 @@ function CinematicScrollScene({
         coinGroupRef.current.position.x = 0;
       }
 
-      // Camera position: pushes straight down through coin (Y: 3.0 -> -2.0, Z: 0.5 -> 0.0)
+      // Camera position: circular orbit from front [0, 0, 7.5] to top [0, 7.5, 0.0]
       camera.position.set(
         0,
-        3.0 - 5.0 * e2,
-        0.5 - 0.5 * e2
+        7.5 * e2,
+        7.5 * (1 - e2)
       );
 
-      // Camera lookAt: look straight down (Y: -1.25 -> -3.0)
-      camera.lookAt(0, -1.25 - 1.75 * e2, 0);
+      // Camera lookAt: look straight down at the coin on the floor
+      camera.lookAt(0, -1.25, 0);
+
+      // Shadow opacity stays fully visible
+      if (shadowRef.current) {
+        shadowRef.current.traverse((child) => {
+          if (child instanceof THREE.Mesh && child.material) {
+            child.material.opacity = 0.35;
+          }
+        });
+      }
+    } else {
+      // --- STAGE 3 (0.7 -> 1.0): Camera pushes straight down through the center of the coin ---
+      const t3 = (t - 0.7) / 0.3;
+      const e3 = t3 * t3; // accelerate through the coin
+
+      // Coin stays flat on floor
+      if (coinGroupRef.current) {
+        coinGroupRef.current.position.y = -1.25;
+        coinGroupRef.current.rotation.x = Math.PI / 2;
+        coinGroupRef.current.position.x = 0;
+      }
+
+      // Camera position: pushes straight down through coin (Y: 7.5 -> -2.5, Z: 0.0)
+      camera.position.set(
+        0,
+        7.5 - 10.0 * e3,
+        0
+      );
+
+      // Camera lookAt: look straight down (Y: -1.25 -> -10.0)
+      camera.lookAt(0, -1.25 - 8.75 * e3, 0);
 
       // Fade out shadow completely once camera goes past/through
       if (shadowRef.current) {
         shadowRef.current.traverse((child) => {
           if (child instanceof THREE.Mesh && child.material) {
-            child.material.opacity = Math.max(0, 0.35 * (1 - e2));
+            child.material.opacity = Math.max(0, 0.35 * (1 - e3));
           }
         });
       }
@@ -510,7 +535,7 @@ export default function AP3DMonogram({
       onMouseLeave={() => isMini && setHovered(false)}
     >
       <Canvas
-        camera={{ position: [0, 0, 4], fov: 35 }}
+        camera={{ position: [0, 0, 7.5], fov: 35 }}
         gl={{ antialias: false, alpha: true, toneMapping: THREE.NoToneMapping }}
         shadows={!isMini}
         style={{ background: 'transparent' }}

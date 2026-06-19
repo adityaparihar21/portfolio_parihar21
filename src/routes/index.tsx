@@ -56,8 +56,6 @@ function Preloader({
   videoVisible,
   wordsVisible,
   scrollProgress,
-  setScrollProgress,
-  isAnimatingScroll,
 }: {
   monogram: string;
   triggerTransition: boolean;
@@ -68,12 +66,9 @@ function Preloader({
   videoVisible: boolean;
   wordsVisible: boolean;
   scrollProgress: number;
-  setScrollProgress: (val: number) => void;
-  isAnimatingScroll: boolean;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Smooth mouse tracking for the light spotlight
   const mouseX = useMotionValue(typeof window !== "undefined" ? window.innerWidth / 2 : 0);
@@ -105,14 +100,6 @@ function Preloader({
       videoRef.current.playbackRate = 1.25;
     }
   }, []);
-
-  // Handle native scroll container overlay events
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    if (isAnimatingScroll) return;
-    const target = e.currentTarget;
-    const progress = target.scrollTop / (target.scrollHeight - target.clientHeight);
-    setScrollProgress(Math.min(Math.max(progress, 0), 1));
-  };
 
   useEffect(() => {
     if (triggerTransition) {
@@ -165,18 +152,6 @@ function Preloader({
       transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black overflow-hidden"
     >
-      {/* Scroll container that overlays the screen to capture scrolls/swipes natively */}
-      {showEnter && !isAnimatingScroll && (
-        <div
-          ref={scrollContainerRef}
-          onScroll={handleScroll}
-          className="absolute inset-0 z-10 overflow-y-auto scrollbar-none pointer-events-auto"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          <div className="h-[250vh] w-full" />
-        </div>
-      )}
-
       {/* Interior Video Background - Awakens when videoVisible is true */}
       <motion.div
         initial={{ opacity: 0, scale: 1.0 }}
@@ -281,15 +256,15 @@ function Preloader({
           )}
         </AnimatePresence>
 
-        {/* SCROLL TO ENTER PROMPT / Skip button */}
+        {/* SCROLL TO ENTER PROMPT / Skip button (Fades out when user starts scrolling) */}
         <AnimatePresence>
-          {showEnter && (
+          {showEnter && scrollProgress < 0.15 && (
             <motion.div
               key="enter"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.7, ease: EASE_OUT_EXPO }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.5, ease: EASE_OUT_EXPO }}
               className="mt-2 flex flex-col items-center gap-3 z-40 pointer-events-auto"
             >
               {/* Bouncing mouse scroll icon */}
@@ -1536,6 +1511,49 @@ function Index() {
     scrollProgressRef.current = scrollProgress;
   }, [scrollProgress]);
 
+  // Accumulate delta to simulate scroll progress virtually on window
+  useEffect(() => {
+    if (!isLoading || !showEnter) return;
+
+    let accumulatedDelta = 0;
+    const maxDelta = 800; // Total scroll delta required to enter the site
+
+    const handleWheel = (e: WheelEvent) => {
+      if (animatingScrollRef.current) return;
+      e.preventDefault();
+      accumulatedDelta += e.deltaY;
+      accumulatedDelta = Math.min(Math.max(accumulatedDelta, 0), maxDelta);
+      setScrollProgress(accumulatedDelta / maxDelta);
+    };
+
+    let touchStart = 0;
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStart = e.touches[0].clientY;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (animatingScrollRef.current) return;
+      e.preventDefault();
+      const touchY = e.touches[0].clientY;
+      const deltaY = touchStart - touchY; // Swipe up to scroll down
+      touchStart = touchY;
+      
+      accumulatedDelta += deltaY * 1.5; // Touch sensitivity factor
+      accumulatedDelta = Math.min(Math.max(accumulatedDelta, 0), maxDelta);
+      setScrollProgress(accumulatedDelta / maxDelta);
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+    return () => {
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, [isLoading, showEnter]);
+
   // Staged timeline sequence states
   const [videoVisible, setVideoVisible] = useState(true);
   const [wordsVisible, setWordsVisible] = useState(false);
@@ -1656,8 +1674,6 @@ function Index() {
             videoVisible={videoVisible}
             wordsVisible={wordsVisible}
             scrollProgress={scrollProgress}
-            setScrollProgress={setScrollProgress}
-            isAnimatingScroll={animatingScrollRef.current}
           />
         )}
       </AnimatePresence>
