@@ -308,9 +308,9 @@ function Header({ data, isLoading }: { data: ReturnType<typeof useContent>; isLo
       }`}
     >
       <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-6 md:px-12">
-        <a href="#top" className="flex items-center gap-2 w-10 h-10 md:w-12 md:h-12" onClick={() => setMenuOpen(false)}>
+        <a href="#top" className="flex items-center gap-2 w-12 h-12 md:w-16 md:h-16" onClick={() => setMenuOpen(false)}>
           {/* Invisible placeholder matching the flying coin's layout box */}
-          <div className="w-10 h-10 md:w-12 md:h-12" />
+          <div className="w-12 h-12 md:w-16 md:h-16" />
         </a>
         <nav className="hidden items-center gap-10 md:flex">
           {data.brand.nav.map((item, i) => (
@@ -1633,7 +1633,7 @@ function Index() {
           className={
             coinState === 'preloader'
               ? "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] md:w-[420px] md:h-[420px] z-[110] pointer-events-auto"
-              : "fixed left-6 md:left-[48px] top-6 translate-x-0 translate-y-0 w-10 h-10 md:w-12 md:h-12 z-[60] pointer-events-auto cursor-pointer"
+              : "fixed left-6 md:left-[48px] top-6 translate-x-0 translate-y-0 w-12 h-12 md:w-16 md:h-16 z-[60] pointer-events-auto cursor-pointer"
           }
         >
           <AP3DMonogram isMini={coinState === 'navbar'} />
