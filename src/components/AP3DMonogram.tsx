@@ -329,7 +329,7 @@ function PostProcessing() {
 }
 
 /* ── Main exported component ── */
-export default function AP3DMonogram({ className = '' }: { className?: string }) {
+export default function AP3DMonogram({ className = '', isTransitioning = false }: { className?: string, isTransitioning?: boolean }) {
   return (
     <div className={`w-full h-full cursor-grab active:cursor-grabbing ${className}`}>
       <Canvas
@@ -363,12 +363,14 @@ export default function AP3DMonogram({ className = '' }: { className?: string })
           <OrbitControls
             enableZoom={false}
             enablePan={false}
-            enableRotate={true}
+            enableRotate={!isTransitioning} // Disable user rotation during the cinematic intro
             target={[0.25, 0, 0]}
             minPolarAngle={Math.PI / 2 - 0.4} // Allow slight upward tilt (drifting)
             maxPolarAngle={Math.PI / 2 + 0.4} // Allow slight downward tilt
             makeDefault
           />
+
+          <CameraAnimator isTransitioning={isTransitioning} />
         </Suspense>
 
         {/* Post-processing outside Suspense for immediate rendering */}
@@ -376,4 +378,30 @@ export default function AP3DMonogram({ className = '' }: { className?: string })
       </Canvas>
     </div>
   );
+}
+
+/* ── Cinematic Camera Animation ── */
+function CameraAnimator({ isTransitioning }: { isTransitioning: boolean }) {
+  const { camera } = useThree();
+  const transitionRef = useRef({ elapsed: 0 });
+
+  useFrame((state, delta) => {
+    if (!isTransitioning) return;
+    
+    transitionRef.current.elapsed += delta;
+    
+    // Total animation time is ~1.8s
+    const t = Math.min(transitionRef.current.elapsed / 1.8, 1);
+    
+    // Accelerating curve (ease-in cubic) for a cinematic swooping push
+    const ease = t * t * t;
+
+    // Start position: [0, 0, 4]
+    // End position: [0.25, 0, -1.5] (Pushing completely through the coin group at x=0.25)
+    // By passing through the coin, it fills the screen with gold, then clips to reveal the black background
+    camera.position.x = THREE.MathUtils.lerp(0, 0.25, ease);
+    camera.position.z = THREE.MathUtils.lerp(4, -1.5, ease);
+  });
+
+  return null;
 }
