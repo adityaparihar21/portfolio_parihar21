@@ -91,20 +91,27 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
       audioRef.current.play().catch(e => console.warn("Audio playback blocked", e));
 
       const runTransition = async () => {
-        // Fade out the Enter button immediately
-        gsap.to(".preloader-content", { opacity: 0, duration: 0.4, ease: "power2.out" });
+        // Fade out monogram and text
+        gsap.to(".preloader-content", { opacity: 0, duration: 0.8, ease: "power2.out" });
+        gsap.to(".preloader-coin", { opacity: 0, scale: 1.1, duration: 1.5, ease: "power2.inOut" });
         
-        // The camera zoom inside AP3DMonogram takes ~1.8 seconds.
-        // We wait for it to finish, then call onComplete to unmount Preloader and show the Hero.
-        gsap.delayedCall(1.8, () => {
-          if (audioRef.current) {
-            gsap.to(audioRef.current, {
-              volume: 0,
-              duration: 0.3,
-              onComplete: () => audioRef.current?.pause()
-            });
-          }
-          onComplete();
+        // Smooth fade out and slight zoom for the new interior video
+        gsap.to(".preloader-bg", { 
+          scale: 1.1, 
+          opacity: 0, 
+          duration: 2.5, 
+          ease: "power2.inOut",
+          onComplete: () => {
+            if (audioRef.current) {
+              // Rapidly fade out audio so it never bleeds into home page
+              gsap.to(audioRef.current, {
+                volume: 0,
+                duration: 0.3,
+                onComplete: () => audioRef.current?.pause()
+              });
+            }
+            onComplete();
+          } 
         });
       };
       runTransition();
@@ -125,53 +132,130 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
       transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black overflow-hidden"
     >
-      {/* Pure Black Background */}
-      <div className="absolute inset-0 bg-black z-0 pointer-events-none" />
+      {/* Interior Video Background */}
+      <motion.div
+        initial={{ opacity: 0, scale: 1.0 }}
+        animate={{ opacity: 1, scale: 1.15 }}
+        exit={{ opacity: 0 }}
+        transition={{ 
+          opacity: { duration: 3, ease: "easeOut" },
+          scale: { duration: 25, ease: "linear", repeat: Infinity, repeatType: "reverse" }
+        }}
+        className="preloader-bg absolute inset-0 z-0 pointer-events-none origin-center"
+      >
+        <video
+          ref={videoRef}
+          src="/loadingpagebg.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        {/* Dark dimming overlay to ensure the 3D monogram and text pop against the bright flowers */}
+        <div className="absolute inset-0 bg-black/40 z-[1]" />
+        {/* Additional gradient at the bottom for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-[2]" />
+      </motion.div>
       
+      {/* Interactive Spotlight */}
+      <motion.div 
+        className="pointer-events-none absolute z-0 h-[800px] w-[800px] rounded-full opacity-40"
+        style={{
+          x: springX,
+          y: springY,
+          translateX: "-50%",
+          translateY: "-50%",
+          background: "radial-gradient(circle, rgba(224, 185, 80, 0.15) 0%, rgba(224, 185, 80, 0.05) 30%, transparent 60%)"
+        }}
+      />
+
       {/* 3D Monogram - Full Screen Canvas for perfect centering and unbound interaction */}
       <motion.div
         initial={{ opacity: 0, scale: 0.85 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
-        className="preloader-coin absolute inset-0 z-10 pointer-events-auto"
+        className="preloader-coin absolute inset-0 z-10 drop-shadow-2xl pointer-events-auto"
       >
-        <AP3DMonogram isTransitioning={triggerTransition} />
+        <AP3DMonogram />
       </motion.div>
 
       {/* Loading & Enter UI - Positioned at Bottom */}
-      <div className="absolute bottom-20 md:bottom-28 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center justify-center w-full px-6 preloader-content pointer-events-none">
+      <div className="absolute bottom-20 md:bottom-28 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-6 w-full px-6 preloader-content pointer-events-none">
         
-        <AnimatePresence mode="wait">
-          {!showEnter ? (
-            /* Minimal loading shimmer */
-            <motion.div
-              key="shimmer"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="h-px w-24 overflow-hidden bg-foreground/20 relative"
-            >
-              <motion.div
-                initial={{ x: "-100%" }}
-                animate={{ x: "100%" }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute inset-0 h-full w-full bg-primary/90"
-              />
-            </motion.div>
-          ) : (
-            /* Minimalist ENTER text */
+        {/* ALWAYS VISIBLE: Cycling words + Timer bar */}
+        <div className="flex flex-col items-center gap-5">
+          {/* All descriptor words side by side on desktop, stacked on mobile */}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-4 overflow-hidden">
+            {["Code.", "Vision.", "Cinematography."].map((word, i) => (
+              <motion.span
+                key={word}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: i * 0.15, ease: EASE_OUT_EXPO }}
+                className="font-serif text-[11px] md:text-base tracking-[0.2em] md:tracking-[0.3em] uppercase text-foreground/90 italic drop-shadow-md"
+              >
+                {word}
+              </motion.span>
+            ))}
+          </div>
+
+          {/* Timer bar / Divider */}
+          <div className="flex items-center gap-4 opacity-90">
+            <div className="h-px w-10 md:w-20 bg-foreground/30 shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
+            <AnimatePresence mode="wait">
+              {!showEnter ? (
+                /* Thin shimmer bar while loading */
+                <motion.div
+                  key="shimmer"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="h-px w-24 md:w-32 overflow-hidden bg-foreground/20 relative shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
+                >
+                  <motion.div
+                    initial={{ x: "-100%" }}
+                    animate={{ x: "100%" }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", repeatDelay: 0.4 }}
+                    className="absolute inset-0 h-full w-full bg-primary/90"
+                  />
+                </motion.div>
+              ) : (
+                /* 10s countdown text */
+                <motion.span
+                  key="countdown"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="font-serif text-[10px] md:text-xs tracking-[0.3em] uppercase text-foreground/90 italic whitespace-nowrap drop-shadow-md"
+                >
+                  auto in {countdown}s
+                </motion.span>
+              )}
+            </AnimatePresence>
+            <div className="h-px w-10 md:w-20 bg-foreground/30 shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
+          </div>
+        </div>
+
+        {/* ENTER BUTTON: Fades in below the timer bar */}
+        <AnimatePresence>
+          {showEnter && (
             <motion.div
               key="enter"
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.8, ease: EASE_OUT_EXPO }}
-              className="pointer-events-auto cursor-pointer"
-              onClick={onEnter}
+              transition={{ duration: 0.7, ease: EASE_OUT_EXPO }}
+              className="mt-2 pointer-events-auto"
             >
-              <span className="font-serif text-[10px] md:text-xs tracking-[0.4em] uppercase text-foreground/70 hover:text-foreground transition-colors duration-500">
-                Tap to Enter
-              </span>
+              <button
+                onClick={onEnter}
+                className="relative overflow-hidden px-12 py-3 border border-transparent bg-foreground transition-all duration-500 hover:scale-[1.03] hover:bg-foreground/90 active:scale-95 group rounded-full shadow-[0_4px_30px_rgba(237,224,202,0.15)] cursor-pointer"
+              >
+                <div className="absolute inset-0 bg-primary/10 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+                <span className="relative z-10 font-serif text-[11px] md:text-xs tracking-[0.35em] uppercase text-background group-hover:text-background/80 transition-colors duration-300 font-medium">
+                  Enter Site
+                </span>
+              </button>
             </motion.div>
           )}
         </AnimatePresence>
@@ -267,13 +351,11 @@ function Hero({
   activeAudioId,
   setActiveAudioId,
   onMediaReady,
-  isLoading,
 }: {
   data: ReturnType<typeof useContent>;
   activeAudioId: string | null;
   setActiveAudioId: (id: string | null) => void;
   onMediaReady?: () => void;
-  isLoading: boolean;
 }) {
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 800], [0, 200]);
@@ -345,7 +427,7 @@ function Hero({
       >
         <motion.span
           initial={{ opacity: 0, y: 20 }}
-          animate={isLoading ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.3 }}
           className="text-[10px] font-medium tracking-[0.45em] uppercase text-primary"
         >
@@ -354,7 +436,7 @@ function Hero({
 
         <motion.h1
           initial={{ opacity: 0, y: 40 }}
-          animate={isLoading ? { opacity: 0, y: 40 } : { opacity: 1, y: 0 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, delay: 0.5, ease: EASE_OUT_EXPO }}
           className="font-serif mt-6 text-6xl font-medium leading-[0.95] tracking-tight text-foreground md:text-8xl lg:text-9xl"
         >
@@ -363,7 +445,7 @@ function Hero({
 
         <motion.p
           initial={{ opacity: 0 }}
-          animate={isLoading ? { opacity: 0 } : { opacity: 1 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.9 }}
           className="mt-6 text-base font-light tracking-wide text-foreground/70 md:text-lg"
         >
@@ -372,7 +454,7 @@ function Hero({
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={isLoading ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 1.1 }}
           className="mt-10 flex flex-wrap gap-4"
         >
@@ -1385,10 +1467,9 @@ function Index() {
   const [isPreloaderMounted, setIsPreloaderMounted] = useState(true);
   const [showEnter, setShowEnter] = useState(false);
   const [countdown, setCountdown] = useState(10);
-  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Handle Enter button press
-  const handleEnter = () => setIsTransitioning(true);
+  const handleEnter = () => setIsLoading(false);
 
   useEffect(() => {
     // Clear hash on mount
@@ -1449,11 +1530,8 @@ function Index() {
         {isPreloaderMounted && (
           <Preloader 
             monogram={data.brand.monogram} 
-            triggerTransition={isTransitioning}
-            onComplete={() => {
-              setIsPreloaderMounted(false);
-              setIsLoading(false);
-            }}
+            triggerTransition={!isLoading}
+            onComplete={() => setIsPreloaderMounted(false)}
             showEnter={showEnter}
             onEnter={handleEnter}
             countdown={countdown}
@@ -1476,7 +1554,6 @@ function Index() {
           activeAudioId={activeAudioId} 
           setActiveAudioId={setActiveAudioId} 
           onMediaReady={() => setMediaReady(true)}
-          isLoading={isLoading}
         />
       <SelectedWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
       <Clients data={data} />
