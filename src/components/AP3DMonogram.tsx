@@ -1,6 +1,6 @@
-import { useRef, useMemo, useState, Suspense } from 'react';
+import { useRef, useMemo, useState, Suspense, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Text3D, Center, Environment, OrbitControls, ContactShadows } from '@react-three/drei';
+import { Text3D, Center, Environment, OrbitControls, ContactShadows, useTexture } from '@react-three/drei';
 import { EffectComposer, ToneMapping, Vignette, SMAA } from '@react-three/postprocessing';
 import { ToneMappingMode } from 'postprocessing';
 import * as THREE from 'three';
@@ -450,6 +450,45 @@ function NavbarSceneController() {
   return null;
 }
 
+/* ── Ground floor plane matching the preloader video background ── */
+function PreloaderFloor({ scrollProgress }: { scrollProgress: number }) {
+  const texture = useTexture('/preloader_floor_texture.png');
+  const floorRef = useRef<THREE.Mesh>(null);
+
+  useFrame((state, delta) => {
+    if (!floorRef.current) return;
+    const mat = floorRef.current.material as THREE.MeshStandardMaterial;
+    if (mat) {
+      // Fade in the floor opacity as scroll progress goes from 0.0 to 0.4
+      const fadeProgress = Math.min(Math.max(scrollProgress / 0.4, 0), 1);
+      mat.opacity = fadeProgress;
+      // Fade out the floor opacity as camera zooms past it in Stage 2 (0.5 to 0.8)
+      if (scrollProgress > 0.5) {
+        const fadeOut = Math.min(Math.max((scrollProgress - 0.5) / 0.3, 0), 1);
+        mat.opacity = Math.max(0, 1.0 - fadeOut);
+      }
+    }
+  });
+
+  return (
+    <mesh 
+      ref={floorRef}
+      rotation={[-Math.PI / 2, 0, 0]} 
+      position={[0, -1.31, 0]} 
+      receiveShadow
+    >
+      <planeGeometry args={[12, 12]} />
+      <meshStandardMaterial 
+        map={texture} 
+        transparent 
+        roughness={0.7} 
+        metalness={0.15} 
+        envMapIntensity={0.5}
+      />
+    </mesh>
+  );
+}
+
 /* ── Main exported component ── */
 export default function AP3DMonogram({
   className = '',
@@ -502,6 +541,11 @@ export default function AP3DMonogram({
               scale={10}
               far={4}
             />
+          )}
+
+          {/* Preloader Floor matching the video background aesthetic */}
+          {!isMini && (
+            <PreloaderFloor scrollProgress={scrollProgress} />
           )}
 
           {/* Handle scroll-driven camera & coin animations inside the Canvas context */}
