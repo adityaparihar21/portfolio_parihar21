@@ -154,14 +154,13 @@ function Preloader({
     >
       {/* Interior Video Background - Awakens when videoVisible is true */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: videoVisible ? 1 : 0 }}
-        style={{
-          scale: 1.15 - scrollProgress * 0.15,
-          y: scrollProgress * -50,
-          filter: `blur(${scrollProgress * 6}px) brightness(${1 - scrollProgress * 0.3})`
-        }}
+        initial={{ opacity: 0, scale: 1.0 }}
+        animate={{ opacity: videoVisible ? 1 : 0, scale: 1.15 }}
         exit={{ opacity: 0 }}
+        transition={{ 
+          opacity: { duration: 2.0, ease: "easeOut" },
+          scale: { duration: 25, ease: "linear", repeat: Infinity, repeatType: "reverse" }
+        }}
         className="preloader-bg absolute inset-0 z-0 pointer-events-none origin-center"
       >
         <video
@@ -1661,6 +1660,12 @@ function Index() {
 
   const coinState = isLoading ? 'preloader' : 'navbar';
 
+  const monogramOpacity = isLoading
+    ? (scrollProgress >= 0.8
+        ? Math.max(0, 1 - (scrollProgress - 0.8) / 0.15)
+        : 1)
+    : 1;
+
   return (
     <div className="bg-black min-h-screen">
       <AnimatePresence>
@@ -1725,12 +1730,17 @@ function Index() {
       {(isPreloaderMounted || coinState === 'navbar') && (
         <motion.div
           layout
-          transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 1 }}
+          animate={{ opacity: monogramOpacity }}
+          transition={{
+            layout: { duration: 1.6, ease: [0.16, 1, 0.3, 1] },
+            opacity: { duration: 0.8, ease: "easeOut" }
+          }}
           onClick={handleLogoClick}
           className={
             coinState === 'preloader'
               ? "fixed inset-0 z-[110] pointer-events-none"
-              : "fixed left-6 md:left-[48px] top-6 translate-x-0 translate-y-0 w-12 h-12 md:w-16 md:h-16 z-[60] pointer-events-auto cursor-pointer"
+              : "fixed left-6 md:left-[48px] top-6 translate-x-0 translate-y-0 w-12 h-12 md:w-16 md:h-16 z-[110] pointer-events-auto cursor-pointer"
           }
         >
           <AP3DMonogram isMini={coinState === 'navbar'} scrollProgress={scrollProgress} />
