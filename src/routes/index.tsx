@@ -308,9 +308,9 @@ function Header({ data, isLoading }: { data: ReturnType<typeof useContent>; isLo
       }`}
     >
       <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-6 md:px-12">
-        <a href="#top" className="flex items-center gap-2 w-8 h-8 md:w-10 md:h-10" onClick={() => setMenuOpen(false)}>
+        <a href="#top" className="flex items-center gap-2 w-10 h-10 md:w-12 md:h-12" onClick={() => setMenuOpen(false)}>
           {/* Invisible placeholder matching the flying coin's layout box */}
-          <div className="w-8 h-8 md:w-10 md:h-10" />
+          <div className="w-10 h-10 md:w-12 md:h-12" />
         </a>
         <nav className="hidden items-center gap-10 md:flex">
           {data.brand.nav.map((item, i) => (
@@ -1582,22 +1582,6 @@ function Index() {
         )}
       </AnimatePresence>
 
-      {/* 3D Monogram - Globally positioned for seamless flight to Navbar logo placeholder */}
-      {(isPreloaderMounted || coinState === 'navbar') && (
-        <motion.div
-          layout
-          transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
-          onClick={handleLogoClick}
-          className={
-            coinState === 'preloader'
-              ? "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] md:w-[350px] md:h-[350px] z-[110] pointer-events-auto"
-              : "fixed left-6 md:left-[48px] top-6 translate-x-0 translate-y-0 w-8 h-8 md:w-10 md:h-10 z-[60] pointer-events-auto cursor-pointer"
-          }
-        >
-          <AP3DMonogram isMini={coinState === 'navbar'} />
-        </motion.div>
-      )}
-
       <motion.div 
         className="relative min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary"
         initial={{ opacity: 0, scale: 0.92, filter: "blur(8px)" }}
@@ -1639,6 +1623,22 @@ function Index() {
         <Testimonial data={data} />
         <CallToAction data={data} />
       </motion.div>
+
+      {/* 3D Monogram - Globally positioned for seamless flight to Navbar logo placeholder (Rendered at bottom of DOM to ensure z-index priority) */}
+      {(isPreloaderMounted || coinState === 'navbar') && (
+        <motion.div
+          layout
+          transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
+          onClick={handleLogoClick}
+          className={
+            coinState === 'preloader'
+              ? "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] md:w-[420px] md:h-[420px] z-[110] pointer-events-auto"
+              : "fixed left-6 md:left-[48px] top-6 translate-x-0 translate-y-0 w-10 h-10 md:w-12 md:h-12 z-[60] pointer-events-auto cursor-pointer"
+          }
+        >
+          <AP3DMonogram isMini={coinState === 'navbar'} />
+        </motion.div>
+      )}
     </div>
   );
 }

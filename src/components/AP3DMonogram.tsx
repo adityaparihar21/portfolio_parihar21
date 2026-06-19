@@ -132,10 +132,10 @@ function APCoin({ isMini, hovered }: { isMini: boolean; hovered: boolean }) {
   // Entrance animation state
   const entranceRef = useRef({ elapsed: 0, done: false });
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  // Make target scale slightly larger in full-screen preloader (0.16 desktop / 0.11 mobile) for cinematic effect
+  // Make target scale slightly larger in full-screen preloader (0.20 desktop / 0.15 mobile) for cinematic effect
   const TARGET_SCALE = isMini 
-    ? 0.16 
-    : (isMobile ? 0.11 : 0.16);
+    ? 0.18 
+    : (isMobile ? 0.15 : 0.20);
 
   // Smooth entrance + auto-rotation with ramp-up
   useFrame((state, delta) => {
