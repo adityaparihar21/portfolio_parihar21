@@ -55,7 +55,6 @@ function Preloader({
   countdown,
   videoVisible,
   wordsVisible,
-  scrollProgress,
 }: {
   monogram: string;
   triggerTransition: boolean;
@@ -65,7 +64,6 @@ function Preloader({
   countdown: number;
   videoVisible: boolean;
   wordsVisible: boolean;
-  scrollProgress: number;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -115,11 +113,11 @@ function Preloader({
         gsap.to(".preloader-content", { opacity: 0, duration: 0.8, ease: "power2.out" });
         gsap.to(".preloader-coin", { opacity: 0, scale: 1.1, duration: 1.5, ease: "power2.inOut" });
         
-        // Smooth fade out and slight zoom for the new interior video (shortened to 1.5s to match container exit)
+        // Smooth fade out and slight zoom for the new interior video
         gsap.to(".preloader-bg", { 
           scale: 1.1, 
           opacity: 0, 
-          duration: 1.5, 
+          duration: 2.5, 
           ease: "power2.inOut",
           onComplete: () => {
             if (audioRef.current) {
@@ -256,39 +254,25 @@ function Preloader({
           )}
         </AnimatePresence>
 
-        {/* SCROLL TO ENTER PROMPT / Skip button (Fades out when user starts scrolling) */}
+        {/* ENTER BUTTON: Fades in below the timer bar */}
         <AnimatePresence>
-          {showEnter && scrollProgress < 0.15 && (
+          {showEnter && (
             <motion.div
               key="enter"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.5, ease: EASE_OUT_EXPO }}
-              className="mt-2 flex flex-col items-center gap-3 z-40 pointer-events-auto"
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.7, ease: EASE_OUT_EXPO }}
+              className="mt-2 pointer-events-auto"
             >
-              {/* Bouncing mouse scroll icon */}
-              <motion.div
-                animate={{ y: [0, 6, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                className="w-5 h-8 border border-foreground/30 rounded-full flex justify-center p-1.5 opacity-80"
-              >
-                <motion.div 
-                  animate={{ y: [0, 4, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                  className="w-1 h-1.5 bg-primary rounded-full" 
-                />
-              </motion.div>
-              
-              <span className="font-serif text-[11px] md:text-xs tracking-[0.25em] uppercase text-foreground/80 italic drop-shadow-md">
-                Scroll to Enter
-              </span>
-              
               <button
                 onClick={onEnter}
-                className="mt-3 text-[9px] md:text-[10px] tracking-[0.2em] uppercase text-foreground/40 hover:text-primary transition-colors cursor-pointer pointer-events-auto"
+                className="relative overflow-hidden px-12 py-3 border border-transparent bg-foreground transition-all duration-500 hover:scale-[1.03] hover:bg-foreground/90 active:scale-95 group rounded-full shadow-[0_4px_30px_rgba(237,224,202,0.15)] cursor-pointer"
               >
-                [ Or Click to Enter ]
+                <div className="absolute inset-0 bg-primary/10 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+                <span className="relative z-10 font-serif text-[11px] md:text-xs tracking-[0.35em] uppercase text-background group-hover:text-background/80 transition-colors duration-300 font-medium">
+                  Enter Site
+                </span>
               </button>
             </motion.div>
           )}
@@ -1501,89 +1485,12 @@ function Index() {
   const [showEnter, setShowEnter] = useState(false);
   const [countdown, setCountdown] = useState(10);
 
-  // Cinematic scroll progress state (0.0 to 1.0)
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const animatingScrollRef = useRef(false);
-  const scrollProgressRef = useRef(0);
-
-  // Sync scrollProgress ref to avoid recreating event handlers / timers
-  useEffect(() => {
-    scrollProgressRef.current = scrollProgress;
-  }, [scrollProgress]);
-
-  // Accumulate delta to simulate scroll progress virtually on window
-  useEffect(() => {
-    if (!isLoading || !showEnter) return;
-
-    let accumulatedDelta = 0;
-    const maxDelta = 800; // Total scroll delta required to enter the site
-
-    const handleWheel = (e: WheelEvent) => {
-      if (animatingScrollRef.current) return;
-      e.preventDefault();
-      accumulatedDelta += e.deltaY;
-      accumulatedDelta = Math.min(Math.max(accumulatedDelta, 0), maxDelta);
-      setScrollProgress(accumulatedDelta / maxDelta);
-    };
-
-    let touchStart = 0;
-    const handleTouchStart = (e: TouchEvent) => {
-      touchStart = e.touches[0].clientY;
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (animatingScrollRef.current) return;
-      e.preventDefault();
-      const touchY = e.touches[0].clientY;
-      const deltaY = touchStart - touchY; // Swipe up to scroll down
-      touchStart = touchY;
-      
-      accumulatedDelta += deltaY * 1.5; // Touch sensitivity factor
-      accumulatedDelta = Math.min(Math.max(accumulatedDelta, 0), maxDelta);
-      setScrollProgress(accumulatedDelta / maxDelta);
-    };
-
-    window.addEventListener('wheel', handleWheel, { passive: false });
-    window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: false });
-
-    return () => {
-      window.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchmove', handleTouchMove);
-    };
-  }, [isLoading, showEnter]);
-
   // Staged timeline sequence states
-  const [videoVisible, setVideoVisible] = useState(true);
+  const [videoVisible, setVideoVisible] = useState(false);
   const [wordsVisible, setWordsVisible] = useState(false);
 
-  // Handle Enter button press - animates the remaining scroll distance
-  const handleEnter = () => {
-    if (animatingScrollRef.current) return;
-    animatingScrollRef.current = true;
-    
-    const obj = { value: scrollProgressRef.current };
-    gsap.to(obj, {
-      value: 1.0,
-      duration: 1.8,
-      ease: "power2.inOut",
-      onUpdate: () => {
-        setScrollProgress(obj.value);
-      },
-      onComplete: () => {
-        setIsLoading(false);
-        animatingScrollRef.current = false;
-      }
-    });
-  };
-
-  // Automatically trigger page entry once scroll progress is complete (>= 0.95)
-  useEffect(() => {
-    if (scrollProgress >= 0.95 && isLoading && !animatingScrollRef.current) {
-      setIsLoading(false);
-    }
-  }, [scrollProgress, isLoading]);
+  // Handle Enter button press
+  const handleEnter = () => setIsLoading(false);
 
   // Scroll to top when clicking the navbar coin logo
   const handleLogoClick = () => {
@@ -1598,11 +1505,9 @@ function Index() {
       window.history.replaceState(null, '', window.location.pathname);
     }
     // Absolute maximum: if nothing happens in 15s, force entry
-    const maxTimer = setTimeout(() => {
-      if (isLoading) handleEnter();
-    }, 15000);
+    const maxTimer = setTimeout(() => setIsLoading(false), 15000);
     return () => clearTimeout(maxTimer);
-  }, [isLoading]);
+  }, []);
 
   useEffect(() => {
     // 2.5s: Background video awakens
@@ -1628,7 +1533,7 @@ function Index() {
     }
   }, [minTimeElapsed, showEnter]);
 
-  // 10-second countdown once enter button appears (triggers cinematic flight on timeout)
+  // 10-second countdown once enter button appears
   useEffect(() => {
     if (!showEnter) return;
     setCountdown(10);
@@ -1636,7 +1541,7 @@ function Index() {
       setCountdown(prev => {
         if (prev <= 1) {
           clearInterval(interval);
-          handleEnter();
+          setIsLoading(false);
           return 0;
         }
         return prev - 1;
@@ -1660,12 +1565,6 @@ function Index() {
 
   const coinState = isLoading ? 'preloader' : 'navbar';
 
-  const monogramOpacity = isLoading
-    ? (scrollProgress >= 0.8
-        ? Math.max(0, 1 - (scrollProgress - 0.8) / 0.15)
-        : 1)
-    : 1;
-
   return (
     <div className="bg-black min-h-screen">
       <AnimatePresence>
@@ -1679,7 +1578,6 @@ function Index() {
             countdown={countdown}
             videoVisible={videoVisible}
             wordsVisible={wordsVisible}
-            scrollProgress={scrollProgress}
           />
         )}
       </AnimatePresence>
@@ -1730,20 +1628,15 @@ function Index() {
       {(isPreloaderMounted || coinState === 'navbar') && (
         <motion.div
           layout
-          initial={{ opacity: 1 }}
-          animate={{ opacity: monogramOpacity }}
-          transition={{
-            layout: { duration: 1.6, ease: [0.16, 1, 0.3, 1] },
-            opacity: { duration: 0.8, ease: "easeOut" }
-          }}
+          transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
           onClick={handleLogoClick}
           className={
             coinState === 'preloader'
-              ? "fixed inset-0 z-[110] pointer-events-none"
-              : "fixed left-6 md:left-[48px] top-6 translate-x-0 translate-y-0 w-12 h-12 md:w-16 md:h-16 z-[110] pointer-events-auto cursor-pointer"
+              ? "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] md:w-[420px] md:h-[420px] z-[110] pointer-events-auto"
+              : "fixed left-6 md:left-[48px] top-6 translate-x-0 translate-y-0 w-12 h-12 md:w-16 md:h-16 z-[60] pointer-events-auto cursor-pointer"
           }
         >
-          <AP3DMonogram isMini={coinState === 'navbar'} scrollProgress={scrollProgress} />
+          <AP3DMonogram isMini={coinState === 'navbar'} />
         </motion.div>
       )}
     </div>

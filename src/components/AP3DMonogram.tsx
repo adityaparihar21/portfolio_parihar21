@@ -1,6 +1,6 @@
-import { useRef, useMemo, useState, Suspense, useEffect } from 'react';
+import { useRef, useMemo, useState, Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Text3D, Center, Environment, OrbitControls, ContactShadows, useTexture } from '@react-three/drei';
+import { Text3D, Center, Environment, OrbitControls, ContactShadows } from '@react-three/drei';
 import { EffectComposer, ToneMapping, Vignette, SMAA } from '@react-three/postprocessing';
 import { ToneMappingMode } from 'postprocessing';
 import * as THREE from 'three';
@@ -137,17 +137,16 @@ function APCoin({ isMini, hovered }: { isMini: boolean; hovered: boolean }) {
     ? 0.55 
     : (isMobile ? 0.15 : 0.20);
 
-  const currentScale = useRef(isMini ? 0.55 : (isMobile ? 0.15 : 0.20));
-
   // Smooth entrance + auto-rotation with ramp-up
   useFrame((state, delta) => {
     if (!coinRef.current) return;
 
-    // Smoothly damp the scale to TARGET_SCALE
-    currentScale.current = THREE.MathUtils.damp(currentScale.current, TARGET_SCALE, 5, delta);
-    coinRef.current.scale.set(currentScale.current, currentScale.current, currentScale.current);
-
     if (!isMini) {
+      if (!entranceRef.current.done) {
+        coinRef.current.scale.set(TARGET_SCALE, TARGET_SCALE, TARGET_SCALE);
+        entranceRef.current.done = true;
+      }
+
       // Rotation: ramp up from 0 to full speed over 1.5s
       entranceRef.current.elapsed += delta;
       const rotRamp = Math.min(entranceRef.current.elapsed / 1.5, 1);
@@ -155,6 +154,7 @@ function APCoin({ isMini, hovered }: { isMini: boolean; hovered: boolean }) {
       coinRef.current.rotation.y += delta * rotSpeed;
     } else {
       // In navbar: fixed scale, fast spin on hover, slow drift otherwise
+      coinRef.current.scale.set(TARGET_SCALE, TARGET_SCALE, TARGET_SCALE);
       const rotSpeed = hovered ? 3.2 : 0.45;
       coinRef.current.rotation.y += delta * rotSpeed;
     }
@@ -347,158 +347,9 @@ function PostProcessing() {
   );
 }
 
-/* ── Cinematic Scroll Controller for Preloader Transitions ── */
-function CinematicScrollScene({
-  scrollProgress,
-  coinGroupRef,
-  shadowRef,
-  isMini,
-  settled,
-  setSettled,
-}: {
-  scrollProgress: number;
-  coinGroupRef: React.RefObject<THREE.Group | null>;
-  shadowRef: React.RefObject<THREE.Group | null>;
-  isMini: boolean;
-  settled: boolean;
-  setSettled: (val: boolean) => void;
-}) {
-  const { camera } = useThree();
-  const smoothedProgress = useRef(0);
-  const currentLookAt = useRef(new THREE.Vector3(0, 0, 0));
-
-  useFrame((state, delta) => {
-    if (!isMini) {
-      // --- PRELOADER SCROLL LOGIC ---
-      if (settled) setSettled(false);
-
-      // Smooth the input scrollProgress with frame-rate independent damping
-      smoothedProgress.current = THREE.MathUtils.damp(
-        smoothedProgress.current,
-        scrollProgress,
-        6, // Damping factor
-        delta
-      );
-
-      const t = Math.min(Math.max(smoothedProgress.current, 0), 1);
-
-      if (t <= 0.4) {
-        // --- STAGE 1 (0.0 -> 0.4): Coin free falls flat to the floor (Camera stays front) ---
-        const t1 = t / 0.4;
-        const e1 = t1 * t1 * (3 - 2 * t1); // smoothstep ease-in-out for gravity fall
-
-        if (coinGroupRef.current) {
-          coinGroupRef.current.position.set(0, -1.25 * e1, 0);
-          coinGroupRef.current.rotation.set((Math.PI / 2) * e1, 0, 0);
-        }
-
-        camera.position.set(0, 0, 7.5);
-        currentLookAt.current.set(0, -1.25 * e1, 0);
-        camera.lookAt(currentLookAt.current);
-
-        if (shadowRef.current) {
-          shadowRef.current.traverse((child) => {
-            if (child instanceof THREE.Mesh && child.material) {
-              child.material.opacity = 0.08 + 0.27 * e1;
-            }
-          });
-        }
-      } else if (t <= 0.7) {
-        // --- STAGE 2 (0.4 -> 0.7): Camera circular orbit to top view ---
-        const t2 = (t - 0.4) / 0.3;
-        const e2 = t2 * t2 * (3 - 2 * t2); // smoothstep ease-in-out
-
-        if (coinGroupRef.current) {
-          coinGroupRef.current.position.set(0, -1.25, 0);
-          coinGroupRef.current.rotation.set(Math.PI / 2, 0, 0);
-        }
-
-        // True circular orbit around the coin [0, -1.25, 0] with radius 7.6034
-        const radius = 7.6034;
-        const theta0 = Math.asin(1.25 / radius);
-        const theta = theta0 + (Math.PI / 2 - theta0) * e2;
-        camera.position.set(0, -1.25 + radius * Math.sin(theta), radius * Math.cos(theta));
-        currentLookAt.current.set(0, -1.25, 0);
-        camera.lookAt(currentLookAt.current);
-
-        if (shadowRef.current) {
-          shadowRef.current.traverse((child) => {
-            if (child instanceof THREE.Mesh && child.material) {
-              child.material.opacity = 0.35;
-            }
-          });
-        }
-      } else {
-        // --- STAGE 3 (0.7 -> 1.0): Camera pushes straight down through the center of the coin ---
-        const t3 = (t - 0.7) / 0.3;
-        const e3 = t3 * t3; // accelerate through the coin
-
-        if (coinGroupRef.current) {
-          coinGroupRef.current.position.set(0, -1.25, 0);
-          coinGroupRef.current.rotation.set(Math.PI / 2, 0, 0);
-        }
-
-        camera.position.set(0, 6.3534 - 8.8534 * e3, 0);
-        currentLookAt.current.set(0, -1.25 - 8.75 * e3, 0);
-        camera.lookAt(currentLookAt.current);
-
-        if (shadowRef.current) {
-          shadowRef.current.traverse((child) => {
-            if (child instanceof THREE.Mesh && child.material) {
-              child.material.opacity = Math.max(0, 0.35 * (1 - e3));
-            }
-          });
-        }
-      }
-    } else {
-      // --- NAVBAR TRANSITION SMOOTHING LOGIC ---
-      // Smoothly damp coin position and rotation back to navbar defaults
-      if (coinGroupRef.current) {
-        coinGroupRef.current.position.x = THREE.MathUtils.damp(coinGroupRef.current.position.x, 0, 5, delta);
-        coinGroupRef.current.position.y = THREE.MathUtils.damp(coinGroupRef.current.position.y, 0, 5, delta);
-        coinGroupRef.current.position.z = THREE.MathUtils.damp(coinGroupRef.current.position.z, 0, 5, delta);
-
-        coinGroupRef.current.rotation.x = THREE.MathUtils.damp(coinGroupRef.current.rotation.x, 0, 5, delta);
-        coinGroupRef.current.rotation.z = THREE.MathUtils.damp(coinGroupRef.current.rotation.z, 0, 5, delta);
-      }
-
-      // Smoothly damp camera position and lookAt back to navbar defaults
-      camera.position.x = THREE.MathUtils.damp(camera.position.x, 0, 5, delta);
-      camera.position.y = THREE.MathUtils.damp(camera.position.y, 0, 5, delta);
-      camera.position.z = THREE.MathUtils.damp(camera.position.z, 4, 5, delta);
-
-      currentLookAt.current.x = THREE.MathUtils.damp(currentLookAt.current.x, 0, 5, delta);
-      currentLookAt.current.y = THREE.MathUtils.damp(currentLookAt.current.y, 0, 5, delta);
-      currentLookAt.current.z = THREE.MathUtils.damp(currentLookAt.current.z, 0, 5, delta);
-      camera.lookAt(currentLookAt.current);
-
-      // Check if camera has settled
-      const dist = camera.position.distanceTo(new THREE.Vector3(0, 0, 4));
-      if (dist < 0.05 && !settled) {
-        setSettled(true);
-      }
-    }
-  });
-
-  return null;
-}
-
-// PreloaderFloor removed (restored to transparent video background)
-
 /* ── Main exported component ── */
-export default function AP3DMonogram({
-  className = '',
-  isMini = false,
-  scrollProgress = 0,
-}: {
-  className?: string;
-  isMini?: boolean;
-  scrollProgress?: number;
-}) {
+export default function AP3DMonogram({ className = '', isMini = false }: { className?: string; isMini?: boolean }) {
   const [hovered, setHovered] = useState(false);
-  const coinGroupRef = useRef<THREE.Group>(null);
-  const shadowRef = useRef<THREE.Group>(null);
-  const [settled, setSettled] = useState(false);
 
   return (
     <div 
@@ -507,7 +358,7 @@ export default function AP3DMonogram({
       onMouseLeave={() => isMini && setHovered(false)}
     >
       <Canvas
-        camera={{ position: [0, 0, 7.5], fov: 35 }}
+        camera={{ position: [0, 0, 4], fov: 35 }}
         gl={{ antialias: false, alpha: true, toneMapping: THREE.NoToneMapping }}
         shadows={!isMini}
         style={{ background: 'transparent' }}
@@ -519,49 +370,30 @@ export default function AP3DMonogram({
           {/* Studio HDRI for strong, clean gold reflections */}
           <Environment preset="studio" />
 
-          {/* Visually center the 3D focal point */}
-          <group 
-            ref={coinGroupRef} 
-            position={[0, 0, 0]}
-            rotation={isMini ? [0, 0, 0] : undefined}
-          >
+          {/* Visually center the 3D focal point (counteracting layout shift in full-screen) */}
+          <group position={isMini ? [0, 0, 0] : [0.28, 0, 0]}>
             <APCoin isMini={isMini} hovered={hovered} />
           </group>
 
           {/* Contact shadow grounds the coin inside preloader (disable in navbar) */}
           {!isMini && (
             <ContactShadows
-              ref={shadowRef}
-              position={[0, -1.3, 0]}
-              opacity={0.08}
-              blur={3.5}
+              position={[0.28, -1.3, 0]}
+              opacity={0.35}
+              blur={2}
               scale={10}
               far={4}
             />
           )}
 
-          {/* Preloader Floor removed */}
-
-          {/* Handle scroll-driven camera & coin animations inside the Canvas context */}
-          <CinematicScrollScene
-            scrollProgress={scrollProgress}
-            coinGroupRef={coinGroupRef}
-            shadowRef={shadowRef}
-            isMini={isMini}
-            settled={settled}
-            setSettled={setSettled}
+          {/* Interactive rotation controls */}
+          <OrbitControls
+            enableZoom={false}
+            enablePan={false}
+            enableRotate={true}
+            target={isMini ? [0, 0, 0] : [0.28, 0, 0]}
+            makeDefault
           />
-
-          {/* Interactive rotation controls - only enable in navbar AFTER camera settles */}
-          {isMini && settled && (
-            <OrbitControls
-              enableZoom={false}
-              enablePan={false}
-              enableRotate={true}
-              target={[0, 0, 0]}
-              makeDefault
-            />
-          )}
         </Suspense>
 
         {/* Post-processing outside Suspense for immediate rendering */}
