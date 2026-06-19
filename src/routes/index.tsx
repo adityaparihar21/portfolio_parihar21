@@ -1584,16 +1584,18 @@ function Index() {
   const [videoVisible, setVideoVisible] = useState(false);
   const [wordsVisible, setWordsVisible] = useState(false);
 
-  const [themeMode, setThemeMode] = useState<'select' | 'creative' | 'engineering'>(() => {
+  const [themeMode, setThemeMode] = useState<'select' | 'creative' | 'engineering'>('select');
+  const [hoverMode, setHoverMode] = useState<'none' | 'creative' | 'engineering'>('none');
+
+  // Hydration-safe localStorage check
+  useEffect(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("AP_PORTFOLIO_THEME");
       if (saved === "creative" || saved === "engineering") {
-        return saved;
+        setThemeMode(saved as 'creative' | 'engineering');
       }
     }
-    return "select";
-  });
-  const [hoverMode, setHoverMode] = useState<'none' | 'creative' | 'engineering'>('none');
+  }, []);
 
   // Stop all running videos and audios in the document when tab is hidden, and resume them when active
   useEffect(() => {
