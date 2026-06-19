@@ -1488,11 +1488,11 @@ function Index() {
   }, []);
 
   useEffect(() => {
-    // Show enter button once media is buffered AND min time passed
-    if (mediaReady && minTimeElapsed && !showEnter) {
+    // Show enter button once min time has passed (no longer blocking on media buffering to ensure it always appears quickly)
+    if (minTimeElapsed && !showEnter) {
       setShowEnter(true);
     }
-  }, [mediaReady, minTimeElapsed, showEnter]);
+  }, [minTimeElapsed, showEnter]);
 
   // 10-second countdown once enter button appears
   useEffect(() => {

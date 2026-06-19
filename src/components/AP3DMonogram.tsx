@@ -132,7 +132,7 @@ function APCoin() {
   // Entrance animation state
   const entranceRef = useRef({ elapsed: 0, done: false });
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  const TARGET_SCALE = isMobile ? 0.10 : 0.15; // Smaller on phones to prevent cropping
+  const TARGET_SCALE = isMobile ? 0.08 : 0.12; // Smaller size to prevent cropping and fit design
 
   // Smooth entrance + auto-rotation with ramp-up
   useFrame((state, delta) => {
