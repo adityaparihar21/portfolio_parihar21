@@ -1553,14 +1553,43 @@ function Index() {
   useEffect(() => {
     if (isLoading) {
       document.body.style.overflow = "hidden";
+      
+      // Force scroll to top immediately and on scroll events to prevent scroll position restore/shifts
+      window.scrollTo(0, 0);
+      const handleScroll = () => {
+        if (window.scrollY !== 0 || window.scrollX !== 0) {
+          window.scrollTo(0, 0);
+        }
+      };
+
+      // Prevent wheel & touch scroll gestures on mobile & desktop
+      const handleWheelTouch = (e: Event) => {
+        e.preventDefault();
+      };
+
+      // Prevent keyboard-driven scrolling (spacebar, arrow keys, page up/down, home/end)
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (["Space", "ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End"].includes(e.code)) {
+          e.preventDefault();
+        }
+      };
+
+      window.addEventListener("scroll", handleScroll, { passive: false });
+      window.addEventListener("wheel", handleWheelTouch, { passive: false });
+      window.addEventListener("touchmove", handleWheelTouch, { passive: false });
+      window.addEventListener("keydown", handleKeyDown, { passive: false });
+
+      return () => {
+        window.removeEventListener("scroll", handleScroll);
+        window.removeEventListener("wheel", handleWheelTouch);
+        window.removeEventListener("touchmove", handleWheelTouch);
+        window.removeEventListener("keydown", handleKeyDown);
+        document.body.style.overflow = "unset";
+      };
     } else {
       document.body.style.overflow = "unset";
-      // Force scroll to top when loading finishes to prevent jumping to lower sections
       window.scrollTo(0, 0);
     }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
   }, [isLoading]);
 
   const coinState = isLoading ? 'preloader' : 'navbar';
