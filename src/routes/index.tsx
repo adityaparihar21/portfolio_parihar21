@@ -99,6 +99,26 @@ function Preloader({
     }
   }, []);
 
+  // Pause preloader audio when page is hidden
+  useEffect(() => {
+    let wasPlaying = false;
+    const handleVisibility = () => {
+      if (document.hidden) {
+        if (audioRef.current && !audioRef.current.paused) {
+          audioRef.current.pause();
+          wasPlaying = true;
+        }
+      } else {
+        if (audioRef.current && wasPlaying) {
+          audioRef.current.play().catch(e => console.warn("Audio resume failed", e));
+          wasPlaying = false;
+        }
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, []);
+
   useEffect(() => {
     if (triggerTransition) {
       // Play cinematic riser SFX safely to prevent overlaps
@@ -1488,6 +1508,48 @@ function Index() {
   // Staged timeline sequence states
   const [videoVisible, setVideoVisible] = useState(false);
   const [wordsVisible, setWordsVisible] = useState(false);
+
+  // Stop all running videos and audios in the document when tab is hidden, and resume them when active
+  useEffect(() => {
+    const pausedMedias: (HTMLVideoElement | HTMLAudioElement)[] = [];
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // Query all video elements
+        const videos = document.querySelectorAll('video');
+        videos.forEach(video => {
+          if (!video.paused) {
+            video.pause();
+            pausedMedias.push(video);
+          }
+        });
+
+        // Query all audio elements
+        const audios = document.querySelectorAll('audio');
+        audios.forEach(audio => {
+          if (!audio.paused) {
+            audio.pause();
+            pausedMedias.push(audio);
+          }
+        });
+      } else {
+        // Resume previously playing media
+        while (pausedMedias.length > 0) {
+          const media = pausedMedias.pop();
+          if (media) {
+            media.play().catch(err => {
+              console.warn("Failed to resume playback on tab focus:", err);
+            });
+          }
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
 
   // Handle Enter button press
   const handleEnter = () => setIsLoading(false);
