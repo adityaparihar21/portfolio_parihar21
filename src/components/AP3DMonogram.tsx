@@ -138,27 +138,17 @@ function APCoin() {
   useFrame((state, delta) => {
     if (!coinRef.current) return;
 
-    const entrance = entranceRef.current;
-    entrance.elapsed += delta;
-
-    if (!entrance.done) {
-      // Spring-like scale entrance over ~0.6s (much faster)
-      const t = Math.min(entrance.elapsed / 0.6, 1);
-      // Overshoot spring curve: rises past 1.0, bounces back
-      const spring = t < 0.6
-        ? t / 0.6 * 1.15 // overshoot to 115%
-        : 1.15 - 0.15 * ((t - 0.6) / 0.4); // settle back to 100%
-      const finalSpring = t >= 1 ? 1 : spring;
-      const s = finalSpring * TARGET_SCALE;
-      coinRef.current.scale.set(s, s, s);
-
-      if (t >= 1) entrance.done = true;
+    if (!entrance.current.done) {
+      // Set scale immediately instead of pop-up
+      coinRef.current.scale.set(TARGET_SCALE, TARGET_SCALE, TARGET_SCALE);
+      entrance.current.done = true;
     }
 
-    // Rotation: ramp up from 0 to full speed over 1.0s
-    const rotRamp = Math.min(entrance.elapsed / 1.0, 1);
-    // Ease-out cubic for smooth acceleration
-    const rotSpeed = rotRamp * rotRamp * (3 - 2 * rotRamp) * 0.6;
+    // Rotation: ramp up from 0 to full speed over 1.5s
+    entrance.current.elapsed += delta;
+    const rotRamp = Math.min(entrance.current.elapsed / 1.5, 1);
+    // Smooth ease-out for rotation start
+    const rotSpeed = rotRamp * (2 - rotRamp) * 0.6;
     coinRef.current.rotation.y += delta * rotSpeed;
   });
 
@@ -197,7 +187,7 @@ function APCoin() {
   };
 
   return (
-    <group scale={0} ref={coinRef}> {/* Centered perfectly at origin */}
+    <group scale={[TARGET_SCALE, TARGET_SCALE, TARGET_SCALE]} ref={coinRef}> {/* Centered perfectly at origin */}
       {/* The Solid Coin Base */}
       <mesh rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[2.0, 2.0, 0.35, 128]} />

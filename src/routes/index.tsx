@@ -172,8 +172,8 @@ function Preloader({ monogram, triggerTransition, onComplete, showEnter, onEnter
 
       {/* 3D Monogram - Full Screen Canvas for perfect centering and unbound interaction */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.85 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
         className="preloader-coin absolute inset-0 z-10 drop-shadow-2xl pointer-events-auto"
       >
