@@ -207,3 +207,12 @@
 .countdown-ring-animate {
   animation: countdown-ring 10s linear forwards;
 }
+
+/* Scrollbar removal utility */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}

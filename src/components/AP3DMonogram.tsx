@@ -347,9 +347,122 @@ function PostProcessing() {
   );
 }
 
+/* ── Cinematic Scroll Controller for Preloader Transitions ── */
+function CinematicScrollScene({
+  scrollProgress,
+  coinGroupRef,
+  shadowRef,
+}: {
+  scrollProgress: number;
+  coinGroupRef: React.RefObject<THREE.Group | null>;
+  shadowRef: React.RefObject<THREE.Group | null>;
+}) {
+  const { camera } = useThree();
+  const smoothedProgress = useRef(0);
+
+  useFrame((state, delta) => {
+    // Smooth the input scrollProgress with frame-rate independent damping
+    smoothedProgress.current = THREE.MathUtils.damp(
+      smoothedProgress.current,
+      scrollProgress,
+      6, // Damping factor (lower = smoother, higher = faster)
+      delta
+    );
+
+    const t = Math.min(Math.max(smoothedProgress.current, 0), 1);
+
+    if (t <= 0.5) {
+      // --- STAGE 1 (0.0 -> 0.5): Coin falls flat to the floor & camera orbits to top view ---
+      const t1 = t / 0.5;
+      const e1 = t1 < 0.5 ? 4 * t1 * t1 * t1 : 1 - Math.pow(-2 * t1 + 2, 3) / 2; // cubic ease-in-out
+
+      // Coin position Y: falls 0 -> -1.25
+      if (coinGroupRef.current) {
+        coinGroupRef.current.position.y = -1.25 * e1;
+        // Coin tilt X: 0 -> pi/2
+        coinGroupRef.current.rotation.x = (Math.PI / 2) * e1;
+        coinGroupRef.current.position.x = 0.28;
+      }
+
+      // Camera position: orbit from front [0, 0, 4] to top [0.28, 3.0, 0.5]
+      camera.position.set(
+        0.28 * e1,
+        3.0 * e1,
+        4.0 - 3.5 * e1
+      );
+
+      // Camera lookAt: track the falling coin center
+      camera.lookAt(0.28, -1.25 * e1, 0);
+
+      // Shadow opacity: scales 0.08 -> 0.35 and sharpens as it touches floor
+      if (shadowRef.current) {
+        shadowRef.current.traverse((child) => {
+          if (child instanceof THREE.Mesh && child.material) {
+            child.material.opacity = 0.08 + 0.27 * e1;
+          }
+        });
+      }
+    } else {
+      // --- STAGE 2 (0.5 -> 1.0): Camera pushes down through the center of the coin ---
+      const t2 = (t - 0.5) / 0.5;
+      const e2 = t2 * t2 * (3 - 2 * t2); // smoothstep ease-in-out
+
+      // Coin stays flat on floor
+      if (coinGroupRef.current) {
+        coinGroupRef.current.position.y = -1.25;
+        coinGroupRef.current.rotation.x = Math.PI / 2;
+        coinGroupRef.current.position.x = 0.28;
+      }
+
+      // Camera position: pushes straight down through coin (Y: 3.0 -> -2.0, Z: 0.5 -> 0.0)
+      camera.position.set(
+        0.28,
+        3.0 - 5.0 * e2,
+        0.5 - 0.5 * e2
+      );
+
+      // Camera lookAt: look straight down (Y: -1.25 -> -3.0)
+      camera.lookAt(0.28, -1.25 - 1.75 * e2, 0);
+
+      // Fade out shadow completely once camera goes past/through
+      if (shadowRef.current) {
+        shadowRef.current.traverse((child) => {
+          if (child instanceof THREE.Mesh && child.material) {
+            child.material.opacity = Math.max(0, 0.35 * (1 - e2));
+          }
+        });
+      }
+    }
+  });
+
+  return null;
+}
+
+/* ── Controller to reset camera to standard front view in Navbar ── */
+function NavbarSceneController() {
+  const { camera } = useThree();
+
+  useEffect(() => {
+    camera.position.set(0, 0, 4);
+    camera.lookAt(0, 0, 0);
+  }, [camera]);
+
+  return null;
+}
+
 /* ── Main exported component ── */
-export default function AP3DMonogram({ className = '', isMini = false }: { className?: string; isMini?: boolean }) {
+export default function AP3DMonogram({
+  className = '',
+  isMini = false,
+  scrollProgress = 0,
+}: {
+  className?: string;
+  isMini?: boolean;
+  scrollProgress?: number;
+}) {
   const [hovered, setHovered] = useState(false);
+  const coinGroupRef = useRef<THREE.Group>(null);
+  const shadowRef = useRef<THREE.Group>(null);
 
   return (
     <div 
@@ -371,29 +484,48 @@ export default function AP3DMonogram({ className = '', isMini = false }: { class
           <Environment preset="studio" />
 
           {/* Visually center the 3D focal point (counteracting layout shift in full-screen) */}
-          <group position={isMini ? [0, 0, 0] : [0.28, 0, 0]}>
+          <group 
+            ref={coinGroupRef} 
+            position={isMini ? [0, 0, 0] : [0.28, 0, 0]}
+            rotation={isMini ? [0, 0, 0] : undefined}
+          >
             <APCoin isMini={isMini} hovered={hovered} />
           </group>
 
           {/* Contact shadow grounds the coin inside preloader (disable in navbar) */}
           {!isMini && (
             <ContactShadows
+              ref={shadowRef}
               position={[0.28, -1.3, 0]}
-              opacity={0.35}
-              blur={2}
+              opacity={0.08}
+              blur={3.5}
               scale={10}
               far={4}
             />
           )}
 
-          {/* Interactive rotation controls */}
-          <OrbitControls
-            enableZoom={false}
-            enablePan={false}
-            enableRotate={true}
-            target={isMini ? [0, 0, 0] : [0.28, 0, 0]}
-            makeDefault
-          />
+          {/* Handle scroll-driven camera & coin animations inside the Canvas context */}
+          {!isMini && (
+            <CinematicScrollScene
+              scrollProgress={scrollProgress}
+              coinGroupRef={coinGroupRef}
+              shadowRef={shadowRef}
+            />
+          )}
+
+          {/* Handle resetting the camera when returning to navbar */}
+          {isMini && <NavbarSceneController />}
+
+          {/* Interactive rotation controls - only enable in navbar to prevent preloader camera override */}
+          {isMini && (
+            <OrbitControls
+              enableZoom={false}
+              enablePan={false}
+              enableRotate={true}
+              target={[0, 0, 0]}
+              makeDefault
+            />
+          )}
         </Suspense>
 
         {/* Post-processing outside Suspense for immediate rendering */}
