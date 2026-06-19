@@ -1297,17 +1297,15 @@ function CallToAction({ data }: { data: ReturnType<typeof useContent> }) {
           >
             {description}
           </motion.p>
-          {email && (
-            <motion.a
-              variants={fadeUp}
-              transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
-              href={`mailto:${email}`}
-              className="mt-4 inline-flex max-w-full items-center gap-2 bg-primary px-4 py-3 md:px-10 md:py-4 text-[10px] md:text-[11px] font-semibold tracking-[0.12em] md:tracking-[0.25em] uppercase text-primary-foreground transition-all hover:bg-primary/90 hover:gap-4"
-            >
-              <Mail className="h-4 w-4" strokeWidth={1.75} />
-              <span className="truncate">{email}</span>
-            </motion.a>
-          )}
+          <motion.a
+            variants={fadeUp}
+            transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
+            href={`mailto:${email}`}
+            className="mt-4 inline-flex max-w-full items-center gap-2 bg-primary px-4 py-3 md:px-10 md:py-4 text-[10px] md:text-[11px] font-semibold tracking-[0.12em] md:tracking-[0.25em] uppercase text-primary-foreground transition-all hover:bg-primary/90 hover:gap-4"
+          >
+            <Mail className="h-4 w-4" strokeWidth={1.75} />
+            <span className="truncate">{email}</span>
+          </motion.a>
         </motion.div>
 
         <div className="flex flex-col gap-8 border-t border-border pt-12 md:flex-row md:items-end md:justify-between">
@@ -1320,30 +1318,28 @@ function CallToAction({ data }: { data: ReturnType<typeof useContent> }) {
               {data.brand.location} · {data.brand.name}
             </span>
           </div>
-          {socials && socials.length > 0 && (
-            <div className="flex flex-col gap-3 md:items-end">
-              <span className="text-[10px] font-medium tracking-[0.4em] uppercase text-muted-foreground">
-                Elsewhere
-              </span>
-              <div className="flex gap-6">
-                {socials.map((s) => {
-                  const Icon = iconFor(s.label);
-                  return (
-                    <a
-                      key={s.label}
-                      href={s.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-2 text-sm font-light text-foreground/70 transition-colors hover:text-primary"
-                    >
-                      <Icon className="h-4 w-4" strokeWidth={1.5} />
-                      {s.label}
-                    </a>
-                  );
-                })}
-              </div>
+          <div className="flex flex-col gap-3 md:items-end">
+            <span className="text-[10px] font-medium tracking-[0.4em] uppercase text-muted-foreground">
+              Elsewhere
+            </span>
+            <div className="flex gap-6">
+              {socials.map((s) => {
+                const Icon = iconFor(s.label);
+                return (
+                  <a
+                    key={s.label}
+                    href={s.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 text-sm font-light text-foreground/70 transition-colors hover:text-primary"
+                  >
+                    <Icon className="h-4 w-4" strokeWidth={1.5} />
+                    {s.label}
+                  </a>
+                );
+              })}
             </div>
-          )}
+          </div>
         </div>
 
         <div className="flex flex-col gap-2 text-[11px] tracking-[0.2em] uppercase text-muted-foreground/70 md:flex-row md:items-center md:justify-between">
