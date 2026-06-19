@@ -1712,7 +1712,7 @@ function Index() {
           onClick={handleLogoClick}
           className={
             coinState === 'preloader'
-              ? "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] md:w-[420px] md:h-[420px] z-[110] pointer-events-none"
+              ? "fixed inset-0 z-[110] pointer-events-none"
               : "fixed left-6 md:left-[48px] top-6 translate-x-0 translate-y-0 w-12 h-12 md:w-16 md:h-16 z-[60] pointer-events-auto cursor-pointer"
           }
         >

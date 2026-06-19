@@ -381,18 +381,18 @@ function CinematicScrollScene({
         coinGroupRef.current.position.y = -1.25 * e1;
         // Coin tilt X: 0 -> pi/2
         coinGroupRef.current.rotation.x = (Math.PI / 2) * e1;
-        coinGroupRef.current.position.x = 0.28;
+        coinGroupRef.current.position.x = 0;
       }
 
-      // Camera position: orbit from front [0, 0, 4] to top [0.28, 3.0, 0.5]
+      // Camera position: orbit from front [0, 0, 4] to top [0, 3.0, 0.5]
       camera.position.set(
-        0.28 * e1,
+        0,
         3.0 * e1,
         4.0 - 3.5 * e1
       );
 
       // Camera lookAt: track the falling coin center
-      camera.lookAt(0.28, -1.25 * e1, 0);
+      camera.lookAt(0, -1.25 * e1, 0);
 
       // Shadow opacity: scales 0.08 -> 0.35 and sharpens as it touches floor
       if (shadowRef.current) {
@@ -411,18 +411,18 @@ function CinematicScrollScene({
       if (coinGroupRef.current) {
         coinGroupRef.current.position.y = -1.25;
         coinGroupRef.current.rotation.x = Math.PI / 2;
-        coinGroupRef.current.position.x = 0.28;
+        coinGroupRef.current.position.x = 0;
       }
 
       // Camera position: pushes straight down through coin (Y: 3.0 -> -2.0, Z: 0.5 -> 0.0)
       camera.position.set(
-        0.28,
+        0,
         3.0 - 5.0 * e2,
         0.5 - 0.5 * e2
       );
 
       // Camera lookAt: look straight down (Y: -1.25 -> -3.0)
-      camera.lookAt(0.28, -1.25 - 1.75 * e2, 0);
+      camera.lookAt(0, -1.25 - 1.75 * e2, 0);
 
       // Fade out shadow completely once camera goes past/through
       if (shadowRef.current) {
@@ -486,7 +486,7 @@ export default function AP3DMonogram({
           {/* Visually center the 3D focal point (counteracting layout shift in full-screen) */}
           <group 
             ref={coinGroupRef} 
-            position={isMini ? [0, 0, 0] : [0.28, 0, 0]}
+            position={[0, 0, 0]}
             rotation={isMini ? [0, 0, 0] : undefined}
           >
             <APCoin isMini={isMini} hovered={hovered} />
@@ -496,7 +496,7 @@ export default function AP3DMonogram({
           {!isMini && (
             <ContactShadows
               ref={shadowRef}
-              position={[0.28, -1.3, 0]}
+              position={[0, -1.3, 0]}
               opacity={0.08}
               blur={3.5}
               scale={10}
