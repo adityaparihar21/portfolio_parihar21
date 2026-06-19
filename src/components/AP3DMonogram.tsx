@@ -125,7 +125,7 @@ function useGoldTextures() {
 }
 
 /* ── Antique Gold "AP" Minted Coin with PBR Textures ── */
-function APCoin({ isMini, hovered }: { isMini: boolean; hovered: boolean }) {
+function APCoin({ isMini, hovered, hoverMode = 'none' }: { isMini: boolean; hovered: boolean; hoverMode?: string }) {
   const coinRef = useRef<THREE.Group>(null);
   const { normalMap, roughnessMap, aoMap } = useGoldTextures();
 
@@ -273,12 +273,20 @@ function APCoin({ isMini, hovered }: { isMini: boolean; hovered: boolean }) {
           </Center>
         </group>
       </group>
+
+      {/* Cybernetic Dev Mode Wireframe Overlay */}
+      {hoverMode === 'engineering' && (
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[2.02, 2.02, 0.36, 64, 4]} />
+          <meshBasicMaterial color="#00e5ff" wireframe transparent opacity={0.35} />
+        </mesh>
+      )}
     </group>
   );
 }
 
 /* ── Cinematic Lighting with Shadow-Casting Key Light ── */
-function CinematicLights({ isMini }: { isMini: boolean }) {
+function CinematicLights({ isMini, hoverMode = 'none' }: { isMini: boolean; hoverMode?: string }) {
   const sweepLightRef = useRef<THREE.DirectionalLight>(null);
 
   useFrame((state) => {
@@ -290,25 +298,33 @@ function CinematicLights({ isMini }: { isMini: boolean }) {
     }
   });
 
+  // Dynamic lights color and intensities based on hoverMode
+  const lightColor = hoverMode === 'engineering' 
+    ? "#00e5ff" // Cool steel blue / cyan
+    : (hoverMode === 'creative' ? "#ffbe5b" : "#ffdf95"); // Warm/deep gold vs default gold
+
+  const ambientIntensity = hoverMode === 'engineering' ? 0.35 : (isMini ? 0.28 : 0.08);
+  const keyIntensity = hoverMode === 'engineering' ? 6 : (isMini ? 4.5 : 3);
+
   return (
     <>
-      <ambientLight intensity={isMini ? 0.28 : 0.08} />
+      <ambientLight intensity={ambientIntensity} />
 
       {/* Sweep light for golden reflection pass */}
       {!isMini && (
         <directionalLight
           ref={sweepLightRef}
           position={[-8, 3, 4]}
-          intensity={8}
-          color="#ffd685"
+          intensity={hoverMode === 'engineering' ? 10 : 8}
+          color={lightColor}
         />
       )}
 
       {/* Key light with shadow casting */}
       <directionalLight
         position={[4, 4, 3]}
-        intensity={isMini ? 4.5 : 3}
-        color="#ffdf95"
+        intensity={keyIntensity}
+        color={lightColor}
         castShadow={!isMini}
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
@@ -321,14 +337,26 @@ function CinematicLights({ isMini }: { isMini: boolean }) {
         shadow-bias={-0.0001}
       />
 
-      {/* Cool fill light */}
-      <pointLight position={[-3, 1, 3]} intensity={isMini ? 12 : 8} color="#ffffff" />
+      {/* Cool fill light (shifts to deep tech blue in engineering mode) */}
+      <pointLight 
+        position={[-3, 1, 3]} 
+        intensity={isMini ? 12 : 8} 
+        color={hoverMode === 'engineering' ? "#0d47a1" : "#ffffff"} 
+      />
 
-      {/* Golden rim light from below */}
-      <pointLight position={[0, -2, -3]} intensity={isMini ? 10 : 6} color="#a28d63" />
+      {/* Golden rim light from below (shifts to cyan in engineering mode) */}
+      <pointLight 
+        position={[0, -2, -3]} 
+        intensity={isMini ? 10 : 6} 
+        color={hoverMode === 'engineering' ? "#00e5ff" : "#a28d63"} 
+      />
 
       {/* Subtle top accent */}
-      <pointLight position={[0, 4, 0]} intensity={isMini ? 6 : 4} color="#ffeebb" />
+      <pointLight 
+        position={[0, 4, 0]} 
+        intensity={isMini ? 6 : 4} 
+        color={hoverMode === 'engineering' ? "#80deea" : "#ffeebb"} 
+      />
     </>
   );
 }
@@ -347,8 +375,69 @@ function PostProcessing() {
   );
 }
 
+/* ── Camera Handler for dynamic sweeps and zooms ── */
+function CameraHandler({ 
+  themeMode, 
+  isMini 
+}: { 
+  themeMode: 'select' | 'creative' | 'engineering'; 
+  isMini: boolean; 
+}) {
+  const { camera } = useThree();
+  const targetPos = useRef(new THREE.Vector3(0, 0, 4));
+
+  useEffect(() => {
+    if (isMini) {
+      targetPos.current.set(0, 0, 4);
+    } else if (themeMode === 'select') {
+      targetPos.current.set(0, 0, 4);
+    }
+  }, [themeMode, isMini]);
+
+  useFrame((state, delta) => {
+    if (isMini) {
+      camera.position.lerp(targetPos.current, delta * 5.0);
+      camera.lookAt(0, 0, 0);
+      return;
+    }
+
+    if (themeMode === 'creative') {
+      // Cinematic camera sweep: orbit slowly around Y axis
+      const time = state.clock.getElapsedTime();
+      const xVal = Math.sin(time * 0.4) * 0.8;
+      const yVal = Math.cos(time * 0.4) * 0.3;
+      camera.position.x = THREE.MathUtils.lerp(camera.position.x, xVal, delta * 2.0);
+      camera.position.y = THREE.MathUtils.lerp(camera.position.y, yVal, delta * 2.0);
+      camera.position.z = THREE.MathUtils.lerp(camera.position.z, 4.2, delta * 2.0);
+      camera.lookAt(0.28, 0, 0);
+    } else if (themeMode === 'engineering') {
+      // Zoom into core
+      camera.position.z = THREE.MathUtils.lerp(camera.position.z, 0.6, delta * 3.5);
+      camera.position.x = THREE.MathUtils.lerp(camera.position.x, 0.28, delta * 3.5);
+      camera.position.y = THREE.MathUtils.lerp(camera.position.y, 0, delta * 3.5);
+      camera.lookAt(0.28, 0, 0);
+    } else {
+      // Choice selection screen
+      camera.position.lerp(targetPos.current, delta * 3.0);
+      camera.lookAt(0.28, 0, 0);
+    }
+  });
+
+  return null;
+}
+
 /* ── Main exported component ── */
-export default function AP3DMonogram({ className = '', isMini = false }: { className?: string; isMini?: boolean }) {
+export default function AP3DMonogram({ 
+  className = '', 
+  isMini = false,
+  themeMode = 'select',
+  hoverMode = 'none'
+}: { 
+  className?: string; 
+  isMini?: boolean;
+  themeMode?: 'select' | 'creative' | 'engineering';
+  hoverMode?: 'none' | 'creative' | 'engineering';
+}) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -365,14 +454,16 @@ export default function AP3DMonogram({ className = '', isMini = false }: { class
         dpr={typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 2) : 1}
       >
         <Suspense fallback={null}>
-          <CinematicLights isMini={isMini} />
+          <CameraHandler themeMode={themeMode} isMini={isMini} />
+          
+          <CinematicLights isMini={isMini} hoverMode={hoverMode} />
 
           {/* Studio HDRI for strong, clean gold reflections */}
           <Environment preset="studio" />
 
           {/* Visually center the 3D focal point (counteracting layout shift in full-screen) */}
           <group position={isMini ? [0, 0, 0] : [0.28, 0, 0]}>
-            <APCoin isMini={isMini} hovered={hovered} />
+            <APCoin isMini={isMini} hovered={hovered} hoverMode={hoverMode} />
           </group>
 
           {/* Contact shadow grounds the coin inside preloader (disable in navbar) */}

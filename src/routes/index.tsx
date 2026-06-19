@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CanvasSequence } from "../components/CanvasSequence";
 import DomeGallery from "../components/DomeGallery";
 import AP3DMonogram from "../components/AP3DMonogram";
+import { DevDashboardHero } from "../components/DevDashboardHero";
 import { ChevronDown, Instagram, Youtube, Github, Linkedin, Mail, ArrowRight, Volume2, VolumeX, Menu, X, Loader2 } from "lucide-react";
 
 import { siteData } from "@/lib/site-data";
@@ -305,7 +306,17 @@ function Preloader({
 
 
 /* ---------------- Header ---------------- */
-function Header({ data, isLoading }: { data: ReturnType<typeof useContent>; isLoading: boolean }) {
+function Header({ 
+  data, 
+  isLoading,
+  themeMode,
+  setThemeMode
+}: { 
+  data: ReturnType<typeof useContent>; 
+  isLoading: boolean;
+  themeMode: 'select' | 'creative' | 'engineering';
+  setThemeMode: (mode: 'select' | 'creative' | 'engineering') => void;
+}) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -344,6 +355,37 @@ function Header({ data, isLoading }: { data: ReturnType<typeof useContent>; isLo
               {item.label}
             </a>
           ))}
+
+          {themeMode !== 'select' && (
+            <div className="flex border border-border/40 rounded-full p-0.5 bg-card/25 font-mono text-[9px] tracking-[0.12em] select-none ml-4">
+              <button
+                onClick={() => {
+                  setThemeMode('creative');
+                  localStorage.setItem('AP_PORTFOLIO_THEME', 'creative');
+                }}
+                className={`px-3 py-1 rounded-full transition-all duration-300 cursor-pointer ${
+                  themeMode === 'creative' 
+                    ? "bg-primary text-background font-semibold" 
+                    : "text-foreground/60 hover:text-foreground"
+                }`}
+              >
+                🎨 CREATIVE
+              </button>
+              <button
+                onClick={() => {
+                  setThemeMode('engineering');
+                  localStorage.setItem('AP_PORTFOLIO_THEME', 'engineering');
+                }}
+                className={`px-3 py-1 rounded-full transition-all duration-300 cursor-pointer ${
+                  themeMode === 'engineering' 
+                    ? "bg-cyan-500 text-black font-semibold" 
+                    : "text-foreground/60 hover:text-foreground"
+                }`}
+              >
+                💻 DEV
+              </button>
+            </div>
+          )}
         </nav>
         <button
           onClick={() => setMenuOpen(!menuOpen)}
@@ -373,6 +415,39 @@ function Header({ data, isLoading }: { data: ReturnType<typeof useContent>; isLo
                 {item.label}
               </a>
             ))}
+
+            {themeMode !== 'select' && (
+              <div className="flex border border-border/40 rounded-full p-0.5 bg-card/25 font-mono text-[10px] tracking-[0.12em] select-none mt-4 w-fit">
+                <button
+                  onClick={() => {
+                    setThemeMode('creative');
+                    localStorage.setItem('AP_PORTFOLIO_THEME', 'creative');
+                    setMenuOpen(false);
+                  }}
+                  className={`px-4 py-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                    themeMode === 'creative' 
+                      ? "bg-primary text-background font-semibold" 
+                      : "text-foreground/60 hover:text-foreground"
+                  }`}
+                >
+                  🎨 CREATIVE
+                </button>
+                <button
+                  onClick={() => {
+                    setThemeMode('engineering');
+                    localStorage.setItem('AP_PORTFOLIO_THEME', 'engineering');
+                    setMenuOpen(false);
+                  }}
+                  className={`px-4 py-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                    themeMode === 'engineering' 
+                      ? "bg-cyan-500 text-black font-semibold" 
+                      : "text-foreground/60 hover:text-foreground"
+                  }`}
+                >
+                  💻 DEV
+                </button>
+              </div>
+            )}
           </nav>
         </motion.div>
       )}
@@ -1509,6 +1584,17 @@ function Index() {
   const [videoVisible, setVideoVisible] = useState(false);
   const [wordsVisible, setWordsVisible] = useState(false);
 
+  const [themeMode, setThemeMode] = useState<'select' | 'creative' | 'engineering'>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("AP_PORTFOLIO_THEME");
+      if (saved === "creative" || saved === "engineering") {
+        return saved;
+      }
+    }
+    return "select";
+  });
+  const [hoverMode, setHoverMode] = useState<'none' | 'creative' | 'engineering'>('none');
+
   // Stop all running videos and audios in the document when tab is hidden, and resume them when active
   useEffect(() => {
     const pausedMedias: (HTMLVideoElement | HTMLAudioElement)[] = [];
@@ -1613,7 +1699,7 @@ function Index() {
   }, [showEnter]);
 
   useEffect(() => {
-    if (isLoading) {
+    if (isLoading || themeMode === 'select') {
       document.body.style.overflow = "hidden";
       
       // Force scroll to top immediately and on scroll events to prevent scroll position restore/shifts
@@ -1652,9 +1738,9 @@ function Index() {
       document.body.style.overflow = "unset";
       window.scrollTo(0, 0);
     }
-  }, [isLoading]);
+  }, [isLoading, themeMode]);
 
-  const coinState = isLoading ? 'preloader' : 'navbar';
+  const coinState = isLoading || themeMode === 'select' ? 'preloader' : 'navbar';
 
   return (
     <div className="bg-black min-h-screen">
@@ -1683,40 +1769,123 @@ function Index() {
         }}
         transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
       >
-        <Header data={data} isLoading={isLoading} />
-        <Hero 
-          data={data} 
-          activeAudioId={activeAudioId} 
-          setActiveAudioId={setActiveAudioId} 
-          onMediaReady={() => setMediaReady(true)}
-        />
-        <SelectedWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
-        <Clients data={data} />
-        <Certifications data={data} />
-        <CreativeWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
-        <UPESWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
-        <WorkedWith data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
-        <CreativeTools data={data} />
-        <About data={data} />
+        <Header data={data} isLoading={isLoading} themeMode={themeMode} setThemeMode={setThemeMode} />
         
-        {/* --- DOME GALLERY SECTION --- */}
-        <section className="relative w-full h-[100vh] bg-black overflow-hidden flex flex-col items-center justify-center border-t border-white/10">
-          <div className="absolute top-20 z-20 text-center pointer-events-none">
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tighter uppercase mb-4 opacity-90">Dome Gallery</h2>
-            <p className="text-xs md:text-sm text-gray-400 font-mono tracking-widest uppercase">Instagram Highlights & Posts</p>
-          </div>
-          {/* The DomeGallery itself is fully interactive */}
-          <div className="w-full h-full cursor-grab active:cursor-grabbing">
-            <DomeGallery images={domeGalleryImages} />
-          </div>
-        </section>
+        {/* CONDITIONAL RENDER: CREATIVE PATH */}
+        {themeMode === 'creative' && (
+          <>
+            <Hero 
+              data={data} 
+              activeAudioId={activeAudioId} 
+              setActiveAudioId={setActiveAudioId} 
+              onMediaReady={() => setMediaReady(true)}
+            />
+            <CreativeWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
+            <UPESWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
+            <WorkedWith data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
+            <CreativeTools data={data} />
+            
+            {/* --- DOME GALLERY SECTION --- */}
+            <section className="relative w-full h-[100vh] bg-black overflow-hidden flex flex-col items-center justify-center border-t border-white/10">
+              <div className="absolute top-20 z-20 text-center pointer-events-none">
+                <h2 className="text-4xl md:text-5xl font-bold tracking-tighter uppercase mb-4 opacity-90">Dome Gallery</h2>
+                <p className="text-xs md:text-sm text-gray-400 font-mono tracking-widest uppercase">Instagram Highlights & Posts</p>
+              </div>
+              {/* The DomeGallery itself is fully interactive */}
+              <div className="w-full h-full cursor-grab active:cursor-grabbing">
+                <DomeGallery images={domeGalleryImages} />
+              </div>
+            </section>
+          </>
+        )}
 
-        <Testimonial data={data} />
-        <CallToAction data={data} />
+        {/* CONDITIONAL RENDER: SYSTEMS ENGINEER PATH */}
+        {themeMode === 'engineering' && (
+          <>
+            <DevDashboardHero />
+            <SelectedWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
+            <Clients data={data} />
+            <Certifications data={data} />
+          </>
+        )}
+
+        {/* SHARED SECTIONS */}
+        {themeMode !== 'select' && (
+          <>
+            <About data={data} />
+            <Testimonial data={data} />
+            <CallToAction data={data} />
+          </>
+        )}
       </motion.div>
 
+      {/* INTERACTIVE CHOICE ENGINE OVERLAY SCREEN */}
+      {themeMode === 'select' && !isLoading && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black">
+          {/* Same video background as preloader */}
+          <div className="absolute inset-0 z-0 opacity-40">
+            <video
+              src="/loadingpagebg.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/60" />
+          </div>
+
+          {/* Prompts and Buttons */}
+          <div className="relative z-10 flex flex-col items-center gap-10 text-center select-none w-full px-6 max-w-lg mt-56 md:mt-64">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+              className="flex flex-col items-center gap-3"
+            >
+              <h2 className="font-serif text-3xl md:text-4xl italic tracking-wide text-foreground/90">
+                I am a...
+              </h2>
+              <div className="h-px w-16 bg-primary/40 my-1 animate-pulse" />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+              className="flex flex-col sm:flex-row items-center gap-6 w-full justify-center"
+            >
+              <button
+                onMouseEnter={() => setHoverMode('creative')}
+                onMouseLeave={() => setHoverMode('none')}
+                onClick={() => {
+                  setThemeMode('creative');
+                  localStorage.setItem('AP_PORTFOLIO_THEME', 'creative');
+                }}
+                className="w-48 py-3.5 border border-primary/30 rounded-full font-serif text-xs md:text-sm tracking-[0.25em] uppercase bg-background/20 hover:bg-primary hover:text-background hover:scale-[1.03] transition-all duration-300 text-foreground cursor-pointer shadow-[0_0_15px_rgba(224,185,80,0.1)] hover:shadow-[0_0_25px_rgba(224,185,80,0.25)]"
+              >
+                Creative Explorer
+              </button>
+              
+              <button
+                onMouseEnter={() => setHoverMode('engineering')}
+                onMouseLeave={() => setHoverMode('none')}
+                onClick={() => {
+                  setHoverMode('none');
+                  setThemeMode('engineering');
+                  localStorage.setItem('AP_PORTFOLIO_THEME', 'engineering');
+                }}
+                className="w-48 py-3.5 border border-cyan-500/30 rounded-full font-serif text-xs md:text-sm tracking-[0.25em] uppercase bg-background/20 hover:bg-cyan-500 hover:text-black hover:scale-[1.03] transition-all duration-300 text-foreground cursor-pointer shadow-[0_0_15px_rgba(0,229,255,0.1)] hover:shadow-[0_0_25px_rgba(0,229,255,0.25)]"
+              >
+                Systems Engineer
+              </button>
+            </motion.div>
+          </div>
+        </div>
+      )}
+
       {/* 3D Monogram - Globally positioned for seamless flight to Navbar logo placeholder (Rendered at bottom of DOM to ensure z-index priority) */}
-      {(isPreloaderMounted || coinState === 'navbar') && (
+      {(isPreloaderMounted || coinState === 'navbar' || themeMode === 'select') && (
         <motion.div
           layout
           transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
@@ -1727,7 +1896,7 @@ function Index() {
               : "fixed left-6 md:left-[48px] top-6 translate-x-0 translate-y-0 w-12 h-12 md:w-16 md:h-16 z-[60] pointer-events-auto cursor-pointer"
           }
         >
-          <AP3DMonogram isMini={coinState === 'navbar'} />
+          <AP3DMonogram isMini={coinState === 'navbar'} themeMode={themeMode} hoverMode={hoverMode} />
         </motion.div>
       )}
     </div>
