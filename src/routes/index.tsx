@@ -9,6 +9,7 @@ import DomeGallery from "../components/DomeGallery";
 import AP3DMonogram from "../components/AP3DMonogram";
 import { DevDashboardHero } from "../components/DevDashboardHero";
 import { EngineeringPortfolio } from "../components/EngineeringPortfolio";
+import { VisionIntro } from "../components/VisionIntro";
 import { ChevronDown, Instagram, Youtube, Github, Linkedin, Mail, ArrowRight, Volume2, VolumeX, Menu, X, Loader2 } from "lucide-react";
 
 import { siteData } from "@/lib/site-data";
@@ -1826,6 +1827,11 @@ function Index() {
       >
         <Header data={data} isLoading={isLoading} themeMode={themeMode} setThemeMode={setThemeMode} />
         
+        {/* NEW: Vision Intro Sequence */}
+        {themeMode !== 'select' && (
+          <VisionIntro themeMode={themeMode} />
+        )}
+
         {/* CONDITIONAL RENDER: CREATIVE PATH */}
         {themeMode === 'creative' && (
           <>
