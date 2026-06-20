@@ -417,9 +417,9 @@ function CameraHandler({
       camera.position.y = THREE.MathUtils.lerp(camera.position.y, 0, delta * 3.5);
       camera.lookAt(0.28, 0, 0);
     } else {
-      // Choice selection screen - smooth transition to center
-      camera.position.lerp(targetPos.current, delta * 3.0);
-      // DO NOT call camera.lookAt here, let OrbitControls handle it so user can drag!
+      // Choice selection screen - perfectly centered, OrbitControls handles the rest.
+      // We do NOT lerp the camera position here because OrbitControls needs full control 
+      // over the camera's position to allow user drag rotation without rubber-banding!
     }
   });
 
@@ -469,14 +469,14 @@ export default function AP3DMonogram({
           <Environment preset="studio" />
 
           {/* Visually center the 3D focal point (counteracting layout shift in full-screen) */}
-          <group position={isMini ? [0, 0, 0] : [0.28, 0, 0]}>
+          <group position={isMini || themeMode === 'select' ? [0, 0, 0] : [0.28, 0, 0]}>
             <APCoin isMini={isMini} hovered={hovered} hoverMode={hoverMode} />
           </group>
 
           {/* Contact shadow grounds the coin inside preloader (disable in navbar) */}
           {!isMini && (
             <ContactShadows
-              position={[0.28, -1.3, 0]}
+              position={themeMode === 'select' ? [0, -1.3, 0] : [0.28, -1.3, 0]}
               opacity={0.35}
               blur={2}
               scale={10}
@@ -489,7 +489,9 @@ export default function AP3DMonogram({
             enableZoom={false}
             enablePan={false}
             enableRotate={true}
-            target={isMini ? [0, 0, 0] : [0.28, 0, 0]}
+            autoRotate={themeMode === 'select'}
+            autoRotateSpeed={2.5}
+            target={isMini || themeMode === 'select' ? [0, 0, 0] : [0.28, 0, 0]}
             makeDefault
           />
         </Suspense>
