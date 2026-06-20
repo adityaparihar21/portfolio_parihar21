@@ -10,6 +10,7 @@ import AP3DMonogram from "../components/AP3DMonogram";
 import { DevDashboardHero } from "../components/DevDashboardHero";
 import { EngineeringPortfolio } from "../components/EngineeringPortfolio";
 import { VisionIntro } from "../components/VisionIntro";
+import { CreativeVisionIntro } from "../components/CreativeVisionIntro";
 import { ChevronDown, Instagram, Youtube, Github, Linkedin, Mail, ArrowRight, Volume2, VolumeX, Menu, X, Loader2 } from "lucide-react";
 
 import { siteData } from "@/lib/site-data";
@@ -1828,8 +1829,11 @@ function Index() {
         <Header data={data} isLoading={isLoading} themeMode={themeMode} setThemeMode={setThemeMode} />
         
         {/* NEW: Vision Intro Sequence */}
-        {themeMode !== 'select' && (
+        {themeMode === 'engineering' && (
           <VisionIntro themeMode={themeMode} />
+        )}
+        {themeMode === 'creative' && (
+          <CreativeVisionIntro />
         )}
 
         {/* CONDITIONAL RENDER: CREATIVE PATH */}
@@ -1845,18 +1849,6 @@ function Index() {
             <UPESWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
             <WorkedWith data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
             <CreativeTools data={data} />
-            
-            {/* --- DOME GALLERY SECTION --- */}
-            <section className="relative w-full h-[100vh] bg-black overflow-hidden flex flex-col items-center justify-center border-t border-white/10">
-              <div className="absolute top-20 z-20 text-center pointer-events-none">
-                <h2 className="text-4xl md:text-5xl font-bold tracking-tighter uppercase mb-4 opacity-90">Dome Gallery</h2>
-                <p className="text-xs md:text-sm text-gray-400 font-mono tracking-widest uppercase">Instagram Highlights & Posts</p>
-              </div>
-              {/* The DomeGallery itself is fully interactive */}
-              <div className="w-full h-full cursor-grab active:cursor-grabbing">
-                <DomeGallery images={domeGalleryImages} />
-              </div>
-            </section>
           </>
         )}
 

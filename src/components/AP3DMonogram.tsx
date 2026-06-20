@@ -153,8 +153,8 @@ function APCoin({
     const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     
     if (themeMode === 'select') {
-      // Choice screen logic
-      const targetScale = hovered ? 1.05 : 1;
+      // Choice screen logic: hover scale is based on TARGET_SCALE
+      const targetScale = TARGET_SCALE * (hovered ? 1.05 : 1);
       coinRef.current.scale.setScalar(
         THREE.MathUtils.lerp(coinRef.current.scale.x, targetScale, delta * 5)
       );
