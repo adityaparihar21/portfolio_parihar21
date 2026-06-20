@@ -10,6 +10,7 @@ import AP3DMonogram from "../components/AP3DMonogram";
 import { DevDashboardHero } from "../components/DevDashboardHero";
 import { EngineeringPortfolio } from "../components/EngineeringPortfolio";
 import { GithubSection } from "../components/GithubSection";
+import { RadialIntroSequence } from "../components/intro/RadialIntro";
 import { ChevronDown, Instagram, Youtube, Github, Linkedin, Mail, ArrowRight, Volume2, VolumeX, Menu, X, Loader2 } from "lucide-react";
 
 import { siteData } from "@/lib/site-data";
@@ -1842,12 +1843,14 @@ function Index() {
         {/* CONDITIONAL RENDER: CREATIVE PATH */}
         {themeMode === 'creative' && (
           <>
-            <Hero 
-              data={data} 
-              activeAudioId={activeAudioId} 
-              setActiveAudioId={setActiveAudioId} 
-              onMediaReady={() => setMediaReady(true)}
-            />
+            <RadialIntroSequence>
+              <Hero 
+                data={data} 
+                activeAudioId={activeAudioId} 
+                setActiveAudioId={setActiveAudioId} 
+                onMediaReady={() => setMediaReady(true)}
+              />
+            </RadialIntroSequence>
             <CreativeWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
             <UPESWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
             <WorkedWith data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
