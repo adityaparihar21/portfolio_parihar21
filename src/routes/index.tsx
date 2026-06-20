@@ -287,22 +287,27 @@ function Preloader({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.7, ease: EASE_OUT_EXPO }}
-              className="mt-6 flex flex-col sm:flex-row items-center gap-4 md:gap-6 w-full justify-center pointer-events-auto"
+              className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-5 w-full pointer-events-auto"
             >
-              {/* Premium Creative Button */}
+              {/* Creative Work Pill */}
               <button
                 onMouseEnter={() => setHoverMode('creative')}
                 onMouseLeave={() => setHoverMode('none')}
                 onClick={() => onChoice('creative')}
-                className="group relative w-56 md:w-64 py-4 md:py-4 rounded-2xl overflow-hidden backdrop-blur-md bg-white/5 border border-white/10 hover:border-[#DDB94E]/50 transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:shadow-[0_0_40px_rgba(224,185,80,0.15)] cursor-pointer"
+                className="group flex flex-col items-center justify-center px-8 py-3.5 rounded-[60px] bg-[rgba(210,175,110,0.12)] border-[0.5px] border-[rgba(210,175,110,0.35)] transition-all duration-500 hover:bg-[rgba(210,175,110,0.22)] hover:border-[rgba(210,175,110,0.6)] hover:-translate-y-[2px] cursor-pointer"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-[#DDB94E]/0 via-[#DDB94E]/10 to-[#DDB94E]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 -translate-x-full group-hover:translate-x-full" />
-                <span className="relative z-10 font-serif text-[11px] md:text-[12px] tracking-[0.25em] uppercase text-white/90 group-hover:text-[#FFF5D1] transition-colors duration-300 drop-shadow-md">
-                  Creative Explorer
+                <span className="font-serif font-light text-[#e8d4a0] uppercase tracking-[0.28em] text-[11px] md:text-xs">
+                  Creative Work
+                </span>
+                <span className="font-serif font-light italic text-[#e8d4a0]/80 text-[9px] mt-1 tracking-widest">
+                  Film · Direction · Design
                 </span>
               </button>
               
-              {/* Premium Engineering Button */}
+              {/* Vertical Divider */}
+              <div className="hidden sm:block w-[0.5px] h-[32px] bg-[rgba(180,145,90,0.2)]" />
+              
+              {/* Technical Work Pill */}
               <button
                 onMouseEnter={() => setHoverMode('engineering')}
                 onMouseLeave={() => setHoverMode('none')}
@@ -310,11 +315,13 @@ function Preloader({
                   setHoverMode('none');
                   onChoice('engineering');
                 }}
-                className="group relative w-56 md:w-64 py-4 md:py-4 rounded-2xl overflow-hidden backdrop-blur-md bg-white/5 border border-white/10 hover:border-cyan-500/50 transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:shadow-[0_0_40px_rgba(0,229,255,0.15)] cursor-pointer"
+                className="group flex flex-col items-center justify-center px-8 py-3.5 rounded-[60px] bg-[rgba(160,185,220,0.08)] border-[0.5px] border-[rgba(160,185,220,0.25)] transition-all duration-500 hover:bg-[rgba(160,185,220,0.16)] hover:border-[rgba(160,185,220,0.5)] hover:-translate-y-[2px] cursor-pointer"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 -translate-x-full group-hover:translate-x-full" />
-                <span className="relative z-10 font-serif text-[11px] md:text-[12px] tracking-[0.25em] uppercase text-white/90 group-hover:text-[#E0FFFF] transition-colors duration-300 drop-shadow-md">
-                  Systems Engineer
+                <span className="font-serif font-light text-[#b8cfe8] uppercase tracking-[0.28em] text-[11px] md:text-xs">
+                  Technical Work
+                </span>
+                <span className="font-serif font-light italic text-[#b8cfe8]/80 text-[9px] mt-1 tracking-widest">
+                  Engineering · Code · Systems
                 </span>
               </button>
             </motion.div>
