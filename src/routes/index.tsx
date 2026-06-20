@@ -53,7 +53,8 @@ function Preloader({
   triggerTransition,
   onComplete,
   showEnter,
-  onEnter,
+  onChoice,
+  setHoverMode,
   countdown,
   videoVisible,
   wordsVisible,
@@ -62,7 +63,8 @@ function Preloader({
   triggerTransition: boolean;
   onComplete: () => void;
   showEnter: boolean;
-  onEnter: () => void;
+  onChoice: (choice: 'creative' | 'engineering') => void;
+  setHoverMode: (mode: 'none' | 'creative' | 'engineering') => void;
   countdown: number;
   videoVisible: boolean;
   wordsVisible: boolean;
@@ -276,7 +278,7 @@ function Preloader({
           )}
         </AnimatePresence>
 
-        {/* ENTER BUTTON: Fades in below the timer bar */}
+        {/* CHOICE BUTTONS: Fades in below the timer bar */}
         <AnimatePresence>
           {showEnter && (
             <motion.div
@@ -285,15 +287,34 @@ function Preloader({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.7, ease: EASE_OUT_EXPO }}
-              className="mt-2 pointer-events-auto"
+              className="mt-6 flex flex-col sm:flex-row items-center gap-4 md:gap-6 w-full justify-center pointer-events-auto"
             >
+              {/* Premium Creative Button */}
               <button
-                onClick={onEnter}
-                className="relative overflow-hidden px-12 py-3 border border-transparent bg-foreground transition-all duration-500 hover:scale-[1.03] hover:bg-foreground/90 active:scale-95 group rounded-full shadow-[0_4px_30px_rgba(237,224,202,0.15)] cursor-pointer"
+                onMouseEnter={() => setHoverMode('creative')}
+                onMouseLeave={() => setHoverMode('none')}
+                onClick={() => onChoice('creative')}
+                className="group relative w-56 md:w-64 py-4 md:py-4 rounded-2xl overflow-hidden backdrop-blur-md bg-white/5 border border-white/10 hover:border-[#DDB94E]/50 transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:shadow-[0_0_40px_rgba(224,185,80,0.15)] cursor-pointer"
               >
-                <div className="absolute inset-0 bg-primary/10 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-500 ease-out" />
-                <span className="relative z-10 font-serif text-[11px] md:text-xs tracking-[0.35em] uppercase text-background group-hover:text-background/80 transition-colors duration-300 font-medium">
-                  Enter Site
+                <div className="absolute inset-0 bg-gradient-to-r from-[#DDB94E]/0 via-[#DDB94E]/10 to-[#DDB94E]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 -translate-x-full group-hover:translate-x-full" />
+                <span className="relative z-10 font-serif text-[11px] md:text-[12px] tracking-[0.25em] uppercase text-white/90 group-hover:text-[#FFF5D1] transition-colors duration-300 drop-shadow-md">
+                  Creative Explorer
+                </span>
+              </button>
+              
+              {/* Premium Engineering Button */}
+              <button
+                onMouseEnter={() => setHoverMode('engineering')}
+                onMouseLeave={() => setHoverMode('none')}
+                onClick={() => {
+                  setHoverMode('none');
+                  onChoice('engineering');
+                }}
+                className="group relative w-56 md:w-64 py-4 md:py-4 rounded-2xl overflow-hidden backdrop-blur-md bg-white/5 border border-white/10 hover:border-cyan-500/50 transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:shadow-[0_0_40px_rgba(0,229,255,0.15)] cursor-pointer"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 -translate-x-full group-hover:translate-x-full" />
+                <span className="relative z-10 font-serif text-[11px] md:text-[12px] tracking-[0.25em] uppercase text-white/90 group-hover:text-[#E0FFFF] transition-colors duration-300 drop-shadow-md">
+                  Systems Engineer
                 </span>
               </button>
             </motion.div>
@@ -370,7 +391,7 @@ function Header({
                     : "text-foreground/60 hover:text-foreground"
                 }`}
               >
-                🎨 CREATIVE
+                CREATIVE
               </button>
               <button
                 onClick={() => {
@@ -383,7 +404,7 @@ function Header({
                     : "text-foreground/60 hover:text-foreground"
                 }`}
               >
-                💻 DEV
+                DEV
               </button>
             </div>
           )}
@@ -1640,8 +1661,14 @@ function Index() {
     };
   }, []);
 
-  // Handle Enter button press
-  const handleEnter = () => setIsLoading(false);
+  // Handle Choice Selection
+  const handleChoice = (choice: 'creative' | 'engineering') => {
+    setThemeMode(choice);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("AP_PORTFOLIO_THEME", choice);
+    }
+    setIsLoading(false);
+  };
 
   // Scroll to top when clicking the navbar coin logo
   const handleLogoClick = () => {
@@ -1655,8 +1682,12 @@ function Index() {
     if (typeof window !== "undefined" && window.location.hash) {
       window.history.replaceState(null, '', window.location.pathname);
     }
-    // Absolute maximum: if nothing happens in 15s, force entry
-    const maxTimer = setTimeout(() => setIsLoading(false), 15000);
+    // Absolute maximum: if nothing happens in 15s, force entry with creative fallback
+    const maxTimer = setTimeout(() => {
+      if (isLoading) {
+        handleChoice('creative');
+      }
+    }, 15000);
     return () => clearTimeout(maxTimer);
   }, []);
 
@@ -1692,7 +1723,7 @@ function Index() {
       setCountdown(prev => {
         if (prev <= 1) {
           clearInterval(interval);
-          setIsLoading(false);
+          handleChoice('creative');
           return 0;
         }
         return prev - 1;
@@ -1754,7 +1785,8 @@ function Index() {
             triggerTransition={!isLoading}
             onComplete={() => setIsPreloaderMounted(false)}
             showEnter={showEnter}
-            onEnter={handleEnter}
+            onChoice={handleChoice}
+            setHoverMode={setHoverMode}
             countdown={countdown}
             videoVisible={videoVisible}
             wordsVisible={wordsVisible}
@@ -1822,79 +1854,7 @@ function Index() {
         )}
       </motion.div>
 
-      {/* INTERACTIVE CHOICE ENGINE OVERLAY SCREEN */}
-      {themeMode === 'select' && !isLoading && (
-        <div className="fixed inset-0 z-[55] flex flex-col items-center justify-center pointer-events-none">
-          {/* Same video background as preloader */}
-          <div className="absolute inset-0 z-0">
-            <video
-              src="/loadingpagebg.mp4"
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full object-cover opacity-30 mix-blend-screen"
-            />
-            {/* Cinematic vignette and grain overlay */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_20%,_rgba(0,0,0,0.85)_100%)] pointer-events-none" />
-          </div>
 
-          {/* Prompts and Buttons */}
-          <div className="relative z-10 flex flex-col items-center gap-12 text-center select-none w-full px-6 max-w-3xl mt-[32vh]">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-              className="flex flex-col items-center gap-4"
-            >
-              <h2 className="font-serif text-4xl md:text-5xl italic tracking-wide text-transparent bg-clip-text bg-gradient-to-b from-[#FFF5D1] to-[#B8912D] drop-shadow-[0_2px_10px_rgba(184,145,45,0.4)]">
-                I am a...
-              </h2>
-              <div className="h-[1px] w-24 bg-gradient-to-r from-transparent via-[#DDB94E] to-transparent opacity-60" />
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-              className="flex flex-col sm:flex-row items-center gap-6 w-full justify-center pointer-events-auto"
-            >
-              {/* Premium Creative Button */}
-              <button
-                onMouseEnter={() => setHoverMode('creative')}
-                onMouseLeave={() => setHoverMode('none')}
-                onClick={() => {
-                  setThemeMode('creative');
-                  localStorage.setItem('AP_PORTFOLIO_THEME', 'creative');
-                }}
-                className="group relative w-64 py-5 rounded-2xl overflow-hidden backdrop-blur-md bg-white/5 border border-white/10 hover:border-[#DDB94E]/50 transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:shadow-[0_0_40px_rgba(224,185,80,0.15)] cursor-pointer"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-[#DDB94E]/0 via-[#DDB94E]/10 to-[#DDB94E]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 -translate-x-full group-hover:translate-x-full" />
-                <span className="relative z-10 font-serif text-[13px] md:text-[14px] tracking-[0.25em] uppercase text-white/90 group-hover:text-[#FFF5D1] transition-colors duration-300 drop-shadow-md">
-                  Creative Explorer
-                </span>
-              </button>
-              
-              {/* Premium Engineering Button */}
-              <button
-                onMouseEnter={() => setHoverMode('engineering')}
-                onMouseLeave={() => setHoverMode('none')}
-                onClick={() => {
-                  setHoverMode('none');
-                  setThemeMode('engineering');
-                  localStorage.setItem('AP_PORTFOLIO_THEME', 'engineering');
-                }}
-                className="group relative w-64 py-5 rounded-2xl overflow-hidden backdrop-blur-md bg-white/5 border border-white/10 hover:border-cyan-500/50 transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:shadow-[0_0_40px_rgba(0,229,255,0.15)] cursor-pointer"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 -translate-x-full group-hover:translate-x-full" />
-                <span className="relative z-10 font-serif text-[13px] md:text-[14px] tracking-[0.25em] uppercase text-white/90 group-hover:text-[#E0FFFF] transition-colors duration-300 drop-shadow-md">
-                  Systems Engineer
-                </span>
-              </button>
-            </motion.div>
-          </div>
-        </div>
-      )}
 
       {/* 3D Monogram - Globally positioned for seamless flight to Navbar logo placeholder (Rendered at bottom of DOM to ensure z-index priority) */}
       {(isPreloaderMounted || coinState === 'navbar' || themeMode === 'select') && (
