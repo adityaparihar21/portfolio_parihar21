@@ -125,7 +125,17 @@ function useGoldTextures() {
 }
 
 /* ── Antique Gold "AP" Minted Coin with PBR Textures ── */
-function APCoin({ isMini, hovered, hoverMode = 'none' }: { isMini: boolean; hovered: boolean; hoverMode?: string }) {
+function APCoin({ 
+  isMini, 
+  hovered, 
+  themeMode = 'select', 
+  hoverMode = 'none' 
+}: { 
+  isMini: boolean; 
+  hovered: boolean; 
+  themeMode?: string; 
+  hoverMode?: string; 
+}) {
   const coinRef = useRef<THREE.Group>(null);
   const { normalMap, roughnessMap, aoMap } = useGoldTextures();
 
@@ -137,26 +147,49 @@ function APCoin({ isMini, hovered, hoverMode = 'none' }: { isMini: boolean; hove
     ? 0.55 
     : (isMobile ? 0.15 : 0.20);
 
-  // Smooth entrance + auto-rotation with ramp-up
   useFrame((state, delta) => {
     if (!coinRef.current) return;
+    // prefers-reduced-motion check
+    const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
+    if (themeMode === 'select') {
+      // Choice screen logic
+      const targetScale = hovered ? 1.05 : 1;
+      coinRef.current.scale.setScalar(
+        THREE.MathUtils.lerp(coinRef.current.scale.x, targetScale, delta * 5)
+      );
 
-    if (!isMini) {
-      if (!entranceRef.current.done) {
+      // Do not auto-rotate if user prefers reduced motion
+      if (!prefersReducedMotion) {
+        coinRef.current.rotation.y += delta * 0.3;
+      }
+    } else if (!isMini) {
+      // Entrance animation
+      if (entranceRef.current.elapsed < 1.5) {
+        const t = entranceRef.current.elapsed / 1.5;
+        const easeOutQuint = 1 - Math.pow(1 - t, 5);
+        const currentScale = THREE.MathUtils.lerp(0.01, TARGET_SCALE, easeOutQuint);
+        coinRef.current.scale.set(currentScale, currentScale, currentScale);
+      } else {
         coinRef.current.scale.set(TARGET_SCALE, TARGET_SCALE, TARGET_SCALE);
-        entranceRef.current.done = true;
       }
 
-      // Rotation: ramp up from 0 to full speed over 1.5s
-      entranceRef.current.elapsed += delta;
-      const rotRamp = Math.min(entranceRef.current.elapsed / 1.5, 1);
-      const rotSpeed = rotRamp * (2 - rotRamp) * 0.6;
-      coinRef.current.rotation.y += delta * rotSpeed;
+      // Rotation ramp up
+      if (!prefersReducedMotion) {
+        entranceRef.current.elapsed += delta;
+        const rotRamp = Math.min(entranceRef.current.elapsed / 1.5, 1);
+        const rotSpeed = rotRamp * (2 - rotRamp) * 0.6;
+        coinRef.current.rotation.y += delta * rotSpeed;
+      } else {
+        coinRef.current.rotation.y = 0;
+      }
     } else {
-      // In navbar: fixed scale, fast spin on hover, slow drift otherwise
+      // Navbar state
       coinRef.current.scale.set(TARGET_SCALE, TARGET_SCALE, TARGET_SCALE);
-      const rotSpeed = hovered ? 3.2 : 0.45;
-      coinRef.current.rotation.y += delta * rotSpeed;
+      if (!prefersReducedMotion) {
+        const rotSpeed = hovered ? 3.2 : 0.45;
+        coinRef.current.rotation.y += delta * rotSpeed;
+      }
     }
   });
 
@@ -176,10 +209,20 @@ function APCoin({ isMini, hovered, hoverMode = 'none' }: { isMini: boolean; hove
     aoMapIntensity: 0.7,
   };
 
+  // Determine dynamic rim color based on hover/theme
+  const activeMode = hoverMode !== 'none' ? hoverMode : themeMode;
+  let dynamicRimColor = '#D4A840'; // Default gold
+  if (activeMode === 'engineering') dynamicRimColor = '#6496d2'; // Tech blue
+  if (activeMode === 'creative') dynamicRimColor = '#d2af64'; // Creative gold
+  if (hoverMode !== 'none') {
+    // Emphasize rim brightness on hover
+    dynamicRimColor = activeMode === 'engineering' ? '#8cb8eb' : '#ebd496';
+  }
+
   // ── Rim: slightly brighter, polished gold (worn edges catch more light) ──
   const coinRimProps = {
     ...coinBodyProps,
-    color: '#D4A840',           // Brighter polished gold on raised edges
+    color: dynamicRimColor,
     roughness: 0.25,            // Smoother — rims get polished from handling
     clearcoat: 0.2,
     envMapIntensity: 3.0,
@@ -470,7 +513,7 @@ export default function AP3DMonogram({
 
           {/* Visually center the 3D focal point (counteracting layout shift in full-screen) */}
           <group position={isMini || themeMode === 'select' ? [0, 0, 0] : [0.28, 0, 0]}>
-            <APCoin isMini={isMini} hovered={hovered} hoverMode={hoverMode} />
+            <APCoin isMini={isMini} hovered={hovered} hoverMode={hoverMode} themeMode={themeMode} />
           </group>
 
           {/* Contact shadow grounds the coin inside preloader (disable in navbar) */}

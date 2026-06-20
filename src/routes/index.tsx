@@ -8,6 +8,8 @@ import { CanvasSequence } from "../components/CanvasSequence";
 import DomeGallery from "../components/DomeGallery";
 import AP3DMonogram from "../components/AP3DMonogram";
 import { DevDashboardHero } from "../components/DevDashboardHero";
+import { EngineeringPortfolio } from "../components/EngineeringPortfolio";
+import { CustomCursor } from "../components/CustomCursor";
 import { ChevronDown, Instagram, Youtube, Github, Linkedin, Mail, ArrowRight, Volume2, VolumeX, Menu, X, Loader2 } from "lucide-react";
 
 import { siteData } from "@/lib/site-data";
@@ -1843,12 +1845,7 @@ function Index() {
 
         {/* CONDITIONAL RENDER: SYSTEMS ENGINEER PATH */}
         {themeMode === 'engineering' && (
-          <>
-            <DevDashboardHero />
-            <SelectedWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
-            <Clients data={data} />
-            <Certifications data={data} />
-          </>
+          <EngineeringPortfolio data={data} />
         )}
 
         {/* SHARED SECTIONS */}
@@ -1880,6 +1877,9 @@ function Index() {
           <AP3DMonogram isMini={coinState === 'navbar'} themeMode={isLoading ? 'select' : themeMode} hoverMode={hoverMode} />
         </motion.div>
       )}
+
+      {/* Global Custom Cursor */}
+      {!isLoading && <CustomCursor themeMode={themeMode} />}
     </div>
   );
 }
