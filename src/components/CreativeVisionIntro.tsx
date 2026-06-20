@@ -7,7 +7,7 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-const words = ["Filmmaking", "Direction", "Design", "Emotion"];
+const words = ["inspire", "transport", "elevate", "move you", "linger"];
 
 // Select a subset of images for the scroll intro
 const bgImages = domeGalleryImages.slice(0, 8);
@@ -87,7 +87,7 @@ export function CreativeVisionIntro() {
 
       // 40% - 90%: Slot machine scrubs through the words
       tl.to(slotInnerRef.current, {
-        yPercent: -75,
+        yPercent: -80,
         duration: 0.5,
         ease: 'none'
       }, 0.4);
@@ -138,10 +138,10 @@ export function CreativeVisionIntro() {
     return (
       <div className="w-full bg-[#070b12] py-24 flex flex-col items-center justify-center text-center px-6">
         <p className="font-serif text-3xl md:text-5xl tracking-wide text-white opacity-90 mb-6">
-          The future of storytelling is precise.
+          Every destination has a story waiting to be told.
         </p>
         <p className="font-serif text-2xl md:text-4xl text-white/70">
-          Changing the way we approach Filmmaking & Design.
+          Cinematic storytelling designed to inspire.
         </p>
       </div>
     );
@@ -182,14 +182,14 @@ export function CreativeVisionIntro() {
         {/* Step 1: The Hook */}
         <div ref={step1Ref} className="absolute inset-0 flex items-center justify-center pointer-events-none origin-center">
           <h2 className="text-3xl md:text-5xl lg:text-6xl text-white/95 leading-tight font-serif font-light tracking-wide">
-            The future of storytelling <br className="md:hidden" /> is <span className="text-[#e8d4a0]">precise</span>.
+            Every destination has a story <br className="md:hidden" /> waiting to be <span className="text-[#e8d4a0]">told</span>.
           </h2>
         </div>
 
         {/* Step 2: The Shift & Slot Machine */}
         <div ref={step2Ref} className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none origin-center">
           <p className="text-xl md:text-3xl lg:text-4xl text-white/70 mb-4 font-serif font-light tracking-wide">
-            Changing the way we approach
+            Cinematic storytelling designed to
           </p>
           
           {/* Slot Machine Window */}
