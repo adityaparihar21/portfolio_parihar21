@@ -417,9 +417,9 @@ function CameraHandler({
       camera.position.y = THREE.MathUtils.lerp(camera.position.y, 0, delta * 3.5);
       camera.lookAt(0.28, 0, 0);
     } else {
-      // Choice selection screen
+      // Choice selection screen - smooth transition to center
       camera.position.lerp(targetPos.current, delta * 3.0);
-      camera.lookAt(0.28, 0, 0);
+      // DO NOT call camera.lookAt here, let OrbitControls handle it so user can drag!
     }
   });
 
