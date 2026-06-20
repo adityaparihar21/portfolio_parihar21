@@ -727,7 +727,7 @@ export default function DomeGallery({
                   onClick={onTileClick}
                   onPointerUp={onTilePointerUp}
                 >
-                  <img src={it.thumb} loading="lazy" draggable={false} alt={it.alt} />
+                  <img src={it.thumb} draggable={false} alt={it.alt} />
                 </div>
               </div>
             ))}

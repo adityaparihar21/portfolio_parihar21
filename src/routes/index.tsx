@@ -1285,7 +1285,7 @@ function About({ data }: { data: ReturnType<typeof useContent> }) {
 function Testimonial({ data }: { data: ReturnType<typeof useContent> }) {
   const { eyebrow, title, quote, author } = data.testimonial;
   return (
-    <section className="border-y border-border bg-card/40 px-6 py-32 md:px-12 md:py-44">
+    <section className="border-b border-border bg-card/40 px-6 py-32 md:px-12 md:py-44">
       <motion.div
         variants={staggerParent}
         initial="hidden"
