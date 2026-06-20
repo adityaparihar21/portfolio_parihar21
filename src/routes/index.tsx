@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform, AnimatePresence, useMotionValue, useSp
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CanvasSequence } from "../components/CanvasSequence";
+// @ts-expect-error: Ignore missing types for JSX file
 import DomeGallery from "../components/DomeGallery";
 import AP3DMonogram from "../components/AP3DMonogram";
 import { DevDashboardHero } from "../components/DevDashboardHero";

@@ -30,7 +30,7 @@ export function CanvasSequence({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [images, setImages] = useState<HTMLImageElement[]>([]);
   const frameIndexRef = useRef(0);
-  const reqRef = useRef<number>();
+  const reqRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     // Preload all images

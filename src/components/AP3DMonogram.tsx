@@ -1,4 +1,4 @@
-import { useRef, useMemo, useState, Suspense } from 'react';
+import { useRef, useMemo, useState, Suspense, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Text3D, Center, Environment, OrbitControls, ContactShadows } from '@react-three/drei';
 import { EffectComposer, ToneMapping, Vignette, SMAA } from '@react-three/postprocessing';
