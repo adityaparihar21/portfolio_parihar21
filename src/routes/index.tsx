@@ -1,6 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useRef } from "react";
-import { motion, useScroll, useTransform, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  AnimatePresence,
+  useMotionValue,
+  useSpring,
+} from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CanvasSequence } from "../components/CanvasSequence";
@@ -11,7 +18,20 @@ import { DevDashboardHero } from "../components/DevDashboardHero";
 import { EngineeringPortfolio } from "../components/EngineeringPortfolio";
 import { GithubSection } from "../components/GithubSection";
 import { RadialIntroSequence } from "../components/intro/RadialIntro";
-import { ChevronDown, Instagram, Youtube, Github, Linkedin, Mail, ArrowRight, Volume2, VolumeX, Menu, X, Loader2 } from "lucide-react";
+import {
+  ChevronDown,
+  Instagram,
+  Youtube,
+  Github,
+  Linkedin,
+  Mail,
+  ArrowRight,
+  Volume2,
+  VolumeX,
+  Menu,
+  X,
+  Loader2,
+} from "lucide-react";
 
 import { siteData } from "@/lib/site-data";
 import { useContent } from "@/lib/use-content";
@@ -66,8 +86,8 @@ function Preloader({
   triggerTransition: boolean;
   onComplete: () => void;
   showEnter: boolean;
-  onChoice: (choice: 'creative' | 'engineering') => void;
-  setHoverMode: (mode: 'none' | 'creative' | 'engineering') => void;
+  onChoice: (choice: "creative" | "engineering") => void;
+  setHoverMode: (mode: "none" | "creative" | "engineering") => void;
   countdown: number;
   videoVisible: boolean;
   wordsVisible: boolean;
@@ -93,7 +113,7 @@ function Preloader({
 
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("touchmove", handleTouchMove);
-    
+
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("touchmove", handleTouchMove);
@@ -117,7 +137,7 @@ function Preloader({
         }
       } else {
         if (audioRef.current && wasPlaying) {
-          audioRef.current.play().catch(e => console.warn("Audio resume failed", e));
+          audioRef.current.play().catch((e) => console.warn("Audio resume failed", e));
           wasPlaying = false;
         }
       }
@@ -130,21 +150,21 @@ function Preloader({
     if (triggerTransition) {
       // Play cinematic riser SFX safely to prevent overlaps
       if (!audioRef.current) {
-        audioRef.current = new Audio('/riser.mp3');
+        audioRef.current = new Audio("/riser.mp3");
         audioRef.current.volume = 0.85;
       }
-      audioRef.current.play().catch(e => console.warn("Audio playback blocked", e));
+      audioRef.current.play().catch((e) => console.warn("Audio playback blocked", e));
 
       const runTransition = async () => {
         // Fade out monogram and text
         gsap.to(".preloader-content", { opacity: 0, duration: 0.8, ease: "power2.out" });
         gsap.to(".preloader-coin", { opacity: 0, scale: 1.1, duration: 1.5, ease: "power2.inOut" });
-        
+
         // Smooth fade out and slight zoom for the new interior video
-        gsap.to(".preloader-bg", { 
-          scale: 1.1, 
-          opacity: 0, 
-          duration: 2.5, 
+        gsap.to(".preloader-bg", {
+          scale: 1.1,
+          opacity: 0,
+          duration: 2.5,
           ease: "power2.inOut",
           onComplete: () => {
             if (audioRef.current) {
@@ -152,11 +172,11 @@ function Preloader({
               gsap.to(audioRef.current, {
                 volume: 0,
                 duration: 0.3,
-                onComplete: () => audioRef.current?.pause()
+                onComplete: () => audioRef.current?.pause(),
               });
             }
             onComplete();
-          } 
+          },
         });
       };
       runTransition();
@@ -182,9 +202,9 @@ function Preloader({
         initial={{ opacity: 0, scale: 1.0 }}
         animate={{ opacity: videoVisible ? 1 : 0, scale: 1.15 }}
         exit={{ opacity: 0 }}
-        transition={{ 
+        transition={{
           opacity: { duration: 2.0, ease: "easeOut" },
-          scale: { duration: 25, ease: "linear", repeat: Infinity, repeatType: "reverse" }
+          scale: { duration: 25, ease: "linear", repeat: Infinity, repeatType: "reverse" },
         }}
         className="preloader-bg absolute inset-0 z-0 pointer-events-none origin-center"
       >
@@ -202,22 +222,22 @@ function Preloader({
         {/* Additional gradient at the bottom for text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-[2]" />
       </motion.div>
-      
+
       {/* Interactive Spotlight */}
-      <motion.div 
+      <motion.div
         className="pointer-events-none absolute z-0 h-[800px] w-[800px] rounded-full opacity-40"
         style={{
           x: springX,
           y: springY,
           translateX: "-50%",
           translateY: "-50%",
-          background: "radial-gradient(circle, rgba(224, 185, 80, 0.15) 0%, rgba(224, 185, 80, 0.05) 30%, transparent 60%)"
+          background:
+            "radial-gradient(circle, rgba(224, 185, 80, 0.15) 0%, rgba(224, 185, 80, 0.05) 30%, transparent 60%)",
         }}
       />
 
       {/* Loading & Enter UI - Positioned at Bottom */}
       <div className="absolute bottom-20 md:bottom-28 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-6 w-full px-6 preloader-content pointer-events-none">
-        
         {/* ALWAYS VISIBLE: Cycling words + Timer bar */}
         <AnimatePresence>
           {wordsVisible && (
@@ -259,7 +279,12 @@ function Preloader({
                       <motion.div
                         initial={{ x: "-100%" }}
                         animate={{ x: "100%" }}
-                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", repeatDelay: 0.4 }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                          repeatDelay: 0.4,
+                        }}
                         className="absolute inset-0 h-full w-full bg-primary/90"
                       />
                     </motion.div>
@@ -294,9 +319,9 @@ function Preloader({
             >
               {/* Creative Work Pill */}
               <button
-                onMouseEnter={() => setHoverMode('creative')}
-                onMouseLeave={() => setHoverMode('none')}
-                onClick={() => onChoice('creative')}
+                onMouseEnter={() => setHoverMode("creative")}
+                onMouseLeave={() => setHoverMode("none")}
+                onClick={() => onChoice("creative")}
                 className="group flex flex-col items-center justify-center px-8 py-3.5 rounded-[60px] bg-[rgba(210,175,110,0.12)] border-[0.5px] border-[rgba(210,175,110,0.35)] transition-all duration-500 hover:bg-[rgba(210,175,110,0.22)] hover:border-[rgba(210,175,110,0.6)] hover:-translate-y-[2px] cursor-pointer"
               >
                 <span className="font-serif font-light text-[#e8d4a0] uppercase tracking-[0.28em] text-[11px] md:text-xs">
@@ -306,17 +331,17 @@ function Preloader({
                   Film · Direction · Design
                 </span>
               </button>
-              
+
               {/* Vertical Divider */}
               <div className="hidden sm:block w-[0.5px] h-[32px] bg-[rgba(180,145,90,0.2)]" />
-              
+
               {/* Technical Work Pill */}
               <button
-                onMouseEnter={() => setHoverMode('engineering')}
-                onMouseLeave={() => setHoverMode('none')}
+                onMouseEnter={() => setHoverMode("engineering")}
+                onMouseLeave={() => setHoverMode("none")}
                 onClick={() => {
-                  setHoverMode('none');
-                  onChoice('engineering');
+                  setHoverMode("none");
+                  onChoice("engineering");
                 }}
                 className="group flex flex-col items-center justify-center px-8 py-3.5 rounded-[60px] bg-[rgba(160,185,220,0.08)] border-[0.5px] border-[rgba(160,185,220,0.25)] transition-all duration-500 hover:bg-[rgba(160,185,220,0.16)] hover:border-[rgba(160,185,220,0.5)] hover:-translate-y-[2px] cursor-pointer"
               >
@@ -330,24 +355,22 @@ function Preloader({
             </motion.div>
           )}
         </AnimatePresence>
-
       </div>
     </motion.div>
   );
 }
 
-
 /* ---------------- Header ---------------- */
-function Header({ 
-  data, 
+function Header({
+  data,
   isLoading,
   themeMode,
-  setThemeMode
-}: { 
-  data: ReturnType<typeof useContent>; 
+  setThemeMode,
+}: {
+  data: ReturnType<typeof useContent>;
   isLoading: boolean;
-  themeMode: 'select' | 'creative' | 'engineering';
-  setThemeMode: (mode: 'select' | 'creative' | 'engineering') => void;
+  themeMode: "select" | "creative" | "engineering";
+  setThemeMode: (mode: "select" | "creative" | "engineering") => void;
 }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -371,39 +394,44 @@ function Header({
       }`}
     >
       <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-6 md:px-12">
-        <a href="#top" className="flex items-center gap-2 w-12 h-12 md:w-16 md:h-16" onClick={() => setMenuOpen(false)}>
+        <a
+          href="#top"
+          className="flex items-center gap-2 w-12 h-12 md:w-16 md:h-16"
+          onClick={() => setMenuOpen(false)}
+        >
           {/* Invisible placeholder matching the flying coin's layout box */}
           <div className="w-12 h-12 md:w-16 md:h-16" />
         </a>
         <nav className="hidden items-center gap-10 md:flex">
           {data.brand.nav
-            .filter(item => {
-              if (themeMode === 'creative' && item.label.toLowerCase() === 'work') return false;
-              if (themeMode === 'engineering' && item.label.toLowerCase() === 'creative') return false;
+            .filter((item) => {
+              if (themeMode === "creative" && item.label.toLowerCase() === "work") return false;
+              if (themeMode === "engineering" && item.label.toLowerCase() === "creative")
+                return false;
               return true;
             })
             .map((item, i) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className={`text-[11px] font-medium tracking-[0.25em] uppercase transition-colors hover:text-primary ${
-                i === 0 ? "text-primary" : "text-foreground/80"
-              }`}
-            >
-              {item.label}
-            </a>
-          ))}
+              <a
+                key={item.href}
+                href={item.href}
+                className={`text-[11px] font-medium tracking-[0.25em] uppercase transition-colors hover:text-primary ${
+                  i === 0 ? "text-primary" : "text-foreground/80"
+                }`}
+              >
+                {item.label}
+              </a>
+            ))}
 
-          {themeMode !== 'select' && (
+          {themeMode !== "select" && (
             <div className="flex border border-border/40 rounded-full p-0.5 bg-card/25 font-mono text-[9px] tracking-[0.12em] select-none ml-4">
               <button
                 onClick={() => {
-                  setThemeMode('creative');
-                  localStorage.setItem('AP_PORTFOLIO_THEME', 'creative');
+                  setThemeMode("creative");
+                  localStorage.setItem("AP_PORTFOLIO_THEME", "creative");
                 }}
                 className={`px-3 py-1 rounded-full transition-all duration-300 cursor-pointer ${
-                  themeMode === 'creative' 
-                    ? "bg-primary text-background font-semibold" 
+                  themeMode === "creative"
+                    ? "bg-primary text-background font-semibold"
                     : "text-foreground/60 hover:text-foreground"
                 }`}
               >
@@ -411,12 +439,12 @@ function Header({
               </button>
               <button
                 onClick={() => {
-                  setThemeMode('engineering');
-                  localStorage.setItem('AP_PORTFOLIO_THEME', 'engineering');
+                  setThemeMode("engineering");
+                  localStorage.setItem("AP_PORTFOLIO_THEME", "engineering");
                 }}
                 className={`px-3 py-1 rounded-full transition-all duration-300 cursor-pointer ${
-                  themeMode === 'engineering' 
-                    ? "bg-cyan-500 text-black font-semibold" 
+                  themeMode === "engineering"
+                    ? "bg-cyan-500 text-black font-semibold"
                     : "text-foreground/60 hover:text-foreground"
                 }`}
               >
@@ -444,33 +472,34 @@ function Header({
         >
           <nav className="flex flex-col px-6 py-8 gap-6">
             {data.brand.nav
-              .filter(item => {
-                if (themeMode === 'creative' && item.label.toLowerCase() === 'work') return false;
-                if (themeMode === 'engineering' && item.label.toLowerCase() === 'creative') return false;
+              .filter((item) => {
+                if (themeMode === "creative" && item.label.toLowerCase() === "work") return false;
+                if (themeMode === "engineering" && item.label.toLowerCase() === "creative")
+                  return false;
                 return true;
               })
               .map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                onClick={() => setMenuOpen(false)}
-                className="text-lg font-serif font-light tracking-wide text-foreground/90 hover:text-primary transition-colors py-1"
-              >
-                {item.label}
-              </a>
-            ))}
+                <a
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMenuOpen(false)}
+                  className="text-lg font-serif font-light tracking-wide text-foreground/90 hover:text-primary transition-colors py-1"
+                >
+                  {item.label}
+                </a>
+              ))}
 
-            {themeMode !== 'select' && (
+            {themeMode !== "select" && (
               <div className="flex border border-border/40 rounded-full p-0.5 bg-card/25 font-mono text-[10px] tracking-[0.12em] select-none mt-4 w-fit">
                 <button
                   onClick={() => {
-                    setThemeMode('creative');
-                    localStorage.setItem('AP_PORTFOLIO_THEME', 'creative');
+                    setThemeMode("creative");
+                    localStorage.setItem("AP_PORTFOLIO_THEME", "creative");
                     setMenuOpen(false);
                   }}
                   className={`px-4 py-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                    themeMode === 'creative' 
-                      ? "bg-primary text-background font-semibold" 
+                    themeMode === "creative"
+                      ? "bg-primary text-background font-semibold"
                       : "text-foreground/60 hover:text-foreground"
                   }`}
                 >
@@ -478,13 +507,13 @@ function Header({
                 </button>
                 <button
                   onClick={() => {
-                    setThemeMode('engineering');
-                    localStorage.setItem('AP_PORTFOLIO_THEME', 'engineering');
+                    setThemeMode("engineering");
+                    localStorage.setItem("AP_PORTFOLIO_THEME", "engineering");
                     setMenuOpen(false);
                   }}
                   className={`px-4 py-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                    themeMode === 'engineering' 
-                      ? "bg-cyan-500 text-black font-semibold" 
+                    themeMode === "engineering"
+                      ? "bg-cyan-500 text-black font-semibold"
                       : "text-foreground/60 hover:text-foreground"
                   }`}
                 >
@@ -498,8 +527,6 @@ function Header({
     </motion.header>
   );
 }
-
-
 
 /* ---------------- Hero ---------------- */
 function Hero({
@@ -529,15 +556,12 @@ function Hero({
     mediaUrl.includes("mixkit");
 
   return (
-    <section
-      id="top"
-      className="relative h-screen w-full overflow-hidden bg-black"
-    >
+    <section id="top" className="relative h-screen w-full overflow-hidden bg-black">
       <motion.div style={{ y, scale }} className="absolute inset-0">
         {isVideo ? (
           <video
             src={mediaUrl}
-            poster={mediaUrl.substring(0, mediaUrl.lastIndexOf('.')) + '_poster.jpg'}
+            poster={mediaUrl.substring(0, mediaUrl.lastIndexOf(".")) + "_poster.jpg"}
             autoPlay
             loop
             muted={isMuted}
@@ -678,6 +702,49 @@ function ProjectMedia({
   const isHtml = src.endsWith(".html");
   const isVideo = /\.(mp4|webm|ogg|mov|m4v)$/i.test(src);
 
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
+  const [inView, setInView] = useState(false);
+  const [hasEnteredView, setHasEnteredView] = useState(false);
+
+  useEffect(() => {
+    if (!isVideo) return;
+    
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const isIntersecting = entry.isIntersecting;
+        setInView(isIntersecting);
+        if (isIntersecting && !hasEnteredView) {
+          setHasEnteredView(true); // Only flip once — start loading src
+        }
+      },
+      { threshold: 0.1, rootMargin: "200px" }, // Start loading 200px before it enters view
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+    return () => observer.disconnect();
+  }, [hasEnteredView, isVideo]);
+
+  useEffect(() => {
+    if (!isVideo) return;
+    
+    const video = videoRef.current;
+    if (!video) return;
+
+    const shouldPlay = inView || isHovered;
+
+    if (shouldPlay) {
+      video.play().catch((err) => {
+        // Ignore play interruption errors
+      });
+    } else {
+      video.pause();
+    }
+  }, [inView, isHovered, isVideo]);
+
   if (isHtml) {
     return (
       <iframe
@@ -689,44 +756,6 @@ function ProjectMedia({
   }
 
   if (isVideo) {
-    const videoRef = useRef<HTMLVideoElement>(null);
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [isHovered, setIsHovered] = useState(false);
-    const [inView, setInView] = useState(false);
-    const [hasEnteredView, setHasEnteredView] = useState(false);
-
-    useEffect(() => {
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          const isIntersecting = entry.isIntersecting;
-          setInView(isIntersecting);
-          if (isIntersecting && !hasEnteredView) {
-            setHasEnteredView(true); // Only flip once — start loading src
-          }
-        },
-        { threshold: 0.1, rootMargin: "200px" } // Start loading 200px before it enters view
-      );
-
-      if (containerRef.current) {
-        observer.observe(containerRef.current);
-      }
-      return () => observer.disconnect();
-    }, [hasEnteredView]);
-
-    useEffect(() => {
-      const video = videoRef.current;
-      if (!video) return;
-
-      const shouldPlay = inView || isHovered;
-
-      if (shouldPlay) {
-        video.play().catch((err) => {
-          // Ignore play interruption errors
-        });
-      } else {
-        video.pause();
-      }
-    }, [inView, isHovered]);
 
     const poster = src.substring(0, src.lastIndexOf(".")) + "_poster.jpg";
 
@@ -899,7 +928,10 @@ function CreativeWork({
 }) {
   const { eyebrow, title, projects } = data.creativeWork;
   return (
-    <section id="creative" className="bg-background px-6 py-32 md:px-12 md:py-44 border-t border-border">
+    <section
+      id="creative"
+      className="bg-background px-6 py-32 md:px-12 md:py-44 border-t border-border"
+    >
       <div className="mx-auto max-w-[1600px]">
         <motion.div
           variants={staggerParent}
@@ -1003,7 +1035,10 @@ function UPESWork({
   };
 
   return (
-    <section id="upes-social" className="bg-background px-6 py-32 md:px-12 md:py-44 border-t border-border overflow-hidden">
+    <section
+      id="upes-social"
+      className="bg-background px-6 py-32 md:px-12 md:py-44 border-t border-border overflow-hidden"
+    >
       <div className="mx-auto max-w-[1600px]">
         <div className="mb-14 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
           <motion.div
@@ -1054,10 +1089,11 @@ function UPESWork({
         <div
           ref={scrollContainerRef}
           className="flex gap-8 overflow-x-auto snap-x snap-mandatory pb-8 custom-scrollbar scroll-smooth items-stretch hide-scrollbar md:scrollbar-thin"
-          style={{ scrollbarWidth: 'thin' }}
+          style={{ scrollbarWidth: "thin" }}
         >
           {/* Stacked Landscapes Column */}
-          {projects.filter((p) => p.image.includes("fresher") || p.image.includes("reel4")).length > 0 && (
+          {projects.filter((p) => p.image.includes("fresher") || p.image.includes("reel4")).length >
+            0 && (
             <div className="flex flex-col gap-6 shrink-0 snap-start w-[85vw] sm:w-[55vw] md:w-[40vw] lg:w-[28vw]">
               {projects
                 .filter((p) => p.image.includes("fresher") || p.image.includes("reel4"))
@@ -1095,7 +1131,8 @@ function UPESWork({
                           {p.description}
                         </p>
                         <span className="mt-1 inline-flex items-center gap-1.5 text-[9px] font-semibold tracking-[0.2em] uppercase text-primary transition-all group-hover:gap-2.5">
-                          {isReel ? "View Reel" : "View Project"} <ArrowRight className="h-3 w-3" strokeWidth={1.5} />
+                          {isReel ? "View Reel" : "View Project"}{" "}
+                          <ArrowRight className="h-3 w-3" strokeWidth={1.5} />
                         </span>
                       </div>
                     </motion.a>
@@ -1141,7 +1178,8 @@ function UPESWork({
                       {p.description}
                     </p>
                     <span className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.2em] uppercase text-primary transition-all group-hover:gap-2.5">
-                      {isReel ? "View Reel" : "View Project"} <ArrowRight className="h-3 w-3" strokeWidth={1.5} />
+                      {isReel ? "View Reel" : "View Project"}{" "}
+                      <ArrowRight className="h-3 w-3" strokeWidth={1.5} />
                     </span>
                   </div>
                 </motion.a>
@@ -1366,18 +1404,24 @@ function Testimonial({ data }: { data: ReturnType<typeof useContent> }) {
 }
 
 /* ---------------- CTA / Footer ---------------- */
-function CallToAction({ data, isEngineering }: { data: ReturnType<typeof useContent>; isEngineering?: boolean }) {
+function CallToAction({
+  data,
+  isEngineering,
+}: {
+  data: ReturnType<typeof useContent>;
+  isEngineering?: boolean;
+}) {
   const { eyebrow, title, description, email, socials } = isEngineering ? data.devCta : data.cta;
   const iconFor = (label: string) =>
     label === "Instagram"
       ? Instagram
       : label === "YouTube"
-      ? Youtube
-      : label === "GitHub"
-      ? Github
-      : label === "LinkedIn"
-      ? Linkedin
-      : Mail;
+        ? Youtube
+        : label === "GitHub"
+          ? Github
+          : label === "LinkedIn"
+            ? Linkedin
+            : Mail;
 
   return (
     <footer
@@ -1393,7 +1437,9 @@ function CallToAction({ data, isEngineering }: { data: ReturnType<typeof useCont
             alt="Let's connect"
           />
         )}
-        <div className={`absolute inset-0 ${isEngineering ? 'bg-[#070b12]' : 'bg-black/75 backdrop-blur-[2px]'}`} />
+        <div
+          className={`absolute inset-0 ${isEngineering ? "bg-[#070b12]" : "bg-black/75 backdrop-blur-[2px]"}`}
+        />
         {isEngineering && (
           <div className="absolute inset-0 bg-[linear-gradient(rgba(100,150,210,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(100,150,210,0.04)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
         )}
@@ -1411,14 +1457,14 @@ function CallToAction({ data, isEngineering }: { data: ReturnType<typeof useCont
           <motion.h2
             variants={fadeUp}
             transition={{ duration: 1.1, ease: EASE_OUT_EXPO }}
-            className={`max-w-4xl text-5xl font-medium leading-[1.02] tracking-tight md:text-8xl ${isEngineering ? 'font-mono text-[#a8c4e0]' : 'font-serif'}`}
+            className={`max-w-4xl text-5xl font-medium leading-[1.02] tracking-tight md:text-8xl ${isEngineering ? "font-mono text-[#a8c4e0]" : "font-serif"}`}
           >
             {title}
           </motion.h2>
           <motion.p
             variants={fadeUp}
             transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
-            className={`max-w-xl text-base font-light leading-relaxed md:text-lg ${isEngineering ? 'font-mono text-[rgba(120,160,200,0.7)]' : 'text-muted-foreground'}`}
+            className={`max-w-xl text-base font-light leading-relaxed md:text-lg ${isEngineering ? "font-mono text-[rgba(120,160,200,0.7)]" : "text-muted-foreground"}`}
           >
             {description}
           </motion.p>
@@ -1427,9 +1473,9 @@ function CallToAction({ data, isEngineering }: { data: ReturnType<typeof useCont
             transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
             href={`mailto:${email}`}
             className={`mt-4 inline-flex max-w-full items-center gap-2 px-4 py-3 md:px-10 md:py-4 text-[10px] md:text-[11px] font-semibold tracking-[0.12em] md:tracking-[0.25em] uppercase transition-all hover:gap-4 ${
-              isEngineering 
-                ? 'bg-[rgba(55,138,221,0.1)] border border-[rgba(55,138,221,0.3)] text-[#a8c4e0] hover:bg-[rgba(55,138,221,0.2)]'
-                : 'bg-primary text-primary-foreground hover:bg-primary/90'
+              isEngineering
+                ? "bg-[rgba(55,138,221,0.1)] border border-[rgba(55,138,221,0.3)] text-[#a8c4e0] hover:bg-[rgba(55,138,221,0.2)]"
+                : "bg-primary text-primary-foreground hover:bg-primary/90"
             }`}
           >
             <Mail className="h-4 w-4" strokeWidth={1.75} />
@@ -1438,7 +1484,6 @@ function CallToAction({ data, isEngineering }: { data: ReturnType<typeof useCont
         </motion.div>
 
         <div className="flex flex-col gap-8 border-t border-border pt-12 md:flex-row md:items-end md:justify-between">
-
           <div className="flex flex-col gap-4">
             <span className="font-serif text-3xl italic text-foreground">
               {data.brand.monogram}
@@ -1472,7 +1517,9 @@ function CallToAction({ data, isEngineering }: { data: ReturnType<typeof useCont
         </div>
 
         <div className="flex flex-col gap-2 text-[11px] tracking-[0.2em] uppercase text-muted-foreground/70 md:flex-row md:items-center md:justify-between">
-          <span>© {new Date().getFullYear()} {data.brand.name}. All rights reserved.</span>
+          <span>
+            © {new Date().getFullYear()} {data.brand.name}. All rights reserved.
+          </span>
           <span>Cinematic Storytelling</span>
         </div>
       </div>
@@ -1560,7 +1607,7 @@ function WorkedWith({
                 <div className="h-20 w-full flex items-center justify-start overflow-hidden">
                   {brand.logo.match(/\.(mp4|webm|ogg|mov|m4v)$/i) ? (
                     <div className="h-full w-auto max-w-[80%] rounded-md transition-transform duration-500 group-hover:scale-[1.03]">
-                      <ProjectMedia 
+                      <ProjectMedia
                         src={brand.logo}
                         title={brand.name}
                         id={`brand-${i}`}
@@ -1580,7 +1627,12 @@ function WorkedWith({
                 <div className="flex flex-col gap-3">
                   <h3 className="font-serif text-3xl italic tracking-wide text-foreground group-hover:text-primary transition-colors flex items-center justify-between">
                     {brand.name}
-                    {brand.href && <ArrowRight className="h-5 w-5 opacity-0 transition-opacity group-hover:opacity-100" strokeWidth={1.5} />}
+                    {brand.href && (
+                      <ArrowRight
+                        className="h-5 w-5 opacity-0 transition-opacity group-hover:opacity-100"
+                        strokeWidth={1.5}
+                      />
+                    )}
                   </h3>
                   <p className="text-sm font-light leading-relaxed text-muted-foreground">
                     {brand.description}
@@ -1589,7 +1641,7 @@ function WorkedWith({
               </>
             );
 
-            const className = `flex flex-col gap-6 group bg-card/25 border border-border/40 rounded-3xl p-8 transition-all duration-500 hover:border-primary/50 hover:bg-card/40 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 ${brand.href ? 'cursor-pointer' : 'cursor-default'}`;
+            const className = `flex flex-col gap-6 group bg-card/25 border border-border/40 rounded-3xl p-8 transition-all duration-500 hover:border-primary/50 hover:bg-card/40 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 ${brand.href ? "cursor-pointer" : "cursor-default"}`;
 
             return brand.href ? (
               <motion.a
@@ -1638,15 +1690,15 @@ function Index() {
   const [videoVisible, setVideoVisible] = useState(false);
   const [wordsVisible, setWordsVisible] = useState(false);
 
-  const [themeMode, setThemeMode] = useState<'select' | 'creative' | 'engineering'>('select');
-  const [hoverMode, setHoverMode] = useState<'none' | 'creative' | 'engineering'>('none');
+  const [themeMode, setThemeMode] = useState<"select" | "creative" | "engineering">("select");
+  const [hoverMode, setHoverMode] = useState<"none" | "creative" | "engineering">("none");
 
   // Hydration-safe localStorage check
   useEffect(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("AP_PORTFOLIO_THEME");
       if (saved === "creative" || saved === "engineering") {
-        setThemeMode(saved as 'creative' | 'engineering');
+        setThemeMode(saved as "creative" | "engineering");
       }
     }
   }, []);
@@ -1658,8 +1710,8 @@ function Index() {
     const handleVisibilityChange = () => {
       if (document.hidden) {
         // Query all video elements
-        const videos = document.querySelectorAll('video');
-        videos.forEach(video => {
+        const videos = document.querySelectorAll("video");
+        videos.forEach((video) => {
           if (!video.paused) {
             video.pause();
             pausedMedias.push(video);
@@ -1667,8 +1719,8 @@ function Index() {
         });
 
         // Query all audio elements
-        const audios = document.querySelectorAll('audio');
-        audios.forEach(audio => {
+        const audios = document.querySelectorAll("audio");
+        audios.forEach((audio) => {
           if (!audio.paused) {
             audio.pause();
             pausedMedias.push(audio);
@@ -1679,7 +1731,7 @@ function Index() {
         while (pausedMedias.length > 0) {
           const media = pausedMedias.pop();
           if (media) {
-            media.play().catch(err => {
+            media.play().catch((err) => {
               console.warn("Failed to resume playback on tab focus:", err);
             });
           }
@@ -1687,14 +1739,14 @@ function Index() {
       }
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 
   // Handle Choice Selection
-  const handleChoice = (choice: 'creative' | 'engineering') => {
+  const handleChoice = (choice: "creative" | "engineering") => {
     setThemeMode(choice);
     if (typeof window !== "undefined") {
       localStorage.setItem("AP_PORTFOLIO_THEME", choice);
@@ -1705,19 +1757,19 @@ function Index() {
   // Scroll to top when clicking the navbar coin logo
   const handleLogoClick = () => {
     if (!isLoading) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   useEffect(() => {
     // Clear hash on mount
     if (typeof window !== "undefined" && window.location.hash) {
-      window.history.replaceState(null, '', window.location.pathname);
+      window.history.replaceState(null, "", window.location.pathname);
     }
     // Absolute maximum: if nothing happens in 15s, force entry with creative fallback
     const maxTimer = setTimeout(() => {
       if (isLoading) {
-        handleChoice('creative');
+        handleChoice("creative");
       }
     }, 15000);
     return () => clearTimeout(maxTimer);
@@ -1752,10 +1804,10 @@ function Index() {
     if (!showEnter) return;
     setCountdown(10);
     const interval = setInterval(() => {
-      setCountdown(prev => {
+      setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
-          handleChoice('creative');
+          handleChoice("creative");
           return 0;
         }
         return prev - 1;
@@ -1765,9 +1817,9 @@ function Index() {
   }, [showEnter]);
 
   useEffect(() => {
-    if (isLoading || themeMode === 'select') {
+    if (isLoading || themeMode === "select") {
       document.body.style.overflow = "hidden";
-      
+
       // Force scroll to top immediately and on scroll events to prevent scroll position restore/shifts
       window.scrollTo(0, 0);
       const handleScroll = () => {
@@ -1783,7 +1835,9 @@ function Index() {
 
       // Prevent keyboard-driven scrolling (spacebar, arrow keys, page up/down, home/end)
       const handleKeyDown = (e: KeyboardEvent) => {
-        if (["Space", "ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End"].includes(e.code)) {
+        if (
+          ["Space", "ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End"].includes(e.code)
+        ) {
           e.preventDefault();
         }
       };
@@ -1806,14 +1860,14 @@ function Index() {
     }
   }, [isLoading, themeMode]);
 
-  const coinState = isLoading || themeMode === 'select' ? 'preloader' : 'navbar';
+  const coinState = isLoading || themeMode === "select" ? "preloader" : "navbar";
 
   return (
     <div className="bg-black min-h-screen">
       <AnimatePresence>
         {isPreloaderMounted && (
-          <Preloader 
-            monogram={data.brand.monogram} 
+          <Preloader
+            monogram={data.brand.monogram}
             triggerTransition={!isLoading}
             onComplete={() => setIsPreloaderMounted(false)}
             showEnter={showEnter}
@@ -1826,41 +1880,62 @@ function Index() {
         )}
       </AnimatePresence>
 
-      <motion.div 
+      <motion.div
         className="relative min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary"
         initial={{ opacity: 0, scale: 0.92, filter: "blur(8px)" }}
-        animate={{ 
-          opacity: isLoading ? 0 : 1, 
-          scale: isLoading ? 0.92 : 1, 
-          filter: isLoading ? "blur(8px)" : "blur(0px)" 
+        animate={{
+          opacity: isLoading ? 0 : 1,
+          scale: isLoading ? 0.92 : 1,
+          filter: isLoading ? "blur(8px)" : "blur(0px)",
         }}
         transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
       >
-        <Header data={data} isLoading={isLoading} themeMode={themeMode} setThemeMode={setThemeMode} />
-        
+        <Header
+          data={data}
+          isLoading={isLoading}
+          themeMode={themeMode}
+          setThemeMode={setThemeMode}
+        />
+
         {/* NEW: Vision Intro Sequence */}
 
         {/* CONDITIONAL RENDER: CREATIVE PATH */}
-        {themeMode === 'creative' && (
+        {themeMode === "creative" && (
           <>
             <RadialIntroSequence>
-              <Hero 
-                data={data} 
-                activeAudioId={activeAudioId} 
-                setActiveAudioId={setActiveAudioId} 
+              <Hero
+                data={data}
+                activeAudioId={activeAudioId}
+                setActiveAudioId={setActiveAudioId}
                 onMediaReady={() => setMediaReady(true)}
               />
             </RadialIntroSequence>
-            <CreativeWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
-            <UPESWork data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
-            <WorkedWith data={data} activeAudioId={activeAudioId} setActiveAudioId={setActiveAudioId} />
+            <CreativeWork
+              data={data}
+              activeAudioId={activeAudioId}
+              setActiveAudioId={setActiveAudioId}
+            />
+            <UPESWork
+              data={data}
+              activeAudioId={activeAudioId}
+              setActiveAudioId={setActiveAudioId}
+            />
+            <WorkedWith
+              data={data}
+              activeAudioId={activeAudioId}
+              setActiveAudioId={setActiveAudioId}
+            />
             <CreativeTools data={data} />
-            
+
             {/* --- DOME GALLERY SECTION --- */}
             <section className="relative w-full h-[100vh] bg-black overflow-hidden flex flex-col items-center justify-center border-t border-white/10">
               <div className="absolute top-20 z-20 text-center pointer-events-none">
-                <h2 className="text-4xl md:text-5xl font-bold tracking-tighter uppercase mb-4 opacity-90">Dome Gallery</h2>
-                <p className="text-xs md:text-sm text-gray-400 font-mono tracking-widest uppercase">Instagram Highlights & Posts</p>
+                <h2 className="text-4xl md:text-5xl font-bold tracking-tighter uppercase mb-4 opacity-90">
+                  Dome Gallery
+                </h2>
+                <p className="text-xs md:text-sm text-gray-400 font-mono tracking-widest uppercase">
+                  Instagram Highlights & Posts
+                </p>
               </div>
               {/* The DomeGallery itself is fully interactive */}
               <div className="w-full h-full cursor-grab active:cursor-grabbing">
@@ -1871,7 +1946,7 @@ function Index() {
         )}
 
         {/* CONDITIONAL RENDER: SYSTEMS ENGINEER PATH */}
-        {themeMode === 'engineering' && (
+        {themeMode === "engineering" && (
           <>
             <EngineeringPortfolio data={data} />
             <GithubSection />
@@ -1879,32 +1954,34 @@ function Index() {
         )}
 
         {/* SHARED SECTIONS */}
-        {themeMode !== 'select' && (
+        {themeMode !== "select" && (
           <>
             <About data={data} />
             <Testimonial data={data} />
-            <CallToAction data={data} isEngineering={themeMode === 'engineering'} />
+            <CallToAction data={data} isEngineering={themeMode === "engineering"} />
           </>
         )}
       </motion.div>
 
-
-
       {/* 3D Monogram - Globally positioned for seamless flight to Navbar logo placeholder (Rendered at bottom of DOM to ensure z-index priority) */}
-      {(isPreloaderMounted || coinState === 'navbar' || themeMode === 'select') && (
+      {(isPreloaderMounted || coinState === "navbar" || themeMode === "select") && (
         <motion.div
           layout
           transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
           onClick={handleLogoClick}
           className={
-            coinState === 'preloader'
+            coinState === "preloader"
               ? "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] md:w-[420px] md:h-[420px] z-[110] pointer-events-auto"
-              : themeMode === 'select'
-              ? "fixed inset-0 z-50 flex items-center justify-center pointer-events-auto"
-              : "fixed left-6 md:left-[48px] top-6 translate-x-0 translate-y-0 w-12 h-12 md:w-16 md:h-16 z-[60] pointer-events-auto cursor-pointer"
+              : themeMode === "select"
+                ? "fixed inset-0 z-50 flex items-center justify-center pointer-events-auto"
+                : "fixed left-6 md:left-[48px] top-6 translate-x-0 translate-y-0 w-12 h-12 md:w-16 md:h-16 z-[60] pointer-events-auto cursor-pointer"
           }
         >
-          <AP3DMonogram isMini={coinState === 'navbar'} themeMode={isLoading ? 'select' : themeMode} hoverMode={hoverMode} />
+          <AP3DMonogram
+            isMini={coinState === "navbar"}
+            themeMode={isLoading ? "select" : themeMode}
+            hoverMode={hoverMode}
+          />
         </motion.div>
       )}
     </div>

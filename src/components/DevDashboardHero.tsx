@@ -13,7 +13,7 @@ export function DevDashboardHero() {
     "Establishing WebGL context... OK",
     "Initializing Three.js PBR rendering maps... OK",
     "Connecting to cognitive neural APIs... OK",
-    "Systems status: ACTIVE. Ready for exploration."
+    "Systems status: ACTIVE. Ready for exploration.",
   ];
 
   // Typing effect for the terminal logs
@@ -51,8 +51,12 @@ export function DevDashboardHero() {
   }, []);
 
   const formatUptime = (sec: number) => {
-    const hrs = Math.floor(sec / 3600).toString().padStart(2, "0");
-    const mins = Math.floor((sec % 3600) / 60).toString().padStart(2, "0");
+    const hrs = Math.floor(sec / 3600)
+      .toString()
+      .padStart(2, "0");
+    const mins = Math.floor((sec % 3600) / 60)
+      .toString()
+      .padStart(2, "0");
     const secs = (sec % 60).toString().padStart(2, "0");
     return `${hrs}:${mins}:${secs}`;
   };
@@ -73,13 +77,15 @@ export function DevDashboardHero() {
             <Cpu className="h-3.5 w-3.5 animate-pulse text-[#A5C9CA]" />
             SYSTEMS ENGINEER / DEVELOPER
           </div>
-          
+
           <h1 className="font-mono text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-tight">
             Aditya Parihar
           </h1>
-          
+
           <p className="font-sans text-base md:text-lg font-light leading-relaxed text-gray-400">
-            Specializing in Artificial Intelligence, machine learning interfaces, and high-performance backend architectures. I design robust systems and interactive logic with absolute precision.
+            Specializing in Artificial Intelligence, machine learning interfaces, and
+            high-performance backend architectures. I design robust systems and interactive logic
+            with absolute precision.
           </p>
 
           {/* Core Metrics Grid */}
@@ -94,7 +100,9 @@ export function DevDashboardHero() {
             <div className="bg-[#0A0A0A] border border-white/10 p-4 rounded-xl flex items-center gap-3">
               <Database className="h-5 w-5 text-gray-400 shrink-0" />
               <div>
-                <div className="text-[10px] text-gray-500 tracking-wider uppercase">Core Database</div>
+                <div className="text-[10px] text-gray-500 tracking-wider uppercase">
+                  Core Database
+                </div>
                 <div className="text-sm font-semibold text-white">MongoDB/SQL</div>
               </div>
             </div>
@@ -121,7 +129,7 @@ export function DevDashboardHero() {
             <div className="text-gray-500">System Time: {sysTime}</div>
             <div className="text-gray-500">Connection Status: LOCALHOST via WEBSOCKETS</div>
             <div className="h-px bg-white/10 my-1" />
-            
+
             {logs.map((log, i) => {
               const isCommand = log.startsWith("systemctl") || log.includes(".sh");
               return (
@@ -133,7 +141,7 @@ export function DevDashboardHero() {
                 </div>
               );
             })}
-            
+
             {logs.length < initialLogs.length && (
               <span className="h-4 w-1.5 bg-gray-400 animate-pulse shrink-0 inline-block align-middle ml-1" />
             )}

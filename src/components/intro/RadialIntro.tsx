@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import React, { useRef, useState, useEffect } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { domeGalleryImages } from '@/lib/domeGalleryImages';
-import { useRadialLayout } from './useRadialLayout';
-import { RadialCard } from './RadialCard';
+import React, { useRef, useState, useEffect } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { domeGalleryImages } from "@/lib/domeGalleryImages";
+import { useRadialLayout } from "./useRadialLayout";
+import { RadialCard } from "./RadialCard";
 
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
@@ -27,9 +27,9 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       setIsMobile(window.innerWidth < 768);
-      setPrefersReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+      setPrefersReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     }
   }, []);
 
@@ -58,60 +58,87 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
-          start: 'top top',
-          end: '+=150%',
+          start: "top top",
+          end: "+=150%",
           pin: true,
           scrub: 1, // Smooth dampening
-        }
+        },
       });
 
       // 1. Rotate the ring continuously through the timeline
-      tl.to(ringRef.current, { 
-        rotation: -90, 
-        ease: 'none' 
-      }, 0);
+      tl.to(
+        ringRef.current,
+        {
+          rotation: -90,
+          ease: "none",
+        },
+        0,
+      );
 
       // 2. Fade out primary tagline and scroll indicator
-      tl.to(taglineRef.current, { 
-        opacity: 0, 
-        y: -20, 
-        ease: 'power1.inOut' 
-      }, 0.15);
+      tl.to(
+        taglineRef.current,
+        {
+          opacity: 0,
+          y: -20,
+          ease: "power1.inOut",
+        },
+        0.15,
+      );
 
       // 3. Fade in secondary tagline
-      tl.to(subTaglineRef.current, { 
-        opacity: 1, 
-        y: 0, 
-        ease: 'power1.inOut' 
-      }, 0.2);
+      tl.to(
+        subTaglineRef.current,
+        {
+          opacity: 1,
+          y: 0,
+          ease: "power1.inOut",
+        },
+        0.2,
+      );
 
       // 4. Zoom in to the ring and fade it out
-      tl.to(ringRef.current, { 
-        scale: 1.5, 
-        opacity: 0, 
-        ease: 'power2.in' 
-      }, 0.6);
+      tl.to(
+        ringRef.current,
+        {
+          scale: 1.5,
+          opacity: 0,
+          ease: "power2.in",
+        },
+        0.6,
+      );
 
       // 5. Fade out secondary tagline
-      tl.to(subTaglineRef.current, { 
-        opacity: 0, 
-        scale: 1.1,
-        ease: 'power1.inOut' 
-      }, 0.7);
+      tl.to(
+        subTaglineRef.current,
+        {
+          opacity: 0,
+          scale: 1.1,
+          ease: "power1.inOut",
+        },
+        0.7,
+      );
 
       // 6. Crossfade the intro container and Hero container
       // The overlap here creates the dissolve handoff
-      tl.to(introRef.current, { 
-        autoAlpha: 0, 
-        ease: 'none' 
-      }, 0.85);
+      tl.to(
+        introRef.current,
+        {
+          autoAlpha: 0,
+          ease: "none",
+        },
+        0.85,
+      );
 
-      tl.to(heroWrapperRef.current, { 
-        autoAlpha: 1, 
-        y: 0, 
-        ease: 'power2.out' 
-      }, 0.85);
-
+      tl.to(
+        heroWrapperRef.current,
+        {
+          autoAlpha: 1,
+          y: 0,
+          ease: "power2.out",
+        },
+        0.85,
+      );
     }, containerRef);
 
     return () => ctx.revert();
@@ -132,24 +159,15 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
 
   return (
     <div ref={containerRef} className="relative w-full h-screen bg-black">
-      
       {/* Intro Sequence Layer */}
-      <div 
-        ref={introRef} 
+      <div
+        ref={introRef}
         className="absolute inset-0 z-10 w-full h-full overflow-hidden flex flex-col items-center justify-center bg-black"
       >
         {/* Rotating Image Ring */}
-        <div 
-          ref={ringRef} 
-          className="absolute inset-0 origin-center will-change-transform"
-        >
-          {layout.length > 0 && selectedImages.map((src, i) => (
-            <RadialCard 
-              key={i} 
-              src={src} 
-              layout={layout[i]} 
-            />
-          ))}
+        <div ref={ringRef} className="absolute inset-0 origin-center will-change-transform">
+          {layout.length > 0 &&
+            selectedImages.map((src, i) => <RadialCard key={i} src={src} layout={layout[i]} />)}
         </div>
 
         {/* Center Text Block */}
@@ -175,13 +193,9 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
       </div>
 
       {/* Hero Content Layer (Handoff Target) */}
-      <div 
-        ref={heroWrapperRef} 
-        className="relative z-0 w-full h-full"
-      >
+      <div ref={heroWrapperRef} className="relative z-0 w-full h-full">
         {children}
       </div>
-      
     </div>
   );
 }

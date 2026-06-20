@@ -97,7 +97,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { rel: "preload", href: "/DARK.mp4", as: "video" },
     ],
-
   }),
   shellComponent: RootShell,
   component: RootComponent,

@@ -1,5 +1,5 @@
-import React from 'react';
-import type { RadialLayoutItem } from './useRadialLayout';
+import React from "react";
+import type { RadialLayoutItem } from "./useRadialLayout";
 
 interface RadialCardProps {
   src: string;
@@ -7,8 +7,8 @@ interface RadialCardProps {
   className?: string;
 }
 
-export function RadialCard({ src, layout, className = '' }: RadialCardProps) {
-  // width based on portrait vs landscape. 
+export function RadialCard({ src, layout, className = "" }: RadialCardProps) {
+  // width based on portrait vs landscape.
   // We'll use viewport relative units so they scale slightly with screen size
   const widthClass = layout.isPortrait ? "w-[14vw] md:w-[9vw]" : "w-[18vw] md:w-[12vw]";
   const aspectRatioClass = layout.isPortrait ? "aspect-[3/4]" : "aspect-[4/3]";

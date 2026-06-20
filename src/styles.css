@@ -101,7 +101,9 @@
 
   --font-serif: "Playfair Display", "Cormorant Garamond", Georgia, serif;
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
-  --font-mono: "DM Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-mono:
+    "DM Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
 }
 
 @theme inline {
@@ -202,8 +204,12 @@
 
 /* Preloader countdown ring — pure CSS animation avoids re-render glitch */
 @keyframes countdown-ring {
-  from { stroke-dashoffset: 0; }
-  to   { stroke-dashoffset: 326.7; } /* 2π × 52 */
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: 326.7;
+  } /* 2π × 52 */
 }
 
 .countdown-ring-animate {
@@ -215,6 +221,6 @@
   display: none;
 }
 .scrollbar-none {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }

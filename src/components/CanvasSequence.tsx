@@ -50,7 +50,7 @@ export function CanvasSequence({
       };
       loadedImages.push(img);
     }
-    
+
     // In case they load instantly from cache
     if (loadedCount === frameCount) {
       setImages(loadedImages);
@@ -81,12 +81,12 @@ export function CanvasSequence({
         if (!canvasRef.current) return;
         const rect = canvasRef.current.getBoundingClientRect();
         // Calculate progress of canvas through viewport
-        const scrollProgress = 1 - (rect.bottom / (window.innerHeight + rect.height));
+        const scrollProgress = 1 - rect.bottom / (window.innerHeight + rect.height);
         const clamped = Math.max(0, Math.min(1, scrollProgress));
-        
+
         let newIndex = Math.floor(clamped * frameCount);
         if (newIndex >= frameCount) newIndex = frameCount - 1;
-        
+
         if (newIndex !== frameIndexRef.current) {
           frameIndexRef.current = newIndex;
           drawFrame(newIndex);
@@ -116,12 +116,5 @@ export function CanvasSequence({
     }
   }, [images, frameCount, fps, width, height, scrollScrub, blendMode]);
 
-  return (
-    <canvas
-      ref={canvasRef}
-      width={width}
-      height={height}
-      className={`block ${className}`}
-    />
-  );
+  return <canvas ref={canvasRef} width={width} height={height} className={`block ${className}`} />;
 }
