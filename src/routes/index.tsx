@@ -1910,7 +1910,7 @@ function Index() {
               : "fixed left-6 md:left-[48px] top-6 translate-x-0 translate-y-0 w-12 h-12 md:w-16 md:h-16 z-[60] pointer-events-auto cursor-pointer"
           }
         >
-          <AP3DMonogram isMini={coinState === 'navbar'} themeMode={themeMode} hoverMode={hoverMode} />
+          <AP3DMonogram isMini={coinState === 'navbar'} themeMode={isLoading ? 'select' : themeMode} hoverMode={hoverMode} />
         </motion.div>
       )}
     </div>
