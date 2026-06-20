@@ -9,7 +9,6 @@ import DomeGallery from "../components/DomeGallery";
 import AP3DMonogram from "../components/AP3DMonogram";
 import { DevDashboardHero } from "../components/DevDashboardHero";
 import { EngineeringPortfolio } from "../components/EngineeringPortfolio";
-import { CustomCursor } from "../components/CustomCursor";
 import { ChevronDown, Instagram, Youtube, Github, Linkedin, Mail, ArrowRight, Volume2, VolumeX, Menu, X, Loader2 } from "lucide-react";
 
 import { siteData } from "@/lib/site-data";
@@ -375,7 +374,13 @@ function Header({
           <div className="w-12 h-12 md:w-16 md:h-16" />
         </a>
         <nav className="hidden items-center gap-10 md:flex">
-          {data.brand.nav.map((item, i) => (
+          {data.brand.nav
+            .filter(item => {
+              if (themeMode === 'creative' && item.label.toLowerCase() === 'work') return false;
+              if (themeMode === 'engineering' && item.label.toLowerCase() === 'creative') return false;
+              return true;
+            })
+            .map((item, i) => (
             <a
               key={item.href}
               href={item.href}
@@ -436,7 +441,13 @@ function Header({
           className="md:hidden w-full bg-background/95 backdrop-blur-2xl border-t border-border overflow-hidden"
         >
           <nav className="flex flex-col px-6 py-8 gap-6">
-            {data.brand.nav.map((item) => (
+            {data.brand.nav
+              .filter(item => {
+                if (themeMode === 'creative' && item.label.toLowerCase() === 'work') return false;
+                if (themeMode === 'engineering' && item.label.toLowerCase() === 'creative') return false;
+                return true;
+              })
+              .map((item) => (
               <a
                 key={item.href}
                 href={item.href}
@@ -461,7 +472,7 @@ function Header({
                       : "text-foreground/60 hover:text-foreground"
                   }`}
                 >
-                  🎨 CREATIVE
+                  CREATIVE
                 </button>
                 <button
                   onClick={() => {
@@ -475,7 +486,7 @@ function Header({
                       : "text-foreground/60 hover:text-foreground"
                   }`}
                 >
-                  💻 DEV
+                  DEV
                 </button>
               </div>
             )}
@@ -1877,9 +1888,6 @@ function Index() {
           <AP3DMonogram isMini={coinState === 'navbar'} themeMode={isLoading ? 'select' : themeMode} hoverMode={hoverMode} />
         </motion.div>
       )}
-
-      {/* Global Custom Cursor */}
-      {!isLoading && <CustomCursor themeMode={themeMode} />}
     </div>
   );
 }
