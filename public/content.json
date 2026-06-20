@@ -316,6 +316,22 @@
       }
     ]
   },
+  "devCta": {
+    "eyebrow": "06 / Open to Work",
+    "title": "Let's build together.",
+    "description": "Open to engineering collaborations, systems architecture discussions, and open-source contributions. Let's create something robust.",
+    "email": "parihar21aditya@gmail.com",
+    "socials": [
+      {
+        "label": "GitHub",
+        "href": "https://github.com/adityaparihar21"
+      },
+      {
+        "label": "LinkedIn",
+        "href": "https://www.linkedin.com/in/aditya-parihar-974b72281"
+      }
+    ]
+  },
   "workedWith": {
     "eyebrow": "Collaborations",
     "title": "Worked With",

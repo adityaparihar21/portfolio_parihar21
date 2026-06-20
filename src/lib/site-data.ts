@@ -102,6 +102,13 @@ export type SiteData = {
     email: string;
     socials: { label: string; href: string }[];
   };
+  devCta: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    email: string;
+    socials: { label: string; href: string }[];
+  };
 };
 
 export const siteData = defaultContent as SiteData;

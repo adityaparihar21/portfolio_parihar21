@@ -1,0 +1,117 @@
+import React from "react";
+import { motion } from "framer-motion";
+import { Github, GitCommit, GitPullRequest, Star, ArrowRight } from "lucide-react";
+
+export function GithubSection() {
+  const stats = [
+    { label: "Repositories", value: "34+" },
+    { label: "Commits (YTD)", value: "1.2k" },
+    { label: "Pull Requests", value: "89" },
+    { label: "Stars", value: "210" },
+  ];
+
+  const recentCommits = [
+    { repo: "adityaparihar21/trip-co", msg: "feat: implemented AI itinerary generation pipeline", time: "2 hours ago", hash: "a1b2c3d" },
+    { repo: "adityaparihar21/ascii-webcam", msg: "fix: resolved memory leak in frame buffer", time: "5 hours ago", hash: "f4e5d6c" },
+    { repo: "adityaparihar21/portfolio_parihar21", msg: "chore: deployed v2.1 with engineering subsystem", time: "1 day ago", hash: "9f8e7d6" },
+  ];
+
+  return (
+    <section className="w-full px-6 md:px-12 py-32 border-t border-[rgba(100,150,210,0.08)] bg-[#070b12] relative overflow-hidden font-mono">
+      {/* Background Grid */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(100,150,210,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(100,150,210,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+
+      <div className="max-w-[1200px] mx-auto relative z-10">
+        <div className="flex flex-col md:flex-row gap-12 md:gap-24 items-start">
+          
+          {/* Left Side: Stats & Info */}
+          <div className="w-full md:w-1/3 flex flex-col">
+            <div className="flex items-center gap-4 mb-8">
+              <Github className="w-8 h-8 text-[#a8c4e0]" />
+              <h2 className="text-2xl text-[#a8c4e0] font-light tracking-tight">Open Source</h2>
+            </div>
+            
+            <p className="text-[13px] text-[rgba(120,160,200,0.6)] leading-relaxed mb-12">
+              Building in public. I regularly contribute to open-source systems, experiment with new rendering pipelines, and push architectural boundaries on GitHub.
+            </p>
+
+            <div className="grid grid-cols-2 gap-8 mb-12">
+              {stats.map((s, i) => (
+                <div key={i}>
+                  <div className="text-2xl text-[#c8dcf4] font-light mb-2">{s.value}</div>
+                  <div className="text-[9px] uppercase tracking-[0.2em] text-[rgba(120,160,200,0.4)]">{s.label}</div>
+                </div>
+              ))}
+            </div>
+
+            <a 
+              href="https://github.com/adityaparihar21" 
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center justify-between w-full p-4 border border-[rgba(100,150,210,0.2)] bg-[rgba(55,138,221,0.05)] hover:bg-[rgba(55,138,221,0.1)] transition-colors group cursor-crosshair"
+            >
+              <span className="text-[11px] uppercase tracking-[0.2em] text-[#a8c4e0]">View Profile</span>
+              <ArrowRight className="w-4 h-4 text-[#a8c4e0] group-hover:translate-x-1 transition-transform" />
+            </a>
+          </div>
+
+          {/* Right Side: Terminal Window */}
+          <div className="w-full md:w-2/3 border border-[rgba(100,150,210,0.15)] bg-[#050810] rounded-sm overflow-hidden shadow-2xl">
+            {/* Terminal Header */}
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-[rgba(100,150,210,0.1)] bg-[rgba(100,150,210,0.02)]">
+              <div className="w-2.5 h-2.5 rounded-full bg-[rgba(255,95,86,0.5)]" />
+              <div className="w-2.5 h-2.5 rounded-full bg-[rgba(255,189,46,0.5)]" />
+              <div className="w-2.5 h-2.5 rounded-full bg-[rgba(39,201,63,0.5)]" />
+              <div className="ml-4 text-[10px] text-[rgba(120,160,200,0.4)] tracking-wider">aditya@mbp: ~/github/activity</div>
+            </div>
+
+            {/* Terminal Body */}
+            <div className="p-6 flex flex-col gap-6">
+              <div className="text-[11px] text-[#a8c4e0] flex gap-2">
+                <span className="text-[#3ddc84]">➜</span>
+                <span className="text-[#6a9fd8]">~</span>
+                <span>git log --oneline -n 3</span>
+              </div>
+              
+              <div className="flex flex-col gap-5 pl-2 border-l border-[rgba(100,150,210,0.1)] ml-1">
+                {recentCommits.map((c, i) => (
+                  <motion.div 
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.15 }}
+                    key={i} 
+                    className="relative pl-6"
+                  >
+                    <div className="absolute left-[-4.5px] top-1.5 w-2 h-2 rounded-full bg-[#050810] border border-[rgba(100,150,210,0.3)]" />
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex items-center gap-3 text-[12px]">
+                        <span className="text-[rgba(200,160,80,0.8)]">{c.hash}</span>
+                        <span className="text-[#c8dcf4]">{c.msg}</span>
+                      </div>
+                      <div className="flex items-center gap-4 text-[10px] text-[rgba(120,160,200,0.4)]">
+                        <span>{c.repo}</span>
+                        <span>{c.time}</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="text-[11px] text-[#a8c4e0] flex gap-2 mt-4">
+                <span className="text-[#3ddc84]">➜</span>
+                <span className="text-[#6a9fd8]">~</span>
+                <motion.span 
+                  animate={{ opacity: [1, 0, 1] }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  className="w-2 h-3 bg-[#a8c4e0] inline-block align-middle"
+                />
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  );
+}

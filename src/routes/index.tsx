@@ -9,6 +9,7 @@ import DomeGallery from "../components/DomeGallery";
 import AP3DMonogram from "../components/AP3DMonogram";
 import { DevDashboardHero } from "../components/DevDashboardHero";
 import { EngineeringPortfolio } from "../components/EngineeringPortfolio";
+import { GithubSection } from "../components/GithubSection";
 import { ChevronDown, Instagram, Youtube, Github, Linkedin, Mail, ArrowRight, Volume2, VolumeX, Menu, X, Loader2 } from "lucide-react";
 
 import { siteData } from "@/lib/site-data";
@@ -1364,8 +1365,8 @@ function Testimonial({ data }: { data: ReturnType<typeof useContent> }) {
 }
 
 /* ---------------- CTA / Footer ---------------- */
-function CallToAction({ data }: { data: ReturnType<typeof useContent> }) {
-  const { eyebrow, title, description, email, socials } = data.cta;
+function CallToAction({ data, isEngineering }: { data: ReturnType<typeof useContent>; isEngineering?: boolean }) {
+  const { eyebrow, title, description, email, socials } = isEngineering ? data.devCta : data.cta;
   const iconFor = (label: string) =>
     label === "Instagram"
       ? Instagram
@@ -1384,11 +1385,17 @@ function CallToAction({ data }: { data: ReturnType<typeof useContent> }) {
     >
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
-        <img
-          src="/letsconnect.jpg"
-          className="h-full w-full object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-black/75 backdrop-blur-[2px]" />
+        {!isEngineering && (
+          <img
+            src="/letsconnect.jpg"
+            className="h-full w-full object-cover object-center"
+            alt="Let's connect"
+          />
+        )}
+        <div className={`absolute inset-0 ${isEngineering ? 'bg-[#070b12]' : 'bg-black/75 backdrop-blur-[2px]'}`} />
+        {isEngineering && (
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(100,150,210,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(100,150,210,0.04)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+        )}
       </div>
 
       <div className="relative z-10 mx-auto flex max-w-[1600px] flex-col gap-20">
@@ -1403,14 +1410,14 @@ function CallToAction({ data }: { data: ReturnType<typeof useContent> }) {
           <motion.h2
             variants={fadeUp}
             transition={{ duration: 1.1, ease: EASE_OUT_EXPO }}
-            className="font-serif max-w-4xl text-5xl font-medium leading-[1.02] tracking-tight md:text-8xl"
+            className={`max-w-4xl text-5xl font-medium leading-[1.02] tracking-tight md:text-8xl ${isEngineering ? 'font-mono text-[#a8c4e0]' : 'font-serif'}`}
           >
             {title}
           </motion.h2>
           <motion.p
             variants={fadeUp}
             transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
-            className="max-w-xl text-base font-light leading-relaxed text-muted-foreground md:text-lg"
+            className={`max-w-xl text-base font-light leading-relaxed md:text-lg ${isEngineering ? 'font-mono text-[rgba(120,160,200,0.7)]' : 'text-muted-foreground'}`}
           >
             {description}
           </motion.p>
@@ -1418,7 +1425,11 @@ function CallToAction({ data }: { data: ReturnType<typeof useContent> }) {
             variants={fadeUp}
             transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
             href={`mailto:${email}`}
-            className="mt-4 inline-flex max-w-full items-center gap-2 bg-primary px-4 py-3 md:px-10 md:py-4 text-[10px] md:text-[11px] font-semibold tracking-[0.12em] md:tracking-[0.25em] uppercase text-primary-foreground transition-all hover:bg-primary/90 hover:gap-4"
+            className={`mt-4 inline-flex max-w-full items-center gap-2 px-4 py-3 md:px-10 md:py-4 text-[10px] md:text-[11px] font-semibold tracking-[0.12em] md:tracking-[0.25em] uppercase transition-all hover:gap-4 ${
+              isEngineering 
+                ? 'bg-[rgba(55,138,221,0.1)] border border-[rgba(55,138,221,0.3)] text-[#a8c4e0] hover:bg-[rgba(55,138,221,0.2)]'
+                : 'bg-primary text-primary-foreground hover:bg-primary/90'
+            }`}
           >
             <Mail className="h-4 w-4" strokeWidth={1.75} />
             <span className="truncate">{email}</span>
@@ -1858,7 +1869,10 @@ function Index() {
 
         {/* CONDITIONAL RENDER: SYSTEMS ENGINEER PATH */}
         {themeMode === 'engineering' && (
-          <EngineeringPortfolio data={data} />
+          <>
+            <EngineeringPortfolio data={data} />
+            <GithubSection />
+          </>
         )}
 
         {/* SHARED SECTIONS */}
@@ -1866,7 +1880,7 @@ function Index() {
           <>
             <About data={data} />
             <Testimonial data={data} />
-            <CallToAction data={data} />
+            <CallToAction data={data} isEngineering={themeMode === 'engineering'} />
           </>
         )}
       </motion.div>

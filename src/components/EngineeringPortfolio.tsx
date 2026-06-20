@@ -138,18 +138,32 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
         </div>
       </section>
 
-      {/* Strict CSS Project Grid */}
+      {/* Strict CSS Project Grid with Images */}
       <section className="w-full px-6 md:px-12 pb-32">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-l border-t border-[rgba(100,150,210,0.08)]">
           {projects.map((p, idx) => (
             <div 
               key={p.id}
               onClick={() => setSelectedProject(p)}
-              className="group relative p-6 border-r border-b border-[rgba(100,150,210,0.08)] bg-[#070b12] cursor-crosshair transition-all duration-200 hover:bg-[rgba(55,100,180,0.06)] hover:border-[rgba(100,150,210,0.3)] flex flex-col justify-between aspect-square md:aspect-auto md:min-h-[320px]"
+              className="group relative p-6 border-r border-b border-[rgba(100,150,210,0.08)] bg-[#070b12] cursor-crosshair transition-all duration-200 hover:bg-[rgba(55,100,180,0.06)] hover:border-[rgba(100,150,210,0.3)] flex flex-col justify-between min-h-[400px] overflow-hidden"
             >
-              <div>
+              {/* Background Image Overlay */}
+              <div className="absolute inset-0 z-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500">
+                <img 
+                  src={p.image} 
+                  alt={p.title}
+                  className="w-full h-full object-cover grayscale mix-blend-luminosity"
+                />
+              </div>
+
+              <div className="relative z-10">
                 <div className="text-[9px] text-[rgba(120,160,200,0.25)] mb-4">
                   {(idx + 1).toString().padStart(3, "0")}
+                </div>
+                {/* Thumbnail Image for Mobile / Small Screens (optional, but requested by user) */}
+                <div className="w-full h-32 mb-6 overflow-hidden border border-[rgba(100,150,210,0.15)] relative">
+                  <img src={p.image} alt={p.title} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+                  <div className="absolute inset-0 bg-[#070b12]/40 group-hover:bg-transparent transition-colors duration-500" />
                 </div>
                 <h3 className="text-base font-normal text-[#a8c4e0] group-hover:text-[#c8dcf4] transition-colors duration-200">
                   {p.title}
@@ -164,12 +178,12 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
                     </span>
                   ))}
                 </div>
-                <p className="mt-4 text-[12px] font-light leading-relaxed text-[rgba(120,160,200,0.45)] max-w-[80%]">
-                  {p.description.substring(0, 80)}{p.description.length > 80 ? "..." : ""}
+                <p className="mt-4 text-[12px] font-light leading-relaxed text-[rgba(120,160,200,0.45)] max-w-[90%]">
+                  {p.description.substring(0, 100)}{p.description.length > 100 ? "..." : ""}
                 </p>
               </div>
 
-              <div className="flex justify-between items-end mt-8 text-[11px] uppercase tracking-widest text-[rgba(120,160,200,0.45)]">
+              <div className="relative z-10 flex justify-between items-end mt-8 text-[11px] uppercase tracking-widest text-[rgba(120,160,200,0.45)]">
                 <span>{p.year}</span>
                 <span className="flex items-center gap-2">
                   {p.status === "Live" && <span className="w-1.5 h-1.5 rounded-full bg-[#3ddc84]" />}
@@ -200,15 +214,23 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
             {/* Close Button */}
             <button 
               onClick={() => setSelectedProject(null)}
-              className="fixed top-8 right-8 z-[110] p-4 text-[rgba(120,160,200,0.5)] hover:text-[#a8c4e0] transition-colors cursor-crosshair"
+              className="fixed top-8 right-8 z-[110] p-4 text-[rgba(120,160,200,0.5)] hover:text-[#a8c4e0] transition-colors cursor-crosshair bg-[#070b12]/80 backdrop-blur-md rounded-full"
             >
               <X className="w-6 h-6" strokeWidth={1} />
             </button>
 
-            <div className="min-h-screen flex flex-col md:flex-row pt-24 pb-32 px-6 md:px-12 max-w-[1600px] mx-auto gap-12 md:gap-24">
+            <div className="min-h-screen flex flex-col md:flex-row pt-24 pb-32 px-6 md:px-12 max-w-[1600px] mx-auto gap-12 md:gap-24 relative">
               
               {/* Left Column - Writeup */}
               <div className="w-full md:w-[65%] flex flex-col">
+                <div className="w-full aspect-[16/9] mb-12 border border-[rgba(100,150,210,0.15)] overflow-hidden">
+                  <img 
+                    src={selectedProject.image} 
+                    alt={selectedProject.title} 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                
                 <h1 className="text-4xl md:text-[48px] font-light tracking-[-0.02em] text-[#a8c4e0] mb-6">
                   {selectedProject.title}
                 </h1>
