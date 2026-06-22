@@ -15,6 +15,7 @@ if (typeof window !== "undefined") {
 const PRIMARY_TAGLINE = "Built on craft & curiosity";
 
 export function RadialIntroSequence({ children }: { children: React.ReactNode }) {
+  const scopeRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const introRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
@@ -194,7 +195,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     
     if (heroCtas && heroCtas.length > 0) tl.to(heroCtas, { autoAlpha: 1, x: 0, ease: "back.out(1.5)", stagger: 0.05 }, 0.98);
 
-  }, { dependencies: [isReady, prefersReducedMotion, layout], scope: containerRef });
+  }, { dependencies: [isReady, prefersReducedMotion, layout], scope: scopeRef });
 
   if (prefersReducedMotion) {
     return (
@@ -208,7 +209,8 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div ref={containerRef} className="relative w-full h-screen bg-[#080808]">
+    <div ref={scopeRef} className="relative w-full">
+      <div ref={containerRef} className="relative w-full h-screen bg-[#080808]">
       
       {/* Film Grain Overlay */}
       <div 
@@ -335,6 +337,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
           </span>
         </div>
       </div>
+    </div>
     </div>
   );
 }
