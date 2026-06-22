@@ -131,6 +131,48 @@ function useGoldTextures() {
   }, []);
 }
 
+/* ── Realistic Instanced Chain Ring ── */
+const CHAIN_LINK_COUNT = 85;
+
+function ChainRing({ radius, xRotation, yRotation, zRotation }: { radius: number, xRotation: number, yRotation: number, zRotation: number }) {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+
+  useEffect(() => {
+    if (!meshRef.current) return;
+    for (let i = 0; i < CHAIN_LINK_COUNT; i++) {
+      const theta = (i / CHAIN_LINK_COUNT) * Math.PI * 2;
+      const x = Math.cos(theta) * radius;
+      const y = Math.sin(theta) * radius;
+      
+      dummy.position.set(x, y, 0);
+      
+      const tx = -Math.sin(theta);
+      const ty = Math.cos(theta);
+      
+      // Point Z axis along tangent
+      dummy.lookAt(x + tx, y + ty, 0);
+      
+      if (i % 2 === 0) {
+        dummy.rotateZ(Math.PI / 2);
+      }
+      
+      dummy.updateMatrix();
+      meshRef.current.setMatrixAt(i, dummy.matrix);
+    }
+    meshRef.current.instanceMatrix.needsUpdate = true;
+  }, [radius, dummy]);
+
+  return (
+    <group rotation={[xRotation, yRotation, zRotation]}>
+      <instancedMesh ref={meshRef} args={[undefined, undefined, CHAIN_LINK_COUNT]} castShadow receiveShadow>
+        <torusGeometry args={[0.07, 0.035, 12, 24]} />
+        <meshStandardMaterial color="#0f0f0f" roughness={0.8} metalness={0.9} />
+      </instancedMesh>
+    </group>
+  );
+}
+
 /* ── Physical Chain Cage Effect ── */
 function ChainCage({ visible }: { visible: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
@@ -142,33 +184,19 @@ function ChainCage({ visible }: { visible: boolean }) {
     const targetScale = visible ? 1 : 0.001;
     groupRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), delta * 12);
 
-    // Subtle breathing/shifting of chains
+    // Subtle breathing of the entire cage
     if (visible || groupRef.current.scale.x > 0.01) {
-      groupRef.current.children[0].rotation.z += delta * 0.15;
-      groupRef.current.children[1].rotation.x -= delta * 0.1;
-      groupRef.current.children[2].rotation.y += delta * 0.12;
+      groupRef.current.rotation.z = Math.sin(state.clock.getElapsedTime() * 0.5) * 0.05;
+      groupRef.current.rotation.x = Math.sin(state.clock.getElapsedTime() * 0.3) * 0.05;
     }
   });
 
   return (
     <group ref={groupRef} scale={0.001}>
-      {/* Heavy Metal Chain Knot 1 - Diagonal Cross */}
-      <mesh rotation={[Math.PI / 4, 0, Math.PI / 6]}>
-        <torusKnotGeometry args={[2.08, 0.12, 256, 32, 2, 5]} />
-        <meshStandardMaterial color="#1a1a1a" roughness={0.8} metalness={0.7} />
-      </mesh>
-
-      {/* Heavy Metal Chain Knot 2 - Opposite Diagonal */}
-      <mesh rotation={[-Math.PI / 4, Math.PI / 4, 0]}>
-        <torusKnotGeometry args={[2.06, 0.1, 256, 32, 3, 4]} />
-        <meshStandardMaterial color="#111111" roughness={0.7} metalness={0.8} />
-      </mesh>
-
-      {/* Heavy Metal Chain Knot 3 - Horizontal Binder */}
-      <mesh rotation={[0, 0, Math.PI / 2]}>
-        <torusKnotGeometry args={[2.04, 0.09, 256, 32, 1, 4]} />
-        <meshStandardMaterial color="#0a0a0a" roughness={0.9} metalness={0.9} />
-      </mesh>
+      <ChainRing radius={2.05} xRotation={Math.PI / 3} yRotation={0} zRotation={Math.PI / 4} />
+      <ChainRing radius={2.06} xRotation={-Math.PI / 3} yRotation={0} zRotation={-Math.PI / 4} />
+      <ChainRing radius={2.07} xRotation={0} yRotation={Math.PI / 2.5} zRotation={Math.PI / 2} />
+      <ChainRing radius={2.04} xRotation={Math.PI / 6} yRotation={-Math.PI / 6} zRotation={0} />
     </group>
   );
 }
