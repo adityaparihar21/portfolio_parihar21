@@ -244,6 +244,7 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
             className="fixed inset-0 z-[100] bg-[#070b12] overflow-y-auto"
+            data-lenis-prevent="true"
           >
             {/* Close Button */}
             <button
