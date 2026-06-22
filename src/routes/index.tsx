@@ -16,8 +16,6 @@ import DomeGallery from "../components/DomeGallery";
 import AP3DMonogram from "../components/AP3DMonogram";
 import { CreativeHero } from "../components/CreativeHero";
 import { DevDashboardHero } from "../components/DevDashboardHero";
-import { CreativeWork } from "../components/CreativeWork";
-import { UPESWork } from "../components/UPESWork";
 import { EngineeringPortfolio } from "../components/EngineeringPortfolio";
 import { GithubSection } from "../components/GithubSection";
 import { RadialIntroSequence } from "../components/intro/RadialIntro";
@@ -1994,5 +1992,6 @@ function Index() {
         </motion.div>
       )}
     </div>
+    </DebugErrorBoundary>
   );
 }
