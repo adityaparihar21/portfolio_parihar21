@@ -239,6 +239,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
             ref={thread1Ref} 
             className="absolute left-0 w-full h-[120px] overflow-visible" 
             style={{ top: "calc(38vh - 60px)" }}
+            viewBox="0 0 100 100"
             preserveAspectRatio="none"
           >
             <defs>
@@ -251,7 +252,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
               </filter>
             </defs>
             <path 
-              d="M -50 20 Q 50vw 100 110vw 20" 
+              d="M -10 20 Q 50 100 110 20" 
               fill="transparent" 
               stroke="#A88B63" 
               strokeWidth="2.5" 
@@ -260,7 +261,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
               opacity="0.8"
             />
             <path 
-              d="M -50 20 Q 50vw 100 110vw 20" 
+              d="M -10 20 Q 50 100 110 20" 
               fill="transparent" 
               stroke="#E0C9A3" 
               strokeWidth="1" 
@@ -274,6 +275,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
             ref={thread2Ref} 
             className="absolute left-0 w-full h-[120px] overflow-visible" 
             style={{ top: "calc(62vh - 60px)" }}
+            viewBox="0 0 100 100"
             preserveAspectRatio="none"
           >
             <defs>
@@ -286,7 +288,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
               </filter>
             </defs>
             <path 
-              d="M -50 20 Q 50vw 100 110vw 20" 
+              d="M -10 20 Q 50 100 110 20" 
               fill="transparent" 
               stroke="#A88B63" 
               strokeWidth="2.5" 
@@ -295,7 +297,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
               opacity="0.8"
             />
             <path 
-              d="M -50 20 Q 50vw 100 110vw 20" 
+              d="M -10 20 Q 50 100 110 20" 
               fill="transparent" 
               stroke="#E0C9A3" 
               strokeWidth="1" 
@@ -307,7 +309,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
 
           {/* Animated Wrapper for Cards */}
           <div ref={ringRef} className="absolute inset-0 origin-center will-change-transform z-3">
-            {isReady &&
+            {isReady && layout.length === cardCount &&
               selectedImages.map((src, i) => (
                 <RadialCard
                   key={i}
