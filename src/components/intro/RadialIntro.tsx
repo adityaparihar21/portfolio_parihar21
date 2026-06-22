@@ -61,22 +61,22 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     const cardElements = cardsRef.current.filter(Boolean);
     if (cardElements.length === 0) return;
 
-    // We start with Frame A: Ring arrangement
+    // 1. Initial State: Horizontal Strip
     cardElements.forEach((card, i) => {
       const l = layout[i];
       if (!l) return;
       gsap.set(card, {
         xPercent: -50,
         yPercent: -50,
-        x: l.radialX,
-        y: l.radialY,
-        rotation: l.radialRot,
+        x: l.stripX,
+        y: l.stripY,
+        rotation: l.stripRot,
         scale: l.scale,
       });
     });
 
     // Set initial states
-    gsap.set(textBlockRef.current, { autoAlpha: 1, y: 0 });
+    gsap.set(textBlockRef.current, { autoAlpha: 0, y: 10 }); // Tagline hidden initially
     gsap.set(scrollIndicatorRef.current, { autoAlpha: 1 });
     
     // The Hero Wrapper contains the background and text
@@ -114,19 +114,41 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top",
-        end: "+=250%", 
+        end: "+=350%", // Extended for the full 4-act timeline
         pin: true,
         scrub: 1.2,
       },
     });
 
-    // --- Act 1: Ring Shatters & Flattens (0% -> 40%) ---
-    
-    // 0-15%: Scroll indicator & Tagline fade out
+    // --- Phase 1: Strip -> Radial Ring (0% -> 25%) ---
+    // Scroll indicator fades out
     tl.to(scrollIndicatorRef.current, { autoAlpha: 0, y: 10, ease: "power2.inOut" }, 0);
-    tl.to(textBlockRef.current, { autoAlpha: 0, y: -12, ease: "power1.inOut" }, 0);
+    
+    // Cards morph to ring
+    cardElements.forEach((card, i) => {
+      const l = layout[i];
+      if (!l) return;
+      tl.to(
+        card,
+        {
+          x: l.radialX,
+          y: l.radialY,
+          rotation: l.radialRot,
+          ease: "power2.inOut",
+        },
+        0 
+      );
+    });
 
-    // 0-40%: Morph cards to flattened horizontal strip
+    // Tagline fades in
+    tl.to(textBlockRef.current, { autoAlpha: 1, y: 0, ease: "none" }, 0.1);
+
+    // --- Phase 2: Ring Rotates & shatters (25% -> 40%) ---
+    tl.to(ringRef.current, { rotation: -40, ease: "none" }, 0.25);
+    tl.to(textBlockRef.current, { autoAlpha: 0, y: -15, ease: "none" }, 0.3);
+
+
+    // --- Phase 3: Morph to Film Strip (40% -> 60%) ---
     cardElements.forEach((card, i) => {
       const l = layout[i];
       if (!l) return;
@@ -134,94 +156,52 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
       if (l.isTopArc) {
         tl.to(card, {
           x: l.filmStripX,
-          y: l.filmStripY - (window.innerHeight * 0.08), // adjust up slightly to sit on horizon
+          y: l.filmStripY - (window.innerHeight * 0.08), 
           rotation: l.filmStripRot,
           ease: "power2.inOut"
-        }, 0);
+        }, 0.4);
       } else {
         tl.to(card, {
           y: window.innerHeight * 0.6,
           rotation: 0,
           autoAlpha: 0,
           ease: "power2.inOut"
-        }, 0);
+        }, 0.4);
       }
     });
 
-    // 20%: Cinematic background starts fading in
-    if (heroBg) {
-      tl.to(heroBg, { autoAlpha: 0.6, scale: 1.0, ease: "power2.out" }, 0.2);
-    }
-    
-    // 30%: Golden horizon line fades in
-    tl.to(horizonLineRef.current, { autoAlpha: 0.7, ease: "power2.inOut" }, 0.3);
+    if (heroBg) tl.to(heroBg, { autoAlpha: 0.6, scale: 1.0, ease: "power2.out" }, 0.45);
+    tl.to(horizonLineRef.current, { autoAlpha: 0.7, ease: "power2.inOut" }, 0.5);
 
 
-    // --- Act 2: Polaroids Become Film Strip (40% -> 70%) ---
-    
-    // 40%: Polaroid borders shrink
+    // --- Phase 4: Polaroid Borders Shrink & Pan (60% -> 80%) ---
     const polaroids = document.querySelectorAll(".polaroid-card");
     const imgWrappers = document.querySelectorAll(".polaroid-img-wrapper");
     
-    // We animate inline padding directly to remove the white matte
-    tl.to(polaroids, { padding: "0px", borderRadius: "0px", ease: "power2.inOut" }, 0.4);
-    tl.to(imgWrappers, { borderRadius: "0px", ease: "power2.inOut" }, 0.4);
+    tl.to(polaroids, { padding: "0px", borderRadius: "0px", ease: "power2.inOut" }, 0.6);
+    tl.to(imgWrappers, { borderRadius: "0px", ease: "power2.inOut" }, 0.6);
+    tl.to(cardElements, { scale: 0.8, ease: "power2.inOut" }, 0.6);
+
+    tl.to(celluloidBarRef.current, { y: 0, autoAlpha: 1, ease: "power2.out" }, 0.6);
+    tl.to([sprocketsTopRef.current, sprocketsBottomRef.current], { autoAlpha: 1, ease: "power2.out" }, 0.6);
+
+    // Continuous Pan
+    tl.to(ringRef.current, { x: "-=30vw", ease: "none" }, 0.6);
     
-    // Scale cards strictly to standard film frame sizes (120x90 roughly handled by scale down)
-    // Actually padding removal might be enough visually, but let's drop their scale to normalize
-    tl.to(cardElements, { scale: 0.8, ease: "power2.inOut" }, 0.4);
-
-    // 40%: Celluloid bar rises to encase images
-    tl.to(celluloidBarRef.current, { y: 0, autoAlpha: 1, ease: "power2.out" }, 0.4);
-    
-    // 40%: Sprockets fade in
-    tl.to([sprocketsTopRef.current, sprocketsBottomRef.current], { autoAlpha: 1, ease: "power2.out" }, 0.4);
-
-    // 40% -> 100%: Continuous Pan of the film strip right-to-left
-    // We will animate the X of the ringRef to pan the images
-    tl.to(ringRef.current, { x: "-=30vw", ease: "none" }, 0.4);
-    
-    // Background becomes fully visible
-    if (heroBg) {
-      tl.to(heroBg, { autoAlpha: 1, ease: "power2.inOut" }, 0.4);
-    }
-
-    // 55%: Soft sun glow appears on horizon
-    tl.to(sunGlowRef.current, { autoAlpha: 1, ease: "power2.inOut" }, 0.55);
+    if (heroBg) tl.to(heroBg, { autoAlpha: 1, ease: "power2.inOut" }, 0.6);
+    tl.to(sunGlowRef.current, { autoAlpha: 1, ease: "power2.inOut" }, 0.7);
 
 
-    // --- Act 3: Hero Text Resolves (70% -> 100%) ---
-    
-    // 70%: Eyebrow text
-    if (heroEyebrow) {
-      tl.to(heroEyebrow, { autoAlpha: 1, y: 0, letterSpacing: "0.2em", ease: "power3.out" }, 0.7);
-    }
+    // --- Phase 5: Hero Text Resolves & Drop (80% -> 100%) ---
+    if (heroEyebrow) tl.to(heroEyebrow, { autoAlpha: 1, y: 0, letterSpacing: "0.2em", ease: "power3.out" }, 0.8);
+    if (heroWords && heroWords.length > 0) tl.to(heroWords, { autoAlpha: 1, y: 0, ease: "power3.out", stagger: 0.05 }, 0.85);
+    if (heroSubtext) tl.to(heroSubtext, { autoAlpha: 0.6, ease: "power2.out" }, 0.9);
+    if (heroCtas && heroCtas.length > 0) tl.to(heroCtas, { autoAlpha: 1, x: 0, ease: "power3.out", stagger: 0.05 }, 0.95);
 
-    // 78%: Headline rises word by word
-    if (heroWords && heroWords.length > 0) {
-      tl.to(heroWords, { autoAlpha: 1, y: 0, ease: "power3.out", stagger: 0.07 }, 0.78);
-    }
-
-    // 88%: Subtext fades in
-    if (heroSubtext) {
-      tl.to(heroSubtext, { autoAlpha: 0.6, ease: "power2.out" }, 0.88);
-    }
-
-    // 95%: Buttons slide in
-    if (heroCtas && heroCtas.length > 0) {
-      tl.to(heroCtas, { autoAlpha: 1, x: 0, ease: "power3.out", stagger: 0.08 }, 0.95);
-    }
-
-    // 90% -> 100%: Film strip sinks below viewport
     tl.to(filmStripGroupRef.current, { y: window.innerHeight * 0.6, ease: "power2.in" }, 0.9);
-    
-    // Horizon glow fades out
     tl.to([horizonLineRef.current, sunGlowRef.current], { autoAlpha: 0, ease: "power2.in" }, 0.9);
 
-    // 100%: Crossfade to original video background (if available)
-    if (heroVideo) {
-      tl.to(heroVideo, { autoAlpha: 1, duration: 0.1, ease: "power2.inOut" }, 1.0);
-    }
+    if (heroVideo) tl.to(heroVideo, { autoAlpha: 1, duration: 0.1, ease: "power2.inOut" }, 1.0);
 
   }, { dependencies: [isReady, prefersReducedMotion, layout], scope: containerRef });
 
