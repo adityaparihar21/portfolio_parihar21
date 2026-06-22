@@ -33,6 +33,7 @@ import {
   Menu,
   X,
   Loader2,
+  Download,
 } from "lucide-react";
 
 import { siteData } from "@/lib/site-data";
@@ -1470,19 +1471,34 @@ function CallToAction({
           >
             {description}
           </motion.p>
-          <motion.a
-            variants={fadeUp}
-            transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
-            href={`mailto:${email}`}
-            className={`mt-4 inline-flex max-w-full items-center gap-2 px-4 py-3 md:px-10 md:py-4 text-[10px] md:text-[11px] font-semibold tracking-[0.12em] md:tracking-[0.25em] uppercase transition-all hover:gap-4 ${
-              isEngineering
-                ? "bg-[rgba(55,138,221,0.1)] border border-[rgba(55,138,221,0.3)] text-[#a8c4e0] hover:bg-[rgba(55,138,221,0.2)]"
-                : "bg-primary text-primary-foreground hover:bg-primary/90"
-            }`}
-          >
-            <Mail className="h-4 w-4" strokeWidth={1.75} />
-            <span className="truncate">{email}</span>
-          </motion.a>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-4 w-full">
+            <motion.a
+              variants={fadeUp}
+              transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
+              href={`mailto:${email}`}
+              className={`inline-flex max-w-full items-center gap-2 px-4 py-3 md:px-10 md:py-4 text-[10px] md:text-[11px] font-semibold tracking-[0.12em] md:tracking-[0.25em] uppercase transition-all hover:gap-4 ${
+                isEngineering
+                  ? "bg-[rgba(55,138,221,0.1)] border border-[rgba(55,138,221,0.3)] text-[#a8c4e0] hover:bg-[rgba(55,138,221,0.2)]"
+                  : "bg-primary text-primary-foreground hover:bg-primary/90"
+              }`}
+            >
+              <Mail className="h-4 w-4" strokeWidth={1.75} />
+              <span className="truncate">{email}</span>
+            </motion.a>
+
+            {isEngineering && (
+              <motion.a
+                variants={fadeUp}
+                transition={{ duration: 0.9, ease: EASE_OUT_EXPO, delay: 0.1 }}
+                href="/AP_ENG_RESUME.docx"
+                download="Aditya_Parihar_Resume.docx"
+                className="inline-flex max-w-full items-center gap-2 px-4 py-3 md:px-10 md:py-4 text-[10px] md:text-[11px] font-semibold tracking-[0.12em] md:tracking-[0.25em] uppercase transition-all hover:gap-4 border border-[rgba(55,138,221,0.2)] text-[rgba(120,160,200,0.8)] hover:text-[#a8c4e0] hover:bg-[rgba(55,138,221,0.05)]"
+              >
+                <Download className="h-4 w-4" strokeWidth={1.75} />
+                <span className="truncate">Download Resume</span>
+              </motion.a>
+            )}
+          </div>
         </motion.div>
 
         <div className="flex flex-col gap-8 border-t border-border pt-12 md:flex-row md:items-end md:justify-between">
