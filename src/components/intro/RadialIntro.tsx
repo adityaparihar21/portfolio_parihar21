@@ -107,9 +107,9 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top 1px",
-        end: "+=600%", // Extensively extended for mega 5-phase timeline
+        end: "+=1200%", // Doubled scroll distance so it requires more scrolling
         pin: true,
-        scrub: 1.2,
+        scrub: 2.5, // High inertia for a very smooth, heavy feel
         invalidateOnRefresh: true,
       },
     });
