@@ -131,8 +131,8 @@ function useGoldTextures() {
   }, []);
 }
 
-/* ── Hybrid Cyber-Lock Effect ── */
-function CyberLock({ visible }: { visible: boolean }) {
+/* ── Physical Chain Cage Effect ── */
+function ChainCage({ visible }: { visible: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
   
   useFrame((state, delta) => {
@@ -140,49 +140,34 @@ function CyberLock({ visible }: { visible: boolean }) {
     
     // Smooth scale animation (slam in, shrink out)
     const targetScale = visible ? 1 : 0.001;
-    groupRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), delta * 10);
+    groupRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), delta * 12);
 
-    // Rotate chains
+    // Subtle breathing/shifting of chains
     if (visible || groupRef.current.scale.x > 0.01) {
-      groupRef.current.children[1].rotation.x += delta * 1.5;
-      groupRef.current.children[2].rotation.y -= delta * 1.2;
-      groupRef.current.children[3].rotation.z += delta * 0.8;
+      groupRef.current.children[0].rotation.z += delta * 0.15;
+      groupRef.current.children[1].rotation.x -= delta * 0.1;
+      groupRef.current.children[2].rotation.y += delta * 0.12;
     }
   });
 
   return (
     <group ref={groupRef} scale={0.001}>
-      {/* Iced/Glass Hexagonal Shield */}
-      <mesh rotation={[Math.PI / 2, 0, Math.PI / 6]}>
-        <cylinderGeometry args={[2.25, 2.25, 0.7, 6]} />
-        <meshPhysicalMaterial 
-          transmission={1} 
-          ior={1.45} 
-          thickness={0.8} 
-          roughness={0.25} 
-          clearcoat={1} 
-          color="#a0eaff" 
-          transparent
-          opacity={0.85}
-        />
+      {/* Heavy Metal Chain Knot 1 - Diagonal Cross */}
+      <mesh rotation={[Math.PI / 4, 0, Math.PI / 6]}>
+        <torusKnotGeometry args={[2.08, 0.12, 256, 32, 2, 5]} />
+        <meshStandardMaterial color="#1a1a1a" roughness={0.8} metalness={0.7} />
       </mesh>
 
-      {/* Cyber Chain 1 */}
-      <mesh rotation={[Math.PI / 4, 0, 0]}>
-        <torusGeometry args={[2.35, 0.05, 16, 64]} />
-        <meshBasicMaterial color="#00e5ff" />
+      {/* Heavy Metal Chain Knot 2 - Opposite Diagonal */}
+      <mesh rotation={[-Math.PI / 4, Math.PI / 4, 0]}>
+        <torusKnotGeometry args={[2.06, 0.1, 256, 32, 3, 4]} />
+        <meshStandardMaterial color="#111111" roughness={0.7} metalness={0.8} />
       </mesh>
 
-      {/* Cyber Chain 2 */}
-      <mesh rotation={[0, Math.PI / 3, 0]}>
-        <torusGeometry args={[2.4, 0.03, 16, 64]} />
-        <meshBasicMaterial color="#00bfff" wireframe />
-      </mesh>
-
-      {/* Cyber Chain 3 (Knot) */}
-      <mesh>
-        <torusKnotGeometry args={[2.3, 0.03, 128, 16, 2, 5]} />
-        <meshBasicMaterial color="#00e5ff" wireframe transparent opacity={0.4} />
+      {/* Heavy Metal Chain Knot 3 - Horizontal Binder */}
+      <mesh rotation={[0, 0, Math.PI / 2]}>
+        <torusKnotGeometry args={[2.04, 0.09, 256, 32, 1, 4]} />
+        <meshStandardMaterial color="#0a0a0a" roughness={0.9} metalness={0.9} />
       </mesh>
     </group>
   );
@@ -376,7 +361,7 @@ function APCoin({
         </group>
       </group>
       {/* Cybernetic Dev Mode Wireframe Overlay */}
-      <CyberLock visible={hoverMode === "engineering"} />
+      <ChainCage visible={hoverMode === "engineering"} />
     </group>
   );
 }
@@ -397,7 +382,7 @@ function CinematicLights({ isMini, hoverMode = "none" }: { isMini: boolean; hove
   // Dynamic lights color and intensities based on hoverMode
   const lightColor =
     hoverMode === "engineering"
-      ? "#00e5ff" // Cool steel blue / cyan
+      ? "#ffe6b3" // Warm amber cinematic light for the physical chain cage
       : hoverMode === "creative"
         ? "#ffbe5b"
         : "#ffdf95"; // Warm/deep gold vs default gold
