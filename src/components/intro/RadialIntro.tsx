@@ -127,6 +127,9 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     tl.to(textBlockRef.current, { autoAlpha: 0, y: -15, ease: "none" }, 0.15);
 
     // --- Phase 3: Polaroids migrate to threads (0.25 - 0.5) ---
+    // Counter-rotate the ring back to 0 so the cards align horizontally with the threads
+    tl.to(ringRef.current, { rotation: 0, ease: "power2.inOut", duration: 0.25 }, 0.25);
+
     cardElements.forEach((card, i) => {
       const l = layout[i];
       if (!l) return;
@@ -155,21 +158,18 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     });
 
     // --- Phase 4: Final settle + sway (0.5 - 0.7) ---
-    // We simulate sway by rotating the ring wrapper slightly back, and panning slightly
-    tl.to(ringRef.current, { rotation: -65, x: "-2vw", ease: "sine.inOut" }, 0.5);
+    // Minimal sway since threads are horizontal
+    tl.to(ringRef.current, { x: "-1vw", ease: "sine.inOut", duration: 0.2 }, 0.5);
 
-    // --- Phase 5: Threads dissolve, polaroids scale up & borders dissolve (0.7 - 0.9) ---
+    // --- Phase 5: Threads & Polaroids dissolve together (0.7 - 0.8) ---
     tl.to(threadsGroupRef.current, { autoAlpha: 0, duration: 0.1 }, 0.7);
     if (clothespins) tl.to(clothespins, { autoAlpha: 0, scale: 0.5, duration: 0.1 }, 0.7);
     
-    tl.to(cardElements, { padding: 0, ease: "power2.inOut" }, 0.8);
-    tl.to(cardElements, { scale: (i) => (layout[i]?.scale || 1) * 1.08, ease: "power2.inOut" }, 0.8);
+    // Cards vanish along with the thread per user request
+    tl.to(cardElements, { autoAlpha: 0, scale: 0.8, ease: "power2.inOut", duration: 0.1 }, 0.7);
 
-    // Fade polaroids into the background video/image
-    tl.to(cardElements, { autoAlpha: 0, ease: "power2.inOut" }, 0.85);
-    const imgWrappers = document.querySelectorAll(".polaroid-img-wrapper");
-    tl.to(imgWrappers, { borderRadius: "0px", ease: "power2.inOut" }, 0.8);
-    if (heroBg) tl.to(heroBg, { autoAlpha: 1, ease: "power2.inOut" }, 0.8);
+    // Fade in the background video/image
+    if (heroBg) tl.to(heroBg, { autoAlpha: 1, ease: "power2.inOut", duration: 0.15 }, 0.75);
 
     // --- Phase 6: Background video crossfade (0.9 - 1.0) ---
     if (heroVideo) tl.to(heroVideo, { autoAlpha: 1, duration: 0.1, ease: "power2.inOut" }, 0.9);
