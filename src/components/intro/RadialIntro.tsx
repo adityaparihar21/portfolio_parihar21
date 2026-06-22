@@ -37,7 +37,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     }
   }, []);
 
-  const cardCount = isMobile ? 16 : 24;
+  const cardCount = isMobile ? 8 : 12;
   const { layout, isReady } = useIntroLayout(cardCount);
 
   const selectedImages = React.useMemo(() => {
