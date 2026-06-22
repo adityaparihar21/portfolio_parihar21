@@ -19,6 +19,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
   const introRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
   const textBlockRef = useRef<HTMLDivElement>(null);
+  const scrollIndicatorRef = useRef<HTMLDivElement>(null);
   const heroWrapperRef = useRef<HTMLDivElement>(null);
   
   // We need to store card refs so we can animate them individually
@@ -100,6 +101,13 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
       );
     });
 
+    // Scroll indicator fades out immediately on scroll (0 -> 0.15)
+    tl.to(
+      scrollIndicatorRef.current,
+      { autoAlpha: 0, y: 10, ease: "power2.inOut" },
+      0
+    );
+
     // Tagline fades in as the ring forms (0.25 -> 0.55)
     tl.to(
       textBlockRef.current,
@@ -180,9 +188,21 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
           <h2 className="font-serif text-[clamp(1.6rem,3.2vw,2.8rem)] text-white font-light tracking-wide text-center leading-tight">
             {PRIMARY_TAGLINE}
           </h2>
-          <span className="mt-[12px] text-[clamp(0.55rem,1vw,0.75rem)] uppercase tracking-[0.2em] font-mono text-white/50">
+        </div>
+
+        {/* Scroll Indicator (Visible on load, fades out on scroll) */}
+        <div
+          ref={scrollIndicatorRef}
+          className="absolute bottom-12 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-3 text-white/50 pointer-events-none"
+        >
+          <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] font-mono">
             Scroll to explore
           </span>
+          <div className="animate-bounce">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </div>
         </div>
 
         {/* Outer Vignette to soften edges of the ring */}
