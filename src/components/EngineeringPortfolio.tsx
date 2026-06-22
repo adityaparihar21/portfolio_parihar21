@@ -25,7 +25,7 @@ const getExtendedProject = (
     status: isWip ? "In progress" : "Live",
     year: "2024",
     role: "Lead Engineer",
-    repo: p.href?.includes("github.com") ? p.href : undefined,
+    repo: p.repo || undefined,
     writeup: `Architectural Overview:\n\nThe primary engineering challenge for ${p.title} involved structuring a robust, highly-concurrent foundation capable of handling complex state mutations without degrading the interactive frame rate. \n\nApproach:\nWe decoupled the rendering pipeline from the core business logic, utilizing a functional reactive model. By isolating side-effects, we achieved a deterministic state machine that scaled effortlessly across client sessions.\n\nOutcome:\nThe resulting architecture maintained a strict 60fps budget, achieving sub-40ms latency across the P95 percentile, validating the strict separation of concerns.`,
     codeSnippet: `// Core logic handler\nfunction processState(currentState, action) {\n  if (action.type === 'MUTATE') {\n    return computeDiff(currentState, action.payload);\n  }\n  return currentState;\n}`,
     metrics: [

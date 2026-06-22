@@ -32,6 +32,7 @@ export type SiteData = {
       description: string;
       image: string;
       href: string;
+      repo?: string;
     }[];
   };
   creativeWork: {
