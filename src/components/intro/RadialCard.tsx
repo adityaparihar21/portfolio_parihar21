@@ -23,6 +23,19 @@ export const RadialCard = React.forwardRef<HTMLDivElement, RadialCardProps>(
           borderRadius: "2px"
         }}
       >
+        {/* Clothespin element */}
+        <div 
+          className="polaroid-clothespin absolute left-1/2 -top-[12px] -ml-[6px] w-[12px] h-[24px] bg-[#C19A6B] rounded-sm opacity-0 will-change-transform shadow-md z-20"
+          style={{ 
+            boxShadow: "inset -2px 0 4px rgba(0,0,0,0.2), 2px 2px 4px rgba(0,0,0,0.3)",
+            backgroundImage: "linear-gradient(to right, #D2B48C, #A0522D)",
+            transformOrigin: "center 8px"
+          }}
+        >
+          {/* Silver spring line */}
+          <div className="absolute top-[8px] left-[-1px] w-[14px] h-[2px] bg-gray-300 rounded-full" />
+        </div>
+
         <div className="polaroid-img-wrapper relative w-full h-full overflow-hidden bg-[#111] rounded-[1px]">
           <img
             src={src}

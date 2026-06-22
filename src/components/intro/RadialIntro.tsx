@@ -22,13 +22,9 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
   const scrollIndicatorRef = useRef<HTMLDivElement>(null);
   const heroWrapperRef = useRef<HTMLDivElement>(null);
   
-  // New elements for the film strip transition
-  const horizonLineRef = useRef<HTMLDivElement>(null);
-  const celluloidBarRef = useRef<HTMLDivElement>(null);
-  const sunGlowRef = useRef<HTMLDivElement>(null);
-  const sprocketsTopRef = useRef<HTMLDivElement>(null);
-  const sprocketsBottomRef = useRef<HTMLDivElement>(null);
-  const filmStripGroupRef = useRef<HTMLDivElement>(null);
+  const thread1Ref = useRef<SVGSVGElement>(null);
+  const thread2Ref = useRef<SVGSVGElement>(null);
+  const threadsGroupRef = useRef<HTMLDivElement>(null);
 
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -100,89 +96,104 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     const heroVideo = heroWrapperRef.current?.querySelector(".creative-hero-video");
     if (heroVideo) gsap.set(heroVideo, { autoAlpha: 0 });
 
-    // Film strip elements initialization
-    gsap.set(horizonLineRef.current, { autoAlpha: 0 });
-    gsap.set(celluloidBarRef.current, { y: 110, autoAlpha: 0 });
-    gsap.set(sprocketsTopRef.current, { autoAlpha: 0 });
-    gsap.set(sprocketsBottomRef.current, { autoAlpha: 0 });
-    gsap.set(sunGlowRef.current, { autoAlpha: 0 });
+    // Film strip elements initialization -> Clothesline initialization
+    gsap.set(threadsGroupRef.current, { autoAlpha: 0 });
     
-    // We group the strip to pan it and eventually drop it
-    gsap.set(filmStripGroupRef.current, { y: 0 });
+    // Select all clothespins
+    const clothespins = introRef.current?.querySelectorAll(".polaroid-clothespin");
+    if (clothespins) gsap.set(clothespins, { autoAlpha: 0, scale: 0.8 });
 
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top",
-        end: "+=250%", // Reverted to 3 acts
+        end: "+=500%", // Extensively extended for 10 phases
         pin: true,
         scrub: 1.2,
       },
     });
 
-    // --- Act 1: Ring Rotates & Shatters (0% -> 40%) ---
+    // --- Phase 1: Ring alive (0 - 0.15) ---
     // Scroll indicator fades out
     tl.to(scrollIndicatorRef.current, { autoAlpha: 0, y: 10, ease: "power2.inOut" }, 0);
-    
-    // Ring Rotates & text drops
-    tl.to(ringRef.current, { rotation: -40, ease: "none" }, 0);
-    tl.to(textBlockRef.current, { autoAlpha: 0, y: -15, ease: "none" }, 0.1);
+    // Ring slow rotation
+    tl.to(ringRef.current, { rotation: -60, ease: "none" }, 0);
+    // Background photo begins bleeding in
+    if (heroBg) tl.to(heroBg, { autoAlpha: 0.3, ease: "power2.inOut" }, 0.05);
 
+    // --- Phase 2: Threads appear (0.15 - 0.25) ---
+    tl.to(threadsGroupRef.current, { autoAlpha: 1, ease: "power2.out" }, 0.15);
+    if (heroBg) tl.to(heroBg, { autoAlpha: 0.8, ease: "none" }, 0.15);
+    tl.to(textBlockRef.current, { autoAlpha: 0, y: -15, ease: "none" }, 0.15);
 
-    // --- Phase 3: Morph to Film Strip (40% -> 60%) ---
+    // --- Phase 3: Polaroids migrate to threads (0.25 - 0.5) ---
     cardElements.forEach((card, i) => {
       const l = layout[i];
       if (!l) return;
       
-      if (l.isTopArc) {
-        tl.to(card, {
-          x: l.filmStripX,
-          y: l.filmStripY - (window.innerHeight * 0.08), 
-          rotation: l.filmStripRot,
-          ease: "power2.inOut"
-        }, 0.4);
-      } else {
-        tl.to(card, {
-          y: window.innerHeight * 1.2,
-          rotation: 0,
-          autoAlpha: 0,
-          ease: "power2.inOut"
-        }, 0.4);
+      // Calculate stagger based on index for random feel
+      const startTime = 0.25 + (i % 5) * 0.03;
+      
+      tl.to(card, {
+        x: l.threadX,
+        y: l.threadY,
+        rotation: l.threadRot,
+        ease: "power2.inOut",
+        duration: 0.15,
+      }, startTime);
+
+      // Clothespin snaps on
+      if (clothespins && clothespins[i]) {
+        tl.to(clothespins[i], {
+          autoAlpha: 1,
+          scale: 1,
+          rotation: l.threadPinAngle,
+          ease: "back.out(2)",
+          duration: 0.05,
+        }, startTime + 0.12);
       }
     });
 
-    if (heroBg) tl.to(heroBg, { autoAlpha: 0.6, scale: 1.0, ease: "power2.out" }, 0.45);
-    tl.to(horizonLineRef.current, { autoAlpha: 0.7, ease: "power2.inOut" }, 0.5);
+    // --- Phase 4: Final settle + sway (0.5 - 0.7) ---
+    // We simulate sway by rotating the ring wrapper slightly back, and panning slightly
+    tl.to(ringRef.current, { rotation: -65, x: "-2vw", ease: "sine.inOut" }, 0.5);
 
-
-    // --- Phase 4: Polaroid Borders Shrink & Pan (60% -> 80%) ---
+    // --- Phase 5: Threads dissolve, world opens (0.7 - 0.9) ---
+    tl.to(threadsGroupRef.current, { autoAlpha: 0, ease: "power2.inOut" }, 0.7);
+    tl.to(clothespins, { autoAlpha: 0, ease: "power2.inOut" }, 0.75); // Fades a half-second behind threads
+    
     const polaroids = document.querySelectorAll(".polaroid-card");
     const imgWrappers = document.querySelectorAll(".polaroid-img-wrapper");
+    tl.to(polaroids, { padding: "0px", borderRadius: "0px", ease: "power2.inOut" }, 0.8);
+    tl.to(imgWrappers, { borderRadius: "0px", ease: "power2.inOut" }, 0.8);
+    tl.to(cardElements, { scale: (i) => layout[i].scale * 1.08, ease: "power2.inOut" }, 0.8);
+    if (heroBg) tl.to(heroBg, { autoAlpha: 1, ease: "power2.inOut" }, 0.8);
+
+    // --- Phase 6: Background video crossfade (0.9 - 1.0) ---
+    if (heroVideo) tl.to(heroVideo, { autoAlpha: 1, duration: 0.1, ease: "power2.inOut" }, 0.9);
+
+    // --- Phase 7-9: Text Cascade (0.9 - 1.0) ---
+    // The logo rotation and nav bar fade in would happen globally, but we can fake it here or just handle hero content
+    // Eyebrow staggering
+    const eyebrowWords = heroWrapperRef.current?.querySelectorAll(".creative-hero-eyebrow-word");
+    if (eyebrowWords) {
+      tl.fromTo(eyebrowWords, 
+        { autoAlpha: 0, x: -20 },
+        { autoAlpha: 1, x: 0, ease: "power3.out", stagger: 0.02 }, 
+        0.92
+      );
+    }
     
-    tl.to(polaroids, { padding: "0px", borderRadius: "0px", ease: "power2.inOut" }, 0.6);
-    tl.to(imgWrappers, { borderRadius: "0px", ease: "power2.inOut" }, 0.6);
-    tl.to(cardElements, { scale: 0.8, ease: "power2.inOut" }, 0.6);
-
-    tl.to(celluloidBarRef.current, { y: 0, autoAlpha: 1, ease: "power2.out" }, 0.6);
-    tl.to([sprocketsTopRef.current, sprocketsBottomRef.current], { autoAlpha: 1, ease: "power2.out" }, 0.6);
-
-    // Continuous Pan
-    tl.to(ringRef.current, { x: "-=30vw", ease: "none" }, 0.6);
+    // Headline slides up
+    if (heroWords && heroWords.length > 0) {
+      tl.to(heroWords, { autoAlpha: 1, y: 0, ease: "power3.out", stagger: 0.05 }, 0.94);
+    }
     
-    if (heroBg) tl.to(heroBg, { autoAlpha: 1, ease: "power2.inOut" }, 0.6);
-    tl.to(sunGlowRef.current, { autoAlpha: 1, ease: "power2.inOut" }, 0.7);
-
-
-    // --- Phase 5: Hero Text Resolves & Drop (80% -> 100%) ---
-    if (heroEyebrow) tl.to(heroEyebrow, { autoAlpha: 1, y: 0, letterSpacing: "0.2em", ease: "power3.out" }, 0.8);
-    if (heroWords && heroWords.length > 0) tl.to(heroWords, { autoAlpha: 1, y: 0, ease: "power3.out", stagger: 0.05 }, 0.85);
-    if (heroSubtext) tl.to(heroSubtext, { autoAlpha: 0.6, ease: "power2.out" }, 0.9);
-    if (heroCtas && heroCtas.length > 0) tl.to(heroCtas, { autoAlpha: 1, x: 0, ease: "power3.out", stagger: 0.05 }, 0.95);
-
-    tl.to(filmStripGroupRef.current, { y: window.innerHeight * 1.2, ease: "power2.in" }, 0.9);
-    tl.to([horizonLineRef.current, sunGlowRef.current], { autoAlpha: 0, ease: "power2.in" }, 0.9);
-
-    if (heroVideo) tl.to(heroVideo, { autoAlpha: 1, duration: 0.1, ease: "power2.inOut" }, 1.0);
+    // Subtext fades in
+    if (heroSubtext) tl.to(heroSubtext, { autoAlpha: 0.55, ease: "power2.out" }, 0.96);
+    
+    // CTAs bounce up
+    if (heroCtas && heroCtas.length > 0) tl.to(heroCtas, { autoAlpha: 1, x: 0, ease: "back.out(1.5)", stagger: 0.05 }, 0.98);
 
   }, { dependencies: [isReady, prefersReducedMotion, layout], scope: containerRef });
 
@@ -200,6 +211,16 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
   return (
     <div ref={containerRef} className="relative w-full h-screen bg-[#080808]">
       
+      {/* Film Grain Overlay */}
+      <div 
+        className="absolute inset-0 z-50 pointer-events-none opacity-[0.08]" 
+        style={{ 
+          backgroundImage: "url('https://upload.wikimedia.org/wikipedia/commons/7/76/1k_Dissolve_Noise_Texture.png')",
+          backgroundSize: "200px 200px",
+          mixBlendMode: "overlay"
+        }} 
+      />
+
       {/* Hero Content Layer (Underneath the Intro, so it can fade in) */}
       <div ref={heroWrapperRef} className="absolute inset-0 z-0 w-full h-full pointer-events-auto">
         {children}
@@ -210,42 +231,79 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
         ref={introRef}
         className="absolute inset-0 z-10 w-full h-full overflow-hidden flex flex-col items-center justify-center pointer-events-none"
       >
-        {/* Film Strip Background Elements */}
-        <div ref={filmStripGroupRef} className="absolute inset-0 origin-center will-change-transform">
-          {/* Horizon Line */}
-          <div 
-            ref={horizonLineRef} 
-            className="absolute left-0 w-full h-[1px] bg-[rgba(200,169,110,0.65)] z-0" 
-            style={{ top: "42vh" }} 
-          />
+        {/* Jute Threads Background Elements */}
+        <div ref={threadsGroupRef} className="absolute inset-0 z-2 origin-center pointer-events-none">
           
-          {/* Sun Glow */}
-          <div 
-            ref={sunGlowRef} 
-            className="absolute left-1/2 -translate-x-1/2 w-[200px] h-[200px] bg-[radial-gradient(circle_at_center,rgba(200,140,60,0.35)_0%,transparent_70%)] z-1" 
-            style={{ top: "calc(42vh - 100px)" }} 
-          />
-
-          {/* Celluloid Bar */}
-          <div 
-            ref={celluloidBarRef} 
-            className="absolute left-0 w-[200vw] -ml-[50vw] h-[110px] bg-[rgba(8,6,4,0.92)] z-2 flex flex-col justify-between overflow-hidden" 
-            style={{ top: "calc(42vh - 55px)" }} 
+          {/* Thread 1 (38%) */}
+          <svg 
+            ref={thread1Ref} 
+            className="absolute left-0 w-full h-[120px] overflow-visible" 
+            style={{ top: "calc(38vh - 60px)" }}
+            preserveAspectRatio="none"
           >
-            {/* Sprockets Top */}
-            <div ref={sprocketsTopRef} className="w-full h-[12px] flex items-center gap-[18px] pl-[10px] mt-[4px]">
-              {Array.from({ length: 60 }).map((_, i) => (
-                <div key={i} className="w-[10px] h-[8px] rounded-[2px] bg-[rgba(200,169,110,0.2)] shrink-0" />
-              ))}
-            </div>
-            
-            {/* Sprockets Bottom */}
-            <div ref={sprocketsBottomRef} className="w-full h-[12px] flex items-center gap-[18px] pl-[10px] mb-[4px]">
-              {Array.from({ length: 60 }).map((_, i) => (
-                <div key={i} className="w-[10px] h-[8px] rounded-[2px] bg-[rgba(200,169,110,0.2)] shrink-0" />
-              ))}
-            </div>
-          </div>
+            <defs>
+              <filter id="glow1">
+                <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+            <path 
+              d="M -50 20 Q 50vw 100 110vw 20" 
+              fill="transparent" 
+              stroke="#A88B63" 
+              strokeWidth="2.5" 
+              strokeLinecap="round"
+              filter="url(#glow1)"
+              opacity="0.8"
+            />
+            <path 
+              d="M -50 20 Q 50vw 100 110vw 20" 
+              fill="transparent" 
+              stroke="#E0C9A3" 
+              strokeWidth="1" 
+              strokeLinecap="round"
+              opacity="0.9"
+            />
+          </svg>
+
+          {/* Thread 2 (62%) */}
+          <svg 
+            ref={thread2Ref} 
+            className="absolute left-0 w-full h-[120px] overflow-visible" 
+            style={{ top: "calc(62vh - 60px)" }}
+            preserveAspectRatio="none"
+          >
+            <defs>
+              <filter id="glow2">
+                <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+            <path 
+              d="M -50 20 Q 50vw 100 110vw 20" 
+              fill="transparent" 
+              stroke="#A88B63" 
+              strokeWidth="2.5" 
+              strokeLinecap="round"
+              filter="url(#glow2)"
+              opacity="0.8"
+            />
+            <path 
+              d="M -50 20 Q 50vw 100 110vw 20" 
+              fill="transparent" 
+              stroke="#E0C9A3" 
+              strokeWidth="1" 
+              strokeLinecap="round"
+              opacity="0.9"
+            />
+          </svg>
+        </div>
 
           {/* Animated Wrapper for Cards */}
           <div ref={ringRef} className="absolute inset-0 origin-center will-change-transform z-3">
@@ -262,7 +320,6 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
                 />
               ))}
           </div>
-        </div>
 
         {/* Center Text Block */}
         <div 
