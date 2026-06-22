@@ -53,8 +53,9 @@ export function CreativeHero({
         )}
       </div>
       
-      {/* Dark tint overlay */}
-      <div className="absolute inset-0 bg-black/35 z-0" />
+      {/* Dark tint overlay for better readability */}
+      <div className="absolute inset-0 bg-black/40 z-0" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/30 to-transparent z-0" />
 
       {/* Content wrapper */}
       <div className="relative z-10 w-full h-full flex flex-col items-start justify-center pl-8 md:pl-24 pt-24">
@@ -66,7 +67,7 @@ export function CreativeHero({
           ))}
         </h3>
         
-        <h1 className="creative-hero-headline font-serif text-[#F5EDD6] text-[clamp(4rem,7vw,85px)] leading-none tracking-tight mb-4 drop-shadow-sm font-medium">
+        <h1 className="creative-hero-headline font-serif text-[#F5EDD6] text-[clamp(4rem,7vw,85px)] leading-none tracking-tight mb-4 drop-shadow-[0_4px_24px_rgba(0,0,0,0.8)] font-medium">
           {"Aditya Parihar".split(" ").map((word, i) => (
             <span key={i} className="inline-block mr-4 creative-hero-word opacity-0">
               {word}
@@ -74,7 +75,7 @@ export function CreativeHero({
           ))}
         </h1>
         
-        <p className="creative-hero-subtext opacity-0 text-[#F5EDD6]/55 text-[18px] md:text-[20px] font-light mb-12 tracking-wide drop-shadow-sm">
+        <p className="creative-hero-subtext opacity-0 text-[#F5EDD6]/70 text-[18px] md:text-[20px] font-light mb-12 tracking-wide drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]">
           Code. Vision. Cinematography.
         </p>
 

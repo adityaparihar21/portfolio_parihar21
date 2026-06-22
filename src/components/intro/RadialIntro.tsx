@@ -175,25 +175,26 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     if (clothespins) tl.to(clothespins, { autoAlpha: 0, scale: 0.5, duration: 0.1 }, 0.8);
     tl.to(cardElements, { autoAlpha: 0, scale: 0.8, ease: "power2.inOut", duration: 0.1 }, 0.8);
 
-    if (heroBg) tl.to(heroBg, { autoAlpha: 1, ease: "power2.inOut", duration: 0.15 }, 0.85);
-    if (heroVideo) tl.to(heroVideo, { autoAlpha: 1, duration: 0.1, ease: "power2.inOut" }, 0.9);
+    if (heroBg) tl.to(heroBg, { autoAlpha: 1, ease: "power2.inOut", duration: 0.15 }, 0.82);
+
+    if (heroWords && heroWords.length > 0) {
+      tl.to(heroWords, { autoAlpha: 1, y: 0, ease: "power3.out", stagger: 0.05 }, 0.84);
+    }
+    
+    if (heroSubtext) tl.to(heroSubtext, { autoAlpha: 0.85, ease: "power2.out" }, 0.88);
+
+    if (heroVideo) tl.to(heroVideo, { autoAlpha: 1, duration: 0.1, ease: "power2.inOut" }, 0.92);
 
     const eyebrowWords = heroWrapperRef.current?.querySelectorAll(".creative-hero-eyebrow-word");
     if (eyebrowWords) {
       tl.fromTo(eyebrowWords, 
         { autoAlpha: 0, x: -20 },
         { autoAlpha: 1, x: 0, ease: "power3.out", stagger: 0.02 }, 
-        0.92
+        0.94
       );
     }
     
-    if (heroWords && heroWords.length > 0) {
-      tl.to(heroWords, { autoAlpha: 1, y: 0, ease: "power3.out", stagger: 0.05 }, 0.94);
-    }
-    
-    if (heroSubtext) tl.to(heroSubtext, { autoAlpha: 0.55, ease: "power2.out" }, 0.96);
-    
-    if (heroCtas && heroCtas.length > 0) tl.to(heroCtas, { autoAlpha: 1, x: 0, ease: "back.out(1.5)", stagger: 0.05 }, 0.98);
+    if (heroCtas && heroCtas.length > 0) tl.to(heroCtas, { autoAlpha: 1, x: 0, ease: "back.out(1.5)", stagger: 0.05 }, 0.96);
 
   }, { dependencies: [isReady, prefersReducedMotion, layout], scope: scopeRef });
 
