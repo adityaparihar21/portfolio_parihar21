@@ -1908,7 +1908,12 @@ function Index() {
         {themeMode === "creative" && (
           <>
             <RadialIntroSequence>
-              <CreativeHero />
+              <CreativeHero
+                data={data}
+                activeAudioId={activeAudioId}
+                setActiveAudioId={setActiveAudioId}
+                onMediaReady={() => setMediaReady(true)}
+              />
             </RadialIntroSequence>
             <CreativeWork
               data={data}

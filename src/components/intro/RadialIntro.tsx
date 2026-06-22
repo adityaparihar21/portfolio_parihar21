@@ -95,6 +95,10 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     if (heroWords) gsap.set(heroWords, { autoAlpha: 0, y: 24 });
     if (heroSubtext) gsap.set(heroSubtext, { autoAlpha: 0 });
     if (heroCtas) gsap.set(heroCtas, { autoAlpha: 0, x: -20 });
+    
+    // Select the video (if it exists)
+    const heroVideo = heroWrapperRef.current?.querySelector(".creative-hero-video");
+    if (heroVideo) gsap.set(heroVideo, { autoAlpha: 0 });
 
     // Film strip elements initialization
     gsap.set(horizonLineRef.current, { autoAlpha: 0 });
@@ -213,6 +217,11 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     
     // Horizon glow fades out
     tl.to([horizonLineRef.current, sunGlowRef.current], { autoAlpha: 0, ease: "power2.in" }, 0.9);
+
+    // 100%: Crossfade to original video background (if available)
+    if (heroVideo) {
+      tl.to(heroVideo, { autoAlpha: 1, duration: 0.1, ease: "power2.inOut" }, 1.0);
+    }
 
   }, { dependencies: [isReady, prefersReducedMotion, layout], scope: containerRef });
 

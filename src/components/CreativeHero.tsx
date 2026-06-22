@@ -1,6 +1,24 @@
 import React from "react";
+import { Volume2, VolumeX } from "lucide-react";
 
-export function CreativeHero() {
+export function CreativeHero({
+  data,
+  activeAudioId,
+  setActiveAudioId,
+  onMediaReady,
+}: {
+  data: any;
+  activeAudioId: string | null;
+  setActiveAudioId: (id: string | null) => void;
+  onMediaReady?: () => void;
+}) {
+  const isMuted = activeAudioId !== "hero";
+  const mediaUrl = data?.hero?.media;
+  const isVideo =
+    mediaUrl &&
+    (/\.(mp4|webm|ogg|mov|m4v)$/i.test(mediaUrl) ||
+      mediaUrl.includes("video") ||
+      mediaUrl.includes("mixkit"));
   return (
     <section className="relative h-screen w-full overflow-hidden bg-[#080808]">
       {/* Background Image is handled by RadialIntro.tsx which fades it in early. 
@@ -17,8 +35,22 @@ export function CreativeHero() {
         <img
           src="/intro bg.jpeg"
           alt="Cinematic background"
-          className="h-[110%] w-full object-cover object-[center_30%]"
+          className="absolute inset-0 h-[110%] w-full object-cover object-[center_30%]"
+          onLoad={onMediaReady}
         />
+        {/* The video sits on top of the image and fades in at the end of the GSAP timeline */}
+        {isVideo && (
+          <video
+            src={mediaUrl}
+            poster={mediaUrl.substring(0, mediaUrl.lastIndexOf(".")) + "_poster.jpg"}
+            autoPlay
+            loop
+            muted={isMuted}
+            playsInline
+            preload="auto"
+            className="creative-hero-video absolute inset-0 h-[110%] w-full object-cover opacity-0 transition-opacity duration-1000"
+          />
+        )}
       </div>
       
       {/* Dark tint overlay */}
@@ -51,6 +83,21 @@ export function CreativeHero() {
           </button>
         </div>
       </div>
+
+      {/* Mute/Unmute toggle button (matches original Hero) */}
+      {isVideo && (
+        <button
+          onClick={() => setActiveAudioId(isMuted ? "hero" : null)}
+          className="absolute right-6 bottom-24 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/15 text-white backdrop-blur-md transition-all hover:bg-black/30 hover:scale-105 active:scale-95 md:right-12 md:bottom-32 creative-hero-cta"
+          aria-label={isMuted ? "Unmute video" : "Mute video"}
+        >
+          {isMuted ? (
+            <VolumeX className="h-5 w-5" strokeWidth={1.5} />
+          ) : (
+            <Volume2 className="h-5 w-5" strokeWidth={1.5} />
+          )}
+        </button>
+      )}
     </section>
   );
 }
