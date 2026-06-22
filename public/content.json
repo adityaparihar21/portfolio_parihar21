@@ -69,15 +69,15 @@
         "category": "AI • Itinerary",
         "title": "Trip Co",
         "description": "An AI-powered itinerary generation app that crafts personalized travel plans based on user preferences, budget, and duration. Currently under active development.",
-        "image": "/tripco_hero_final.html",
+        "image": "/tripco.png",
         "href": "https://github.com/adityaparihar21/trip-co"
       },
       {
         "id": "weather-hut",
         "category": "React • API • UI/UX",
         "title": "WeatherHUT",
-        "description": "A dynamic weather application featuring real-time geolocation API integration, aesthetic themes, and precise weather forecasting.",
-        "image": "/sunset_bg.png",
+        "description": "A beautiful, minimalist weather application providing real-time forecasting, interactive data visualization, and dynamic background adaptations.",
+        "image": "/weather-hut.png",
         "href": "https://weatherhut-zeta.vercel.app"
       }
     ]

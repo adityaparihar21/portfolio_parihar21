@@ -83,6 +83,17 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
     return data.selectedWork.projects.map(getExtendedProject);
   }, [data]);
 
+  // Lock body scroll when a project is open
+  useEffect(() => {
+    if (selectedProject) {
+      const originalStyle = window.getComputedStyle(document.body).overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = originalStyle;
+      };
+    }
+  }, [selectedProject]);
+
   return (
     <div className="min-h-screen bg-[#070b12] text-[#a8c4e0] font-mono selection:bg-[rgba(55,138,221,0.15)] selection:text-[#b8d4f0]">
       {/* Sub-navigation Filters */}
@@ -315,17 +326,28 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
                     <span className="block mb-2 text-[#a8c4e0]">Status</span>
                     {selectedProject.status}
                   </div>
-                  {selectedProject.repo && (
-                    <div>
-                      <span className="block mb-2 text-[#a8c4e0]">Repository</span>
-                      <a
-                        href={selectedProject.repo}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-[#6a9fd8] hover:underline cursor-crosshair"
-                      >
-                        github.com/source
-                      </a>
+                  {(selectedProject.repo || selectedProject.href) && (
+                    <div className="flex flex-col gap-3 mt-4">
+                      {selectedProject.repo && (
+                        <a
+                          href={selectedProject.repo}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center gap-2 text-[#6a9fd8] hover:text-[#a8c4e0] transition-colors hover:underline cursor-crosshair"
+                        >
+                          <ArrowRight className="w-3 h-3" /> GitHub Repository
+                        </a>
+                      )}
+                      {(!selectedProject.repo || selectedProject.href !== selectedProject.repo) && selectedProject.href && (
+                        <a
+                          href={selectedProject.href}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center gap-2 text-[#6a9fd8] hover:text-[#a8c4e0] transition-colors hover:underline cursor-crosshair"
+                        >
+                          <ArrowRight className="w-3 h-3" /> Live Deployment
+                        </a>
+                      )}
                     </div>
                   )}
                 </div>
