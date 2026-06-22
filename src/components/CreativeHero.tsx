@@ -58,8 +58,8 @@ export function CreativeHero({
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent z-0" />
 
       {/* Content wrapper */}
-      <div className="relative z-10 w-full h-full flex flex-col items-start justify-end pl-4 md:pl-12 pr-6 md:pr-12 pb-24 md:pb-32">
-        <div className="creative-hero-glass-panel opacity-0 relative z-10 bg-black/30 backdrop-blur-md p-6 md:p-10 rounded-2xl border border-white/10 shadow-2xl overflow-hidden">
+      <div className="relative z-10 w-full h-full flex flex-col items-start justify-end pl-4 md:pl-8 pr-6 md:pr-12 pb-12 md:pb-16">
+        <div className="creative-hero-glass-panel opacity-0 relative z-10 bg-black/30 backdrop-blur-md p-4 md:p-6 rounded-2xl border border-white/10 shadow-2xl overflow-hidden">
           {/* Subtle noise inside the glass panel for texture */}
           <div className="absolute inset-0 opacity-[0.15] mix-blend-overlay pointer-events-none" style={{ backgroundImage: "url('https://upload.wikimedia.org/wikipedia/commons/7/76/1k_Dissolve_Noise_Texture.png')" }} />
           
