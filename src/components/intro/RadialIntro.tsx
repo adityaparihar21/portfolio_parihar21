@@ -158,15 +158,17 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     // We simulate sway by rotating the ring wrapper slightly back, and panning slightly
     tl.to(ringRef.current, { rotation: -65, x: "-2vw", ease: "sine.inOut" }, 0.5);
 
-    // --- Phase 5: Threads dissolve, world opens (0.7 - 0.9) ---
-    tl.to(threadsGroupRef.current, { autoAlpha: 0, ease: "power2.inOut" }, 0.7);
-    tl.to(clothespins, { autoAlpha: 0, ease: "power2.inOut" }, 0.75); // Fades a half-second behind threads
+    // --- Phase 5: Threads dissolve, polaroids scale up & borders dissolve (0.7 - 0.9) ---
+    tl.to(threadsGroupRef.current, { autoAlpha: 0, duration: 0.1 }, 0.7);
+    if (clothespins) tl.to(clothespins, { autoAlpha: 0, scale: 0.5, duration: 0.1 }, 0.7);
     
-    const polaroids = document.querySelectorAll(".polaroid-card");
+    tl.to(cardElements, { padding: 0, ease: "power2.inOut" }, 0.8);
+    tl.to(cardElements, { scale: (i) => (layout[i]?.scale || 1) * 1.08, ease: "power2.inOut" }, 0.8);
+
+    // Fade polaroids into the background video/image
+    tl.to(cardElements, { autoAlpha: 0, ease: "power2.inOut" }, 0.85);
     const imgWrappers = document.querySelectorAll(".polaroid-img-wrapper");
-    tl.to(polaroids, { padding: "0px", borderRadius: "0px", ease: "power2.inOut" }, 0.8);
     tl.to(imgWrappers, { borderRadius: "0px", ease: "power2.inOut" }, 0.8);
-    tl.to(cardElements, { scale: (i) => layout[i].scale * 1.08, ease: "power2.inOut" }, 0.8);
     if (heroBg) tl.to(heroBg, { autoAlpha: 1, ease: "power2.inOut" }, 0.8);
 
     // --- Phase 6: Background video crossfade (0.9 - 1.0) ---

@@ -1871,7 +1871,8 @@ function Index() {
   const coinState = isLoading || themeMode === "select" ? "preloader" : "navbar";
 
   return (
-    <div className="bg-black min-h-screen">
+    <DebugErrorBoundary>
+      <div className="bg-black min-h-screen">
       <AnimatePresence>
         {isPreloaderMounted && (
           <Preloader
@@ -1910,16 +1911,14 @@ function Index() {
         {/* CONDITIONAL RENDER: CREATIVE PATH */}
         {themeMode === "creative" && (
           <>
-            <DebugErrorBoundary>
-              <RadialIntroSequence>
-                <CreativeHero
-                  data={data}
-                  activeAudioId={activeAudioId}
-                  setActiveAudioId={setActiveAudioId}
-                  onMediaReady={() => setMediaReady(true)}
-                />
-              </RadialIntroSequence>
-            </DebugErrorBoundary>
+            <RadialIntroSequence>
+              <CreativeHero
+                data={data}
+                activeAudioId={activeAudioId}
+                setActiveAudioId={setActiveAudioId}
+                onMediaReady={() => setMediaReady(true)}
+              />
+            </RadialIntroSequence>
             <CreativeWork
               data={data}
               activeAudioId={activeAudioId}
