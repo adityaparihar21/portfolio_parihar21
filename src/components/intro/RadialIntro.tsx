@@ -170,31 +170,32 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     // Minimal sway
     tl.to(ringRef.current, { x: "-1vw", ease: "sine.inOut", duration: 0.1 }, 0.7);
 
-    // --- Phase 5: The Grand Vanish (0.8 - 1.0) ---
-    tl.to(threadsGroupRef.current, { autoAlpha: 0, duration: 0.1 }, 0.8);
-    if (clothespins) tl.to(clothespins, { autoAlpha: 0, scale: 0.5, duration: 0.1 }, 0.8);
-    tl.to(cardElements, { autoAlpha: 0, scale: 0.8, ease: "power2.inOut", duration: 0.1 }, 0.8);
+    // --- Phase 5: The Grand Vanish (0.75 - 1.0) ---
+    tl.to(threadsGroupRef.current, { autoAlpha: 0, duration: 0.1 }, 0.75);
+    if (clothespins) tl.to(clothespins, { autoAlpha: 0, scale: 0.5, duration: 0.1 }, 0.75);
+    tl.to(cardElements, { autoAlpha: 0, scale: 0.8, ease: "power2.inOut", duration: 0.1 }, 0.75);
 
-    if (heroBg) tl.to(heroBg, { autoAlpha: 1, ease: "power2.inOut", duration: 0.15 }, 0.82);
+    if (heroBg) tl.to(heroBg, { autoAlpha: 1, ease: "power2.inOut", duration: 0.15 }, 0.78);
 
     if (heroWords && heroWords.length > 0) {
-      tl.to(heroWords, { autoAlpha: 1, y: 0, ease: "power3.out", stagger: 0.05 }, 0.84);
+      tl.to(heroWords, { autoAlpha: 1, y: 0, ease: "power3.out", stagger: 0.05 }, 0.80);
     }
     
-    if (heroSubtext) tl.to(heroSubtext, { autoAlpha: 0.85, ease: "power2.out" }, 0.88);
+    if (heroSubtext) tl.to(heroSubtext, { autoAlpha: 0.85, ease: "power2.out" }, 0.83);
 
-    if (heroVideo) tl.to(heroVideo, { autoAlpha: 1, duration: 0.1, ease: "power2.inOut" }, 0.92);
+    // Video and rest fade in at the very end
+    if (heroVideo) tl.to(heroVideo, { autoAlpha: 1, duration: 0.1, ease: "power2.inOut" }, 0.95);
 
     const eyebrowWords = heroWrapperRef.current?.querySelectorAll(".creative-hero-eyebrow-word");
     if (eyebrowWords) {
       tl.fromTo(eyebrowWords, 
         { autoAlpha: 0, x: -20 },
         { autoAlpha: 1, x: 0, ease: "power3.out", stagger: 0.02 }, 
-        0.94
+        0.96
       );
     }
     
-    if (heroCtas && heroCtas.length > 0) tl.to(heroCtas, { autoAlpha: 1, x: 0, ease: "back.out(1.5)", stagger: 0.05 }, 0.96);
+    if (heroCtas && heroCtas.length > 0) tl.to(heroCtas, { autoAlpha: 1, x: 0, ease: "back.out(1.5)", stagger: 0.05 }, 0.98);
 
   }, { dependencies: [isReady, prefersReducedMotion, layout], scope: scopeRef });
 
