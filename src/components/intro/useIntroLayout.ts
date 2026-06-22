@@ -73,15 +73,6 @@ export function useIntroLayout(count: number) {
       // Determine if this is a top arc card
       const strictlyTop = Math.sin(angle) < 0.1; 
 
-      // -- Film Strip Positions (Act 2 State) --
-      const rand3 = PRNG(i * 3);
-      const rand4 = PRNG(i * 4);
-      
-      const spreadX = radialX * 1.5; 
-      const filmStripX = strictlyTop ? spreadX : radialX;
-      const filmStripY = strictlyTop ? (rand3 - 0.5) * 20 : window.innerHeight; 
-      const filmStripRot = strictlyTop ? (rand4 - 0.5) * 8 : 0; 
-
       const scale = 0.85 + PRNG(i * 5) * 0.3; // 0.85 to 1.15
       const isPortrait = PRNG(i * 6) > 0.4; // roughly 60% portrait
 
@@ -92,14 +83,38 @@ export function useIntroLayout(count: number) {
         radialX,
         radialY,
         radialRot,
-        filmStripX,
-        filmStripY,
-        filmStripRot,
+        filmStripX: 0, // Placeholder, calculated later
+        filmStripY: 0,
+        filmStripRot: 0,
         isTopArc: strictlyTop,
         scale,
         isPortrait,
       });
     }
+
+    // Now calculate perfectly aligned filmStripX for the strictlyTop cards
+    let topArcCount = 0;
+    newLayout.forEach(l => { if (l.isTopArc) topArcCount++; });
+    
+    // We want to space them out so they touch with a 4px gap. 
+    // They will be scaled down to 0.8 in GSAP, but let's base it on estCardWidth.
+    // At scale 0.8, a 130px card is ~104px. Let's use 110px gap.
+    const filmSpacing = 110; 
+    let topIndex = 0;
+    
+    // To center them, we start from -totalWidth/2
+    const startFilmX = -((topArcCount * filmSpacing) / 2);
+    
+    newLayout.forEach((l) => {
+      if (l.isTopArc) {
+        l.filmStripX = startFilmX + topIndex * filmSpacing;
+        l.filmStripY = 0; // perfectly flat
+        l.filmStripRot = 0; // perfectly straight
+        topIndex++;
+      } else {
+        l.filmStripY = window.innerHeight; // dropping
+      }
+    });
 
     layoutRef.current = newLayout;
     setIsReady(true);

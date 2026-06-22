@@ -162,7 +162,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
         }, 0.4);
       } else {
         tl.to(card, {
-          y: window.innerHeight * 0.6,
+          y: window.innerHeight * 1.2,
           rotation: 0,
           autoAlpha: 0,
           ease: "power2.inOut"
@@ -198,7 +198,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     if (heroSubtext) tl.to(heroSubtext, { autoAlpha: 0.6, ease: "power2.out" }, 0.9);
     if (heroCtas && heroCtas.length > 0) tl.to(heroCtas, { autoAlpha: 1, x: 0, ease: "power3.out", stagger: 0.05 }, 0.95);
 
-    tl.to(filmStripGroupRef.current, { y: window.innerHeight * 0.6, ease: "power2.in" }, 0.9);
+    tl.to(filmStripGroupRef.current, { y: window.innerHeight * 1.2, ease: "power2.in" }, 0.9);
     tl.to([horizonLineRef.current, sunGlowRef.current], { autoAlpha: 0, ease: "power2.in" }, 0.9);
 
     if (heroVideo) tl.to(heroVideo, { autoAlpha: 1, duration: 0.1, ease: "power2.inOut" }, 1.0);
