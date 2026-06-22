@@ -1766,14 +1766,17 @@ function Index() {
     if (typeof window !== "undefined" && window.location.hash) {
       window.history.replaceState(null, "", window.location.pathname);
     }
-    // Absolute maximum: if nothing happens in 15s, force entry with creative fallback
+  }, []);
+
+  // Absolute maximum: if nothing happens in 15s, force entry with creative fallback
+  useEffect(() => {
+    if (!isLoading) return;
+    
     const maxTimer = setTimeout(() => {
-      if (isLoading) {
-        handleChoice("creative");
-      }
+      handleChoice("creative");
     }, 15000);
     return () => clearTimeout(maxTimer);
-  }, []);
+  }, [isLoading]);
 
   useEffect(() => {
     // 2.5s: Background video awakens
@@ -1801,7 +1804,8 @@ function Index() {
 
   // 10-second countdown once enter button appears
   useEffect(() => {
-    if (!showEnter) return;
+    if (!showEnter || !isLoading) return;
+    
     setCountdown(10);
     const interval = setInterval(() => {
       setCountdown((prev) => {
@@ -1814,7 +1818,7 @@ function Index() {
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [showEnter]);
+  }, [showEnter, isLoading]);
 
   useEffect(() => {
     if (isLoading || themeMode === "select") {
