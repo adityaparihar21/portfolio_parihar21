@@ -107,7 +107,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top 1px",
-        end: "+=1200%", // Doubled scroll distance so it requires more scrolling
+        end: "+=800%", // Balanced scroll distance
         pin: true,
         scrub: 2.5, // High inertia for a very smooth, heavy feel
         invalidateOnRefresh: true,
@@ -214,8 +214,8 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div ref={scopeRef} className="relative w-full">
-      <div ref={containerRef} className="relative w-full h-screen bg-[#080808]">
+    <div ref={scopeRef} className="relative w-full overflow-hidden">
+      <div ref={containerRef} className="relative w-full h-screen overflow-hidden bg-[#080808]">
       
       {/* Film Grain Overlay */}
       <div 
