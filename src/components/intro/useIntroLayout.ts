@@ -34,8 +34,10 @@ export function useIntroLayout(count: number) {
     const isMobile = window.innerWidth < 768;
     const rng = PRNG(42);
 
-    const estCardWidth = isMobile ? Math.min(window.innerWidth * 0.14, 88) : Math.min(window.innerWidth * 0.09, 130);
-    const overlapPercent = isMobile ? 0.3 : 0.2;
+    const estCardWidth = isMobile 
+      ? Math.max(60, Math.min(window.innerWidth * 0.14, 88)) 
+      : Math.max(90, Math.min(window.innerWidth * 0.09, 130));
+    const overlapPercent = isMobile ? 0.4 : 0.2;
     const overlap = estCardWidth * overlapPercent;
     
     // Center the strip: start X so that the entire row is centered
