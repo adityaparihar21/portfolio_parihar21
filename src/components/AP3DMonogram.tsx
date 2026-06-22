@@ -132,23 +132,65 @@ function useGoldTextures() {
 }
 
 /* ── Realistic Instanced Chain Ring ── */
-const CHAIN_LINK_COUNT = 85;
+const CHAIN_LINK_COUNT = 150;
 
-function ChainRing({ radius, xRotation, yRotation, zRotation }: { radius: number, xRotation: number, yRotation: number, zRotation: number }) {
+function ChainRing({ 
+  baseRadius, 
+  xRotation, 
+  yRotation, 
+  zRotation,
+  sag = 0,
+  wobble = 0,
+  thickness = 0.045
+}: { 
+  baseRadius: number, 
+  xRotation: number, 
+  yRotation: number, 
+  zRotation: number,
+  sag?: number,
+  wobble?: number,
+  thickness?: number
+}) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);
 
   useEffect(() => {
     if (!meshRef.current) return;
+    
+    // Calculate required links to wrap around base radius + extra for sag
+    const baseLinks = (baseRadius * Math.PI * 2) / 0.16;
+    const linkCount = Math.min(CHAIN_LINK_COUNT, Math.floor(baseLinks + (sag * 20)));
+
     for (let i = 0; i < CHAIN_LINK_COUNT; i++) {
-      const theta = (i / CHAIN_LINK_COUNT) * Math.PI * 2;
-      const x = Math.cos(theta) * radius;
-      const y = Math.sin(theta) * radius;
+      if (i >= linkCount) {
+        dummy.scale.set(0, 0, 0);
+        dummy.updateMatrix();
+        meshRef.current.setMatrixAt(i, dummy.matrix);
+        continue;
+      }
+
+      const theta = (i / linkCount) * Math.PI * 2;
+      
+      const r = baseRadius + Math.sin(theta * 3) * wobble;
+      
+      let x = Math.cos(theta) * r;
+      let y = Math.sin(theta) * r;
+      
+      // Heavy gravity sag on bottom loops
+      if (y < 0) {
+        y -= Math.pow(-y, 1.4) * sag; 
+      }
       
       dummy.position.set(x, y, 0);
       
-      const tx = -Math.sin(theta);
-      const ty = Math.cos(theta);
+      const nextTheta = ((i + 1) / linkCount) * Math.PI * 2;
+      const nextR = baseRadius + Math.sin(nextTheta * 3) * wobble;
+      let nextX = Math.cos(nextTheta) * nextR;
+      let nextY = Math.sin(nextTheta) * nextR;
+      if (nextY < 0) nextY -= Math.pow(-nextY, 1.4) * sag;
+      
+      const tx = nextX - x;
+      const ty = nextY - y;
       
       // Point Z axis along tangent
       dummy.lookAt(x + tx, y + ty, 0);
@@ -157,17 +199,24 @@ function ChainRing({ radius, xRotation, yRotation, zRotation }: { radius: number
         dummy.rotateZ(Math.PI / 2);
       }
       
+      // Messy chaotic links
+      dummy.rotateX((Math.random() - 0.5) * 0.4);
+      dummy.rotateY((Math.random() - 0.5) * 0.2);
+      
+      dummy.scale.set(1, 1, 1);
+      
       dummy.updateMatrix();
       meshRef.current.setMatrixAt(i, dummy.matrix);
     }
     meshRef.current.instanceMatrix.needsUpdate = true;
-  }, [radius, dummy]);
+  }, [baseRadius, xRotation, yRotation, zRotation, sag, wobble, thickness, dummy]);
 
   return (
     <group rotation={[xRotation, yRotation, zRotation]}>
       <instancedMesh ref={meshRef} args={[undefined, undefined, CHAIN_LINK_COUNT]} castShadow receiveShadow>
-        <torusGeometry args={[0.07, 0.035, 12, 24]} />
-        <meshStandardMaterial color="#0f0f0f" roughness={0.8} metalness={0.9} />
+        {/* Slightly flattened torus to look like real heavy iron links */}
+        <torusGeometry args={[0.08, thickness, 12, 24]} />
+        <meshStandardMaterial color="#1a1c1d" roughness={0.95} metalness={0.8} />
       </instancedMesh>
     </group>
   );
@@ -180,23 +229,27 @@ function ChainCage({ visible }: { visible: boolean }) {
   useFrame((state, delta) => {
     if (!groupRef.current) return;
     
-    // Smooth scale animation (slam in, shrink out)
+    // Smooth scale animation
     const targetScale = visible ? 1 : 0.001;
     groupRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), delta * 12);
 
-    // Subtle breathing of the entire cage
+    // Subtle breathing/swinging of chains
     if (visible || groupRef.current.scale.x > 0.01) {
-      groupRef.current.rotation.z = Math.sin(state.clock.getElapsedTime() * 0.5) * 0.05;
-      groupRef.current.rotation.x = Math.sin(state.clock.getElapsedTime() * 0.3) * 0.05;
+      groupRef.current.rotation.z = Math.sin(state.clock.getElapsedTime() * 0.4) * 0.03;
+      groupRef.current.rotation.x = Math.sin(state.clock.getElapsedTime() * 0.2) * 0.02;
     }
   });
 
   return (
     <group ref={groupRef} scale={0.001}>
-      <ChainRing radius={2.05} xRotation={Math.PI / 3} yRotation={0} zRotation={Math.PI / 4} />
-      <ChainRing radius={2.06} xRotation={-Math.PI / 3} yRotation={0} zRotation={-Math.PI / 4} />
-      <ChainRing radius={2.07} xRotation={0} yRotation={Math.PI / 2.5} zRotation={Math.PI / 2} />
-      <ChainRing radius={2.04} xRotation={Math.PI / 6} yRotation={-Math.PI / 6} zRotation={0} />
+      {/* 6-8 chaotic chains wrapping the coin tightly and messily */}
+      <ChainRing baseRadius={2.02} xRotation={0.5} yRotation={0.2} zRotation={0.8} wobble={0.05} sag={0.1} thickness={0.045} />
+      <ChainRing baseRadius={2.05} xRotation={-0.6} yRotation={-0.3} zRotation={-0.7} wobble={0.1} sag={0.2} thickness={0.04} />
+      <ChainRing baseRadius={2.03} xRotation={1.2} yRotation={0.1} zRotation={1.5} wobble={0.08} sag={0.15} thickness={0.05} />
+      <ChainRing baseRadius={2.06} xRotation={0.1} yRotation={1.4} zRotation={-1.2} wobble={0.04} sag={0.3} thickness={0.045} />
+      <ChainRing baseRadius={2.08} xRotation={-1.5} yRotation={0.5} zRotation={0.3} wobble={0.12} sag={0.4} thickness={0.05} />
+      <ChainRing baseRadius={2.04} xRotation={0.8} yRotation={-1.1} zRotation={-0.4} wobble={0.15} sag={0.5} thickness={0.04} />
+      <ChainRing baseRadius={2.1} xRotation={0.3} yRotation={0.7} zRotation={0.9} wobble={0.1} sag={0.3} thickness={0.05} />
     </group>
   );
 }
@@ -267,6 +320,15 @@ function APCoin({
         const rotSpeed = hovered ? 3.2 : 0.45;
         coinRef.current.rotation.y += delta * rotSpeed;
       }
+    }
+    
+    // Tilt the coin 10 degrees dynamically when engineering is hovered
+    if (hoverMode === "engineering") {
+      coinRef.current.rotation.z = THREE.MathUtils.lerp(coinRef.current.rotation.z, -Math.PI / 18, delta * 5); // 10 degree tilt
+      coinRef.current.rotation.x = THREE.MathUtils.lerp(coinRef.current.rotation.x, -Math.PI / 24, delta * 5); // Slight low-angle pitch
+    } else {
+      coinRef.current.rotation.z = THREE.MathUtils.lerp(coinRef.current.rotation.z, 0, delta * 5);
+      coinRef.current.rotation.x = THREE.MathUtils.lerp(coinRef.current.rotation.x, 0, delta * 5);
     }
   });
 
@@ -410,31 +472,32 @@ function CinematicLights({ isMini, hoverMode = "none" }: { isMini: boolean; hove
   // Dynamic lights color and intensities based on hoverMode
   const lightColor =
     hoverMode === "engineering"
-      ? "#ffe6b3" // Warm amber cinematic light for the physical chain cage
+      ? "#ffae42" // Warm dramatic key light from upper right
       : hoverMode === "creative"
         ? "#ffbe5b"
         : "#ffdf95"; // Warm/deep gold vs default gold
 
-  const ambientIntensity = hoverMode === "engineering" ? 0.35 : isMini ? 0.28 : 0.08;
-  const keyIntensity = hoverMode === "engineering" ? 6 : isMini ? 4.5 : 3;
+  // Deep shadows for engineering, softer ambient for others
+  const ambientIntensity = hoverMode === "engineering" ? 0.08 : isMini ? 0.28 : 0.08;
+  const keyIntensity = hoverMode === "engineering" ? 8 : isMini ? 4.5 : 3;
 
   return (
     <>
       <ambientLight intensity={ambientIntensity} />
 
       {/* Sweep light for golden reflection pass */}
-      {!isMini && (
+      {!isMini && hoverMode !== "engineering" && (
         <directionalLight
           ref={sweepLightRef}
           position={[-8, 3, 4]}
-          intensity={hoverMode === "engineering" ? 10 : 8}
+          intensity={8}
           color={lightColor}
         />
       )}
 
-      {/* Key light with shadow casting */}
+      {/* Key light with shadow casting (cinematic upper right for engineering) */}
       <directionalLight
-        position={[4, 4, 3]}
+        position={hoverMode === "engineering" ? [8, 10, 5] : [4, 4, 3]}
         intensity={keyIntensity}
         color={lightColor}
         castShadow={!isMini}
@@ -449,12 +512,20 @@ function CinematicLights({ isMini, hoverMode = "none" }: { isMini: boolean; hove
         shadow-bias={-0.0001}
       />
 
-      {/* Cool fill light (shifts to deep tech blue in engineering mode) */}
-      <pointLight
-        position={[-3, 1, 3]}
-        intensity={isMini ? 12 : 8}
-        color={hoverMode === "engineering" ? "#0d47a1" : "#ffffff"}
-      />
+      {/* Weak fill light from bottom left to keep left side very dark but not pitch black in engineering mode */}
+      {hoverMode === "engineering" ? (
+        <directionalLight
+          position={[-6, -4, 2]}
+          intensity={0.5}
+          color="#3a4b66" // Cool dark blue fill to contrast the warm key
+        />
+      ) : (
+        <pointLight
+          position={[-3, 1, 3]}
+          intensity={isMini ? 12 : 8}
+          color="#ffffff"
+        />
+      )}
 
       {/* Golden rim light from below (shifts to cyan in engineering mode) */}
       <pointLight
