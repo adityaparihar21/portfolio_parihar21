@@ -49,6 +49,15 @@
     },
     "projects": [
       {
+        "id": "portfolio",
+        "category": "React • GSAP • Three.js",
+        "title": "Interactive Dual-Themed Portfolio",
+        "description": "A highly interactive, premium web experience designed and built from scratch. Features a custom 3D WebGL monogram, seamless Lenis scroll, complex GSAP cinematic animations, and dynamic split-theme routing. Completely self-designed UI/UX.",
+        "image": "/intro bg.jpeg",
+        "href": "https://portfolioparihar21.vercel.app/",
+        "repo": "https://github.com/adityaparihar21/portfolio_parihar21"
+      },
+      {
         "id": "ctj",
         "category": "React • Tailwind • Framer Motion",
         "title": "Communal Typewriter Journal",
