@@ -14,6 +14,7 @@ import { CanvasSequence } from "../components/CanvasSequence";
 // @ts-expect-error: Ignore missing types for JSX file
 import DomeGallery from "../components/DomeGallery";
 import AP3DMonogram from "../components/AP3DMonogram";
+import { CreativeHero } from "../components/CreativeHero";
 import { DevDashboardHero } from "../components/DevDashboardHero";
 import { EngineeringPortfolio } from "../components/EngineeringPortfolio";
 import { GithubSection } from "../components/GithubSection";
@@ -1907,12 +1908,7 @@ function Index() {
         {themeMode === "creative" && (
           <>
             <RadialIntroSequence>
-              <Hero
-                data={data}
-                activeAudioId={activeAudioId}
-                setActiveAudioId={setActiveAudioId}
-                onMediaReady={() => setMediaReady(true)}
-              />
+              <CreativeHero />
             </RadialIntroSequence>
             <CreativeWork
               data={data}

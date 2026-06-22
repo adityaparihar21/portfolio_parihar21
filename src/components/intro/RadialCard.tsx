@@ -17,16 +17,13 @@ export const RadialCard = React.forwardRef<HTMLDivElement, RadialCardProps>(
     return (
       <div
         ref={ref}
-        className={`absolute top-1/2 left-1/2 origin-center bg-white rounded-[2px] shadow-[0_4px_16px_rgba(0,0,0,0.35)] pointer-events-none will-change-transform ${widthClass} ${aspectRatioClass} ${className}`}
+        className={`polaroid-card absolute top-1/2 left-1/2 origin-center bg-white shadow-[0_4px_16px_rgba(0,0,0,0.35)] pointer-events-none will-change-transform ${widthClass} ${aspectRatioClass} ${className}`}
         style={{
-          // Polaroid padding: top, right, bottom, left
           padding: "6px 6px 18px 6px",
-          // The transforms will be set by GSAP timeline, but we start at 0 before GSAP kicks in.
-          // Centering is handled by translate(-50%, -50%) which we'll let GSAP manage via xPercent/yPercent 
-          // or just CSS translate. Since GSAP overwrites transform, it's safer to have xPercent/yPercent: -50 in GSAP.
+          borderRadius: "2px"
         }}
       >
-        <div className="relative w-full h-full overflow-hidden bg-[#111] rounded-[1px]">
+        <div className="polaroid-img-wrapper relative w-full h-full overflow-hidden bg-[#111] rounded-[1px]">
           <img
             src={src}
             alt=""
