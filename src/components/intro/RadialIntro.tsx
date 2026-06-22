@@ -19,7 +19,6 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
   const introRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
   const textBlockRef = useRef<HTMLDivElement>(null);
-  const scrollIndicatorRef = useRef<HTMLDivElement>(null);
   const heroWrapperRef = useRef<HTMLDivElement>(null);
   
   const thread1Ref = useRef<SVGSVGElement>(null);
@@ -57,49 +56,41 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     const cardElements = cardsRef.current.filter(Boolean);
     if (cardElements.length === 0) return;
 
-    // 1. Initial State: Radial Ring
+    // 1. Initial State: Horizontal Strip
     cardElements.forEach((card, i) => {
       const l = layout[i];
       if (!l) return;
       gsap.set(card, {
         xPercent: -50,
         yPercent: -50,
-        x: l.radialX,
-        y: l.radialY,
-        rotation: l.radialRot,
+        x: l.stripX,
+        y: l.stripY,
+        rotation: l.stripRot,
         scale: l.scale,
       });
     });
 
     // Set initial states
-    gsap.set(textBlockRef.current, { autoAlpha: 1, y: 0 }); // Tagline visible initially
-    gsap.set(scrollIndicatorRef.current, { autoAlpha: 1 });
-    
-    // The Hero Wrapper contains the background and text
+    gsap.set(textBlockRef.current, { autoAlpha: 0, y: 10 });
     gsap.set(heroWrapperRef.current, { autoAlpha: 1 });
-    
-    // Select Hero elements inside children
+    gsap.set(ringRef.current, { rotation: 0 });
+
     const heroBg = heroWrapperRef.current?.querySelector(".creative-hero-bg");
     const heroEyebrow = heroWrapperRef.current?.querySelector(".creative-hero-eyebrow");
     const heroWords = heroWrapperRef.current?.querySelectorAll(".creative-hero-word");
     const heroSubtext = heroWrapperRef.current?.querySelector(".creative-hero-subtext");
     const heroCtas = heroWrapperRef.current?.querySelectorAll(".creative-hero-cta");
+    const heroVideo = heroWrapperRef.current?.querySelector(".creative-hero-video");
 
-    // Initialize Hero text & bg as hidden
     if (heroBg) gsap.set(heroBg, { autoAlpha: 0, scale: 1.04 });
     if (heroEyebrow) gsap.set(heroEyebrow, { autoAlpha: 0, y: 8, letterSpacing: "0.05em" });
     if (heroWords) gsap.set(heroWords, { autoAlpha: 0, y: 24 });
     if (heroSubtext) gsap.set(heroSubtext, { autoAlpha: 0 });
     if (heroCtas) gsap.set(heroCtas, { autoAlpha: 0, x: -20 });
-    
-    // Select the video (if it exists)
-    const heroVideo = heroWrapperRef.current?.querySelector(".creative-hero-video");
     if (heroVideo) gsap.set(heroVideo, { autoAlpha: 0 });
 
-    // Film strip elements initialization -> Clothesline initialization
     gsap.set(threadsGroupRef.current, { autoAlpha: 0 });
     
-    // Select all clothespins
     const clothespins = introRef.current?.querySelectorAll(".polaroid-clothespin");
     if (clothespins) gsap.set(clothespins, { autoAlpha: 0, scale: 0.8 });
 
@@ -107,35 +98,45 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top",
-        end: "+=500%", // Extensively extended for 10 phases
+        end: "+=600%", // Extensively extended for mega 5-phase timeline
         pin: true,
         scrub: 1.2,
       },
     });
 
-    // --- Phase 1: Ring alive (0 - 0.15) ---
-    // Scroll indicator fades out
-    tl.to(scrollIndicatorRef.current, { autoAlpha: 0, y: 10, ease: "power2.inOut" }, 0);
-    // Ring slow rotation
-    tl.to(ringRef.current, { rotation: -60, ease: "none" }, 0);
-    // Background photo begins bleeding in
-    if (heroBg) tl.to(heroBg, { autoAlpha: 0.3, ease: "power2.inOut" }, 0.05);
+    // --- Phase 1 -> 2: Strip to Radial Ring (0 - 0.2) ---
+    tl.to(cardElements, {
+      x: (i) => layout[i].radialX,
+      y: (i) => layout[i].radialY,
+      rotation: (i) => layout[i].radialRot,
+      ease: "power2.inOut",
+      stagger: 0,
+      duration: 0.2,
+    }, 0);
 
-    // --- Phase 2: Threads appear (0.15 - 0.25) ---
-    tl.to(threadsGroupRef.current, { autoAlpha: 1, ease: "power2.out" }, 0.15);
-    if (heroBg) tl.to(heroBg, { autoAlpha: 0.8, ease: "none" }, 0.15);
-    tl.to(textBlockRef.current, { autoAlpha: 0, y: -15, ease: "none" }, 0.15);
+    // Tagline fades in as ring forms
+    tl.fromTo(textBlockRef.current,
+      { autoAlpha: 0, y: 10 },
+      { autoAlpha: 1, y: 0, ease: "none", duration: 0.1 },
+      0.1
+    );
 
-    // --- Phase 3: Polaroids migrate to threads (0.25 - 0.5) ---
-    // Counter-rotate the ring back to 0 so the cards align horizontally with the threads
-    tl.to(ringRef.current, { rotation: 0, ease: "power2.inOut", duration: 0.25 }, 0.25);
+    // --- Phase 3: Ring Rotates & Tagline Exits (0.2 - 0.4) ---
+    tl.to(ringRef.current, { rotation: -60, ease: "none", duration: 0.2 }, 0.2);
+    tl.to(textBlockRef.current, { autoAlpha: 0, y: -15, ease: "none", duration: 0.1 }, 0.3);
+
+    // --- Phase 4: Ring to Dual-Thread Clothesline (0.4 - 0.7) ---
+    // Counter-rotate the ring back to 0
+    tl.to(ringRef.current, { rotation: 0, ease: "power2.inOut", duration: 0.25 }, 0.4);
+
+    // Fade in threads
+    tl.to(threadsGroupRef.current, { autoAlpha: 1, ease: "power2.out", duration: 0.1 }, 0.4);
 
     cardElements.forEach((card, i) => {
       const l = layout[i];
       if (!l) return;
       
-      // Calculate stagger based on index for random feel
-      const startTime = 0.25 + (i % 5) * 0.03;
+      const startTime = 0.4 + (i % 5) * 0.03;
       
       tl.to(card, {
         x: l.threadX,
@@ -145,7 +146,6 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
         duration: 0.15,
       }, startTime);
 
-      // Clothespin snaps on
       if (clothespins && clothespins[i]) {
         tl.to(clothespins[i], {
           autoAlpha: 1,
@@ -157,26 +157,17 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
       }
     });
 
-    // --- Phase 4: Final settle + sway (0.5 - 0.7) ---
-    // Minimal sway since threads are horizontal
-    tl.to(ringRef.current, { x: "-1vw", ease: "sine.inOut", duration: 0.2 }, 0.5);
+    // Minimal sway
+    tl.to(ringRef.current, { x: "-1vw", ease: "sine.inOut", duration: 0.1 }, 0.7);
 
-    // --- Phase 5: Threads & Polaroids dissolve together (0.7 - 0.8) ---
-    tl.to(threadsGroupRef.current, { autoAlpha: 0, duration: 0.1 }, 0.7);
-    if (clothespins) tl.to(clothespins, { autoAlpha: 0, scale: 0.5, duration: 0.1 }, 0.7);
-    
-    // Cards vanish along with the thread per user request
-    tl.to(cardElements, { autoAlpha: 0, scale: 0.8, ease: "power2.inOut", duration: 0.1 }, 0.7);
+    // --- Phase 5: The Grand Vanish (0.8 - 1.0) ---
+    tl.to(threadsGroupRef.current, { autoAlpha: 0, duration: 0.1 }, 0.8);
+    if (clothespins) tl.to(clothespins, { autoAlpha: 0, scale: 0.5, duration: 0.1 }, 0.8);
+    tl.to(cardElements, { autoAlpha: 0, scale: 0.8, ease: "power2.inOut", duration: 0.1 }, 0.8);
 
-    // Fade in the background video/image
-    if (heroBg) tl.to(heroBg, { autoAlpha: 1, ease: "power2.inOut", duration: 0.15 }, 0.75);
-
-    // --- Phase 6: Background video crossfade (0.9 - 1.0) ---
+    if (heroBg) tl.to(heroBg, { autoAlpha: 1, ease: "power2.inOut", duration: 0.15 }, 0.85);
     if (heroVideo) tl.to(heroVideo, { autoAlpha: 1, duration: 0.1, ease: "power2.inOut" }, 0.9);
 
-    // --- Phase 7-9: Text Cascade (0.9 - 1.0) ---
-    // The logo rotation and nav bar fade in would happen globally, but we can fake it here or just handle hero content
-    // Eyebrow staggering
     const eyebrowWords = heroWrapperRef.current?.querySelectorAll(".creative-hero-eyebrow-word");
     if (eyebrowWords) {
       tl.fromTo(eyebrowWords, 
@@ -186,15 +177,12 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
       );
     }
     
-    // Headline slides up
     if (heroWords && heroWords.length > 0) {
       tl.to(heroWords, { autoAlpha: 1, y: 0, ease: "power3.out", stagger: 0.05 }, 0.94);
     }
     
-    // Subtext fades in
     if (heroSubtext) tl.to(heroSubtext, { autoAlpha: 0.55, ease: "power2.out" }, 0.96);
     
-    // CTAs bounce up
     if (heroCtas && heroCtas.length > 0) tl.to(heroCtas, { autoAlpha: 1, x: 0, ease: "back.out(1.5)", stagger: 0.05 }, 0.98);
 
   }, { dependencies: [isReady, prefersReducedMotion, layout], scope: containerRef });
@@ -333,23 +321,10 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
           <h2 className="font-serif text-[clamp(1.6rem,3.2vw,2.8rem)] text-[#F5ECD7] font-light tracking-wide text-center leading-tight">
             {PRIMARY_TAGLINE}
           </h2>
-        </div>
-
-        {/* Scroll Indicator */}
-        <div
-          ref={scrollIndicatorRef}
-          className="absolute bottom-12 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-3 text-white/50 pointer-events-none"
-        >
-          <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] font-mono">
+          <span className="text-[clamp(0.55rem,1vw,0.75rem)] tracking-[0.2em] uppercase opacity-50 mt-[12px] text-white font-mono">
             Scroll to explore
           </span>
-          <div className="animate-bounce">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m6 9 6 6 6-6" />
-            </svg>
-          </div>
         </div>
-        
       </div>
     </div>
   );
