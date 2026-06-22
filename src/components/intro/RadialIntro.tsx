@@ -61,22 +61,22 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     const cardElements = cardsRef.current.filter(Boolean);
     if (cardElements.length === 0) return;
 
-    // 1. Initial State: Horizontal Strip
+    // 1. Initial State: Radial Ring
     cardElements.forEach((card, i) => {
       const l = layout[i];
       if (!l) return;
       gsap.set(card, {
         xPercent: -50,
         yPercent: -50,
-        x: l.stripX,
-        y: l.stripY,
-        rotation: l.stripRot,
+        x: l.radialX,
+        y: l.radialY,
+        rotation: l.radialRot,
         scale: l.scale,
       });
     });
 
     // Set initial states
-    gsap.set(textBlockRef.current, { autoAlpha: 0, y: 10 }); // Tagline hidden initially
+    gsap.set(textBlockRef.current, { autoAlpha: 1, y: 0 }); // Tagline visible initially
     gsap.set(scrollIndicatorRef.current, { autoAlpha: 1 });
     
     // The Hero Wrapper contains the background and text
@@ -114,38 +114,19 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top",
-        end: "+=350%", // Extended for the full 4-act timeline
+        end: "+=250%", // Reverted to 3 acts
         pin: true,
         scrub: 1.2,
       },
     });
 
-    // --- Phase 1: Strip -> Radial Ring (0% -> 25%) ---
+    // --- Act 1: Ring Rotates & Shatters (0% -> 40%) ---
     // Scroll indicator fades out
     tl.to(scrollIndicatorRef.current, { autoAlpha: 0, y: 10, ease: "power2.inOut" }, 0);
     
-    // Cards morph to ring
-    cardElements.forEach((card, i) => {
-      const l = layout[i];
-      if (!l) return;
-      tl.to(
-        card,
-        {
-          x: l.radialX,
-          y: l.radialY,
-          rotation: l.radialRot,
-          ease: "power2.inOut",
-        },
-        0 
-      );
-    });
-
-    // Tagline fades in
-    tl.to(textBlockRef.current, { autoAlpha: 1, y: 0, ease: "none" }, 0.1);
-
-    // --- Phase 2: Ring Rotates & shatters (25% -> 40%) ---
-    tl.to(ringRef.current, { rotation: -40, ease: "none" }, 0.25);
-    tl.to(textBlockRef.current, { autoAlpha: 0, y: -15, ease: "none" }, 0.3);
+    // Ring Rotates & text drops
+    tl.to(ringRef.current, { rotation: -40, ease: "none" }, 0);
+    tl.to(textBlockRef.current, { autoAlpha: 0, y: -15, ease: "none" }, 0.1);
 
 
     // --- Phase 3: Morph to Film Strip (40% -> 60%) ---
