@@ -3,25 +3,26 @@
 import React, { useRef, useState, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 import { domeGalleryImages } from "@/lib/domeGalleryImages";
-import { useRadialLayout } from "./useRadialLayout";
+import { useIntroLayout } from "./useIntroLayout";
 import { RadialCard } from "./RadialCard";
 
 if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
+  gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
 
-// "Built on [craft / code / curiosity]" - but we'll use words that fit the cinematic theme
 const PRIMARY_TAGLINE = "Built on craft & curiosity";
-const SECONDARY_TAGLINE = "A visual exploration";
 
 export function RadialIntroSequence({ children }: { children: React.ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const introRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
-  const taglineRef = useRef<HTMLDivElement>(null);
-  const subTaglineRef = useRef<HTMLDivElement>(null);
+  const textBlockRef = useRef<HTMLDivElement>(null);
   const heroWrapperRef = useRef<HTMLDivElement>(null);
+  
+  // We need to store card refs so we can animate them individually
+  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   const [isMobile, setIsMobile] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
@@ -33,8 +34,8 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     }
   }, []);
 
-  const cardCount = isMobile ? 14 : 26;
-  const layout = useRadialLayout(cardCount);
+  const cardCount = isMobile ? 16 : 24;
+  const { layout, isReady } = useIntroLayout(cardCount);
 
   // We sample evenly from the dome gallery array so we get a good mix
   const selectedImages = React.useMemo(() => {
@@ -47,102 +48,93 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     return imgs;
   }, [cardCount]);
 
-  useEffect(() => {
-    if (prefersReducedMotion || layout.length === 0 || !containerRef.current) return;
+  useGSAP(() => {
+    if (prefersReducedMotion || !isReady || !containerRef.current) return;
 
-    const ctx = gsap.context(() => {
-      // Setup initial states
-      gsap.set(subTaglineRef.current, { opacity: 0, y: 20 });
-      gsap.set(heroWrapperRef.current, { autoAlpha: 0, y: 30 });
+    // Filter out any null refs
+    const cardElements = cardsRef.current.filter(Boolean);
+    if (cardElements.length === 0) return;
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top top",
-          end: "+=150%",
-          pin: true,
-          scrub: 1, // Smooth dampening
-        },
+    // 1. Set initial Phase 1 (Strip) positions for all cards
+    cardElements.forEach((card, i) => {
+      const l = layout[i];
+      if (!l) return;
+      gsap.set(card, {
+        xPercent: -50,
+        yPercent: -50,
+        x: l.stripX,
+        y: l.stripY,
+        rotation: l.stripRot,
+        scale: l.scale,
       });
+    });
 
-      // 1. Rotate the ring continuously through the timeline
+    // Hide text and hero initially
+    gsap.set(textBlockRef.current, { autoAlpha: 0, y: 10 });
+    gsap.set(heroWrapperRef.current, { autoAlpha: 0, y: 24 });
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: "top top",
+        end: "+=250%", // Tweak for scroll duration length
+        pin: true,
+        scrub: 1.2,
+      },
+    });
+
+    // --- Phase 1 -> 2: Morph strip to radial (0 -> 0.55) ---
+    // All cards move simultaneously to their ring positions
+    cardElements.forEach((card, i) => {
+      const l = layout[i];
+      if (!l) return;
       tl.to(
-        ringRef.current,
+        card,
         {
-          rotation: -90,
-          ease: "none",
+          x: l.radialX,
+          y: l.radialY,
+          rotation: l.radialRot,
+          ease: "power2.inOut",
         },
-        0,
+        0 // start exactly at 0
       );
+    });
 
-      // 2. Fade out primary tagline and scroll indicator
-      tl.to(
-        taglineRef.current,
-        {
-          opacity: 0,
-          y: -20,
-          ease: "power1.inOut",
-        },
-        0.15,
-      );
+    // Tagline fades in as the ring forms (0.25 -> 0.55)
+    tl.to(
+      textBlockRef.current,
+      { autoAlpha: 1, y: 0, ease: "none" },
+      0.25
+    );
 
-      // 3. Fade in secondary tagline
-      tl.to(
-        subTaglineRef.current,
-        {
-          opacity: 1,
-          y: 0,
-          ease: "power1.inOut",
-        },
-        0.2,
-      );
+    // --- Phase 2 -> 3: Ring rotates (0.55 -> 0.8) ---
+    tl.to(
+      ringRef.current,
+      { rotation: -70, ease: "none" },
+      0.55
+    );
 
-      // 4. Zoom in to the ring and fade it out
-      tl.to(
-        ringRef.current,
-        {
-          scale: 1.5,
-          opacity: 0,
-          ease: "power2.in",
-        },
-        0.6,
-      );
+    // Tagline shrinks/fades (0.72 -> 0.85)
+    tl.to(
+      textBlockRef.current,
+      { autoAlpha: 0, y: -15, ease: "none" },
+      0.72
+    );
 
-      // 5. Fade out secondary tagline
-      tl.to(
-        subTaglineRef.current,
-        {
-          opacity: 0,
-          scale: 1.1,
-          ease: "power1.inOut",
-        },
-        0.7,
-      );
+    // --- Intro dissolves and Hero crossfades in (0.82 -> 0.95) ---
+    tl.to(
+      introRef.current,
+      { autoAlpha: 0, ease: "none" },
+      0.82
+    );
 
-      // 6. Crossfade the intro container and Hero container
-      // The overlap here creates the dissolve handoff
-      tl.to(
-        introRef.current,
-        {
-          autoAlpha: 0,
-          ease: "none",
-        },
-        0.85,
-      );
+    tl.to(
+      heroWrapperRef.current,
+      { autoAlpha: 1, y: 0, ease: "none" },
+      0.82
+    );
 
-      tl.to(
-        heroWrapperRef.current,
-        {
-          autoAlpha: 1,
-          y: 0,
-          ease: "power2.out",
-        },
-        0.85,
-      );
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, [prefersReducedMotion, layout.length]);
+  }, { dependencies: [isReady, prefersReducedMotion, layout], scope: containerRef });
 
   if (prefersReducedMotion) {
     return (
@@ -150,7 +142,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
         {/* Simple static fallback for reduced motion */}
         <div className="w-full bg-black py-32 flex flex-col items-center justify-center text-center">
           <h1 className="font-serif text-3xl md:text-5xl text-white/90 mb-4">{PRIMARY_TAGLINE}</h1>
-          <p className="font-serif text-lg md:text-xl text-white/50">{SECONDARY_TAGLINE}</p>
+          <p className="font-serif text-lg md:text-xl text-white/50">A visual exploration</p>
         </div>
         {children}
       </div>
@@ -164,28 +156,33 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
         ref={introRef}
         className="absolute inset-0 z-10 w-full h-full overflow-hidden flex flex-col items-center justify-center bg-black"
       >
-        {/* Rotating Image Ring */}
+        {/* Animated Wrapper for overall Ring Rotation */}
         <div ref={ringRef} className="absolute inset-0 origin-center will-change-transform">
-          {layout.length > 0 &&
-            selectedImages.map((src, i) => <RadialCard key={i} src={src} layout={layout[i]} />)}
+          {isReady &&
+            selectedImages.map((src, i) => (
+              <RadialCard
+                key={i}
+                ref={(el) => {
+                  cardsRef.current[i] = el;
+                }}
+                src={src}
+                layout={layout[i]}
+                priority={i < 6}
+              />
+            ))}
         </div>
 
-        {/* Center Text Block */}
-        <div className="relative z-20 flex flex-col items-center justify-center pointer-events-none drop-shadow-[0_4px_24px_rgba(0,0,0,0.8)]">
-          <div ref={taglineRef} className="flex flex-col items-center">
-            <h2 className="font-serif text-4xl md:text-6xl text-white font-light tracking-wide text-center px-4 max-w-3xl leading-tight">
-              {PRIMARY_TAGLINE}
-            </h2>
-            <span className="mt-8 text-[10px] uppercase tracking-[0.3em] font-mono text-white/50">
-              Scroll to explore
-            </span>
-          </div>
-
-          <div ref={subTaglineRef} className="absolute inset-0 flex items-center justify-center">
-            <h2 className="font-serif text-3xl md:text-5xl text-[#e8d4a0] font-light tracking-wide text-center italic">
-              {SECONDARY_TAGLINE}
-            </h2>
-          </div>
+        {/* Center Text Block (Typography size strictly constrained per prompt to avoid overlap) */}
+        <div 
+          ref={textBlockRef} 
+          className="relative z-20 flex flex-col items-center justify-center pointer-events-none drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)] max-w-[80vw]"
+        >
+          <h2 className="font-serif text-[clamp(1.6rem,3.2vw,2.8rem)] text-white font-light tracking-wide text-center leading-tight">
+            {PRIMARY_TAGLINE}
+          </h2>
+          <span className="mt-[12px] text-[clamp(0.55rem,1vw,0.75rem)] uppercase tracking-[0.2em] font-mono text-white/50">
+            Scroll to explore
+          </span>
         </div>
 
         {/* Outer Vignette to soften edges of the ring */}

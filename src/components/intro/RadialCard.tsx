@@ -1,39 +1,43 @@
 import React from "react";
-import type { RadialLayoutItem } from "./useRadialLayout";
+import type { LayoutItem } from "./useIntroLayout";
 
 interface RadialCardProps {
   src: string;
-  layout: RadialLayoutItem;
+  layout: LayoutItem;
   className?: string;
+  priority?: boolean;
 }
 
-export function RadialCard({ src, layout, className = "" }: RadialCardProps) {
-  // width based on portrait vs landscape.
-  // We'll use viewport relative units so they scale slightly with screen size
-  const widthClass = layout.isPortrait ? "w-[14vw] md:w-[9vw]" : "w-[18vw] md:w-[12vw]";
-  const aspectRatioClass = layout.isPortrait ? "aspect-[3/4]" : "aspect-[4/3]";
+export const RadialCard = React.forwardRef<HTMLDivElement, RadialCardProps>(
+  ({ src, layout, className = "", priority = false }, ref) => {
+    // Width and aspect ratio per prompt constraints
+    const widthClass = "w-[clamp(60px,14vw,88px)] md:w-[clamp(90px,9vw,130px)]";
+    const aspectRatioClass = layout.isPortrait ? "aspect-[3/4]" : "aspect-[4/3]";
 
-  return (
-    <div
-      className={`absolute top-1/2 left-1/2 origin-center shadow-[0_8px_24px_rgba(0,0,0,0.6)] ${widthClass} ${aspectRatioClass} bg-white p-[3px] md:p-[6px] rounded-[2px] pointer-events-none will-change-transform ${className}`}
-      style={{
-        // We use translate(-50%, -50%) to center it on the origin, then apply the layout offsets and rotation.
-        // GSAP will animate the parent container, so these local transforms stay static.
-        transform: `translate(-50%, -50%) translate(${layout.x}px, ${layout.y}px) rotate(${layout.rotation}deg) scale(${layout.scale})`,
-      }}
-    >
-      <div className="relative w-full h-full overflow-hidden bg-[#111]">
-        {/* The user requested a cinematic look. We can optionally dim the image to help center text pop, 
-            or keep it full brightness. We'll use a slight dim overlay. */}
-        <img
-          src={src}
-          alt=""
-          loading="lazy"
-          className="w-full h-full object-cover"
-          sizes="(max-width: 768px) 20vw, 15vw"
-        />
-        <div className="absolute inset-0 bg-black/10 mix-blend-multiply" />
+    return (
+      <div
+        ref={ref}
+        className={`absolute top-1/2 left-1/2 origin-center bg-white rounded-[2px] shadow-[0_4px_16px_rgba(0,0,0,0.35)] pointer-events-none will-change-transform ${widthClass} ${aspectRatioClass} ${className}`}
+        style={{
+          // Polaroid padding: top, right, bottom, left
+          padding: "6px 6px 18px 6px",
+          // The transforms will be set by GSAP timeline, but we start at 0 before GSAP kicks in.
+          // Centering is handled by translate(-50%, -50%) which we'll let GSAP manage via xPercent/yPercent 
+          // or just CSS translate. Since GSAP overwrites transform, it's safer to have xPercent/yPercent: -50 in GSAP.
+        }}
+      >
+        <div className="relative w-full h-full overflow-hidden bg-[#111] rounded-[1px]">
+          <img
+            src={src}
+            alt=""
+            loading={priority ? "eager" : "lazy"}
+            className="w-full h-full object-cover"
+            sizes="(max-width: 768px) 14vw, 9vw"
+          />
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
+);
+
+RadialCard.displayName = "RadialCard";
