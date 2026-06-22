@@ -131,6 +131,63 @@ function useGoldTextures() {
   }, []);
 }
 
+/* ── Hybrid Cyber-Lock Effect ── */
+function CyberLock({ visible }: { visible: boolean }) {
+  const groupRef = useRef<THREE.Group>(null);
+  
+  useFrame((state, delta) => {
+    if (!groupRef.current) return;
+    
+    // Smooth scale animation (slam in, shrink out)
+    const targetScale = visible ? 1 : 0.001;
+    groupRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), delta * 10);
+
+    // Rotate chains
+    if (visible || groupRef.current.scale.x > 0.01) {
+      groupRef.current.children[1].rotation.x += delta * 1.5;
+      groupRef.current.children[2].rotation.y -= delta * 1.2;
+      groupRef.current.children[3].rotation.z += delta * 0.8;
+    }
+  });
+
+  return (
+    <group ref={groupRef} scale={0.001}>
+      {/* Iced/Glass Hexagonal Shield */}
+      <mesh rotation={[Math.PI / 2, 0, Math.PI / 6]}>
+        <cylinderGeometry args={[2.25, 2.25, 0.7, 6]} />
+        <meshPhysicalMaterial 
+          transmission={1} 
+          ior={1.45} 
+          thickness={0.8} 
+          roughness={0.25} 
+          clearcoat={1} 
+          color="#a0eaff" 
+          transparent
+          opacity={0.85}
+        />
+      </mesh>
+
+      {/* Cyber Chain 1 */}
+      <mesh rotation={[Math.PI / 4, 0, 0]}>
+        <torusGeometry args={[2.35, 0.05, 16, 64]} />
+        <meshBasicMaterial color="#00e5ff" />
+      </mesh>
+
+      {/* Cyber Chain 2 */}
+      <mesh rotation={[0, Math.PI / 3, 0]}>
+        <torusGeometry args={[2.4, 0.03, 16, 64]} />
+        <meshBasicMaterial color="#00bfff" wireframe />
+      </mesh>
+
+      {/* Cyber Chain 3 (Knot) */}
+      <mesh>
+        <torusKnotGeometry args={[2.3, 0.03, 128, 16, 2, 5]} />
+        <meshBasicMaterial color="#00e5ff" wireframe transparent opacity={0.4} />
+      </mesh>
+    </group>
+  );
+}
+
 /* ── Antique Gold "AP" Minted Coin with PBR Textures ── */
 function APCoin({
   isMini,
@@ -319,12 +376,7 @@ function APCoin({
         </group>
       </group>
       {/* Cybernetic Dev Mode Wireframe Overlay */}
-      {hoverMode === "engineering" && (
-        <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[2.02, 2.02, 0.36, 64, 4]} />
-          <meshBasicMaterial color="#00e5ff" wireframe transparent opacity={0.35} />
-        </mesh>
-      )}
+      <CyberLock visible={hoverMode === "engineering"} />
     </group>
   );
 }

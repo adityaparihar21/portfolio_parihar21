@@ -710,7 +710,7 @@ function ProjectMedia({
 
   useEffect(() => {
     if (!isVideo) return;
-    
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         const isIntersecting = entry.isIntersecting;
@@ -730,7 +730,7 @@ function ProjectMedia({
 
   useEffect(() => {
     if (!isVideo) return;
-    
+
     const video = videoRef.current;
     if (!video) return;
 
@@ -756,7 +756,6 @@ function ProjectMedia({
   }
 
   if (isVideo) {
-
     const poster = src.substring(0, src.lastIndexOf(".")) + "_poster.jpg";
 
     return (
@@ -1411,7 +1410,8 @@ function CallToAction({
   data: ReturnType<typeof useContent>;
   isEngineering?: boolean;
 }) {
-  const { eyebrow, title, description, email, socials } = isEngineering ? data.devCta : data.cta;
+  const ctaData = (isEngineering ? data.devCta : data.cta) || data.cta || {};
+  const { eyebrow = "", title = "", description = "", email = "", socials = [] } = ctaData;
   const iconFor = (label: string) =>
     label === "Instagram"
       ? Instagram

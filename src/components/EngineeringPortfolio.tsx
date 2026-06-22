@@ -25,7 +25,7 @@ const getExtendedProject = (
     status: isWip ? "In progress" : "Live",
     year: "2024",
     role: "Lead Engineer",
-    repo: p.href.includes("github.com") ? p.href : undefined,
+    repo: p.href?.includes("github.com") ? p.href : undefined,
     writeup: `Architectural Overview:\n\nThe primary engineering challenge for ${p.title} involved structuring a robust, highly-concurrent foundation capable of handling complex state mutations without degrading the interactive frame rate. \n\nApproach:\nWe decoupled the rendering pipeline from the core business logic, utilizing a functional reactive model. By isolating side-effects, we achieved a deterministic state machine that scaled effortlessly across client sessions.\n\nOutcome:\nThe resulting architecture maintained a strict 60fps budget, achieving sub-40ms latency across the P95 percentile, validating the strict separation of concerns.`,
     codeSnippet: `// Core logic handler\nfunction processState(currentState, action) {\n  if (action.type === 'MUTATE') {\n    return computeDiff(currentState, action.payload);\n  }\n  return currentState;\n}`,
     metrics: [
@@ -184,7 +184,7 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
                   {p.title}
                 </h3>
                 <div className="flex flex-wrap gap-2 mt-3">
-                  {p.category.split("•").map((tag, tIdx) => (
+                  {p.category?.split("•").map((tag, tIdx) => (
                     <span
                       key={tIdx}
                       className="px-2 py-1 bg-[rgba(55,138,221,0.1)] border border-[rgba(55,138,221,0.2)] rounded-full text-[9px] tracking-[0.12em] text-[rgba(106,159,216,0.8)]"
@@ -194,8 +194,8 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
                   ))}
                 </div>
                 <p className="mt-4 text-[12px] font-light leading-relaxed text-[rgba(120,160,200,0.45)] max-w-[90%]">
-                  {p.description.substring(0, 100)}
-                  {p.description.length > 100 ? "..." : ""}
+                  {p.description?.substring(0, 100)}
+                  {(p.description?.length || 0) > 100 ? "..." : ""}
                 </p>
               </div>
 
@@ -301,7 +301,7 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
                 <div className="flex flex-col gap-8 text-[9px] uppercase tracking-[0.2em] text-[rgba(120,160,200,0.45)]">
                   <div>
                     <span className="block mb-2 text-[#a8c4e0]">Stack</span>
-                    {selectedProject.category.replace(/•/g, ", ")}
+                    {selectedProject.category?.replace(/•/g, ", ")}
                   </div>
                   <div>
                     <span className="block mb-2 text-[#a8c4e0]">Role</span>
@@ -351,7 +351,7 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
             <div className="w-full border-t border-[rgba(100,150,210,0.15)] mt-24 py-32 px-6 md:px-12 flex items-center justify-center cursor-crosshair hover:bg-[rgba(55,100,180,0.02)] transition-colors">
               <div className="text-[32px] font-light text-[#a8c4e0]">
                 <span className="text-[rgba(120,160,200,0.3)] text-xl">next_</span>
-                {projects[(projects.indexOf(selectedProject) + 1) % projects.length].title}
+                {projects.length > 0 && projects[(projects.indexOf(selectedProject) + 1) % projects.length]?.title}
               </div>
             </div>
           </motion.div>
