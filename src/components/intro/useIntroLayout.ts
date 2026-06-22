@@ -115,33 +115,9 @@ export function useIntroLayout(count: number) {
       });
     }
 
-    // Now calculate perfectly aligned filmStripX for the strictlyTop cards
-    let topArcCount = 0;
-    newLayout.forEach(l => { if (l.isTopArc) topArcCount++; });
-    
-    // We want to space them out so they touch with a 4px gap. 
-    // They will be scaled down to 0.8 in GSAP, but let's base it on estCardWidth.
-    // At scale 0.8, a 130px card is ~104px. Let's use 110px gap.
-    const filmSpacing = 110; 
-    let topIndex = 0;
-    
-    // To center them, we start from -totalWidth/2
-    const startFilmX = -((topArcCount * filmSpacing) / 2);
-    
-    newLayout.forEach((l) => {
-      if (l.isTopArc) {
-        l.filmStripX = startFilmX + topIndex * filmSpacing;
-        l.filmStripY = 0; // perfectly flat
-        l.filmStripRot = 0; // perfectly straight
-        topIndex++;
-      } else {
-        l.filmStripY = window.innerHeight; // dropping
-      }
-    });
-
-    layoutRef.current = newLayout;
+    setLayout(newLayout);
     setIsReady(true);
   }, [count]);
 
-  return { layout: layoutRef.current, isReady };
+  return { layout, isReady };
 }
