@@ -16,9 +16,12 @@ import DomeGallery from "../components/DomeGallery";
 import AP3DMonogram from "../components/AP3DMonogram";
 import { CreativeHero } from "../components/CreativeHero";
 import { DevDashboardHero } from "../components/DevDashboardHero";
+import { CreativeWork } from "../components/CreativeWork";
+import { UPESWork } from "../components/UPESWork";
 import { EngineeringPortfolio } from "../components/EngineeringPortfolio";
 import { GithubSection } from "../components/GithubSection";
 import { RadialIntroSequence } from "../components/intro/RadialIntro";
+import { DebugErrorBoundary } from "../components/DebugErrorBoundary";
 import {
   ChevronDown,
   Instagram,
@@ -1907,14 +1910,16 @@ function Index() {
         {/* CONDITIONAL RENDER: CREATIVE PATH */}
         {themeMode === "creative" && (
           <>
-            <RadialIntroSequence>
-              <CreativeHero
-                data={data}
-                activeAudioId={activeAudioId}
-                setActiveAudioId={setActiveAudioId}
-                onMediaReady={() => setMediaReady(true)}
-              />
-            </RadialIntroSequence>
+            <DebugErrorBoundary>
+              <RadialIntroSequence>
+                <CreativeHero
+                  data={data}
+                  activeAudioId={activeAudioId}
+                  setActiveAudioId={setActiveAudioId}
+                  onMediaReady={() => setMediaReady(true)}
+                />
+              </RadialIntroSequence>
+            </DebugErrorBoundary>
             <CreativeWork
               data={data}
               activeAudioId={activeAudioId}
