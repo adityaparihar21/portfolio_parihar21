@@ -175,7 +175,10 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     if (clothespins) tl.to(clothespins, { autoAlpha: 0, scale: 0.5, duration: 0.1 }, 0.75);
     tl.to(cardElements, { autoAlpha: 0, scale: 0.8, ease: "power2.inOut", duration: 0.1 }, 0.75);
 
+    const glassPanel = heroWrapperRef.current?.querySelector(".creative-hero-glass-panel");
+
     if (heroBg) tl.to(heroBg, { autoAlpha: 1, ease: "power2.inOut", duration: 0.15 }, 0.78);
+    if (glassPanel) tl.to(glassPanel, { autoAlpha: 1, ease: "power2.inOut", duration: 0.15 }, 0.78);
 
     if (heroWords && heroWords.length > 0) {
       tl.to(heroWords, { autoAlpha: 1, y: 0, ease: "power3.out", stagger: 0.05 }, 0.80);
