@@ -16,7 +16,7 @@ export interface LayoutItem {
   isPortrait: boolean;
 }
 
-function PRNG(seed: number) {
+export function PRNG(seed: number) {
   let s = seed % 2147483647;
   if (s <= 0) s += 2147483646;
   return () => {

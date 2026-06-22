@@ -5,7 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { domeGalleryImages } from "@/lib/domeGalleryImages";
-import { useIntroLayout } from "./useIntroLayout";
+import { useIntroLayout, PRNG } from "./useIntroLayout";
 import { RadialCard } from "./RadialCard";
 
 if (typeof window !== "undefined") {
@@ -37,7 +37,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     }
   }, []);
 
-  const cardCount = isMobile ? 8 : 12;
+  const cardCount = isMobile ? 16 : 24;
   const { layout, isReady } = useIntroLayout(cardCount);
 
   const selectedImages = React.useMemo(() => {
@@ -47,7 +47,15 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     for (let i = 0; i < cardCount; i++) {
       imgs.push(domeGalleryImages[(i * step) % domeGalleryImages.length]);
     }
-    return imgs;
+    // Shuffle the images deterministically
+    let m = imgs.length, t, j;
+    const rng = PRNG(42);
+    while (m) {
+      j = Math.floor(rng() * m--);
+      t = imgs[m];
+      imgs[m] = imgs[j];
+      imgs[j] = t;
+    }    return imgs;
   }, [cardCount]);
 
   useGSAP(() => {
@@ -222,7 +230,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
         className="absolute inset-0 z-10 w-full h-full overflow-hidden flex flex-col items-center justify-center pointer-events-none"
       >
         {/* Jute Threads Background Elements */}
-        <div ref={threadsGroupRef} className="absolute inset-0 z-2 origin-center pointer-events-none">
+        <div ref={threadsGroupRef} className="absolute inset-0 z-2 origin-center pointer-events-none opacity-0">
           
           {/* Thread 1 (38%) */}
           <svg 
@@ -316,7 +324,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
         {/* Center Text Block */}
         <div 
           ref={textBlockRef} 
-          className="relative z-20 flex flex-col items-center justify-center pointer-events-none drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)] max-w-[80vw]"
+          className="relative z-20 flex flex-col items-center justify-center pointer-events-none drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)] max-w-[80vw] opacity-0"
         >
           <h2 className="font-serif text-[clamp(1.6rem,3.2vw,2.8rem)] text-[#F5ECD7] font-light tracking-wide text-center leading-tight">
             {PRIMARY_TAGLINE}
