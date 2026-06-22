@@ -105,10 +105,11 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: "top top",
+        start: "top 1px",
         end: "+=600%", // Extensively extended for mega 5-phase timeline
         pin: true,
         scrub: 1.2,
+        invalidateOnRefresh: true,
       },
     });
 
