@@ -338,14 +338,12 @@ function CinematicLights({ isMini, hoverMode = "none" }: { isMini: boolean; hove
 
   // Dynamic lights color and intensities based on hoverMode
   const lightColor =
-    hoverMode === "engineering"
-      ? "#6496d2" // Cool steel blue / cyan
-      : hoverMode === "creative"
-        ? "#ffbe5b"
-        : "#ffdf95"; // Warm/deep gold vs default gold
+    hoverMode === "engineering" || hoverMode === "creative"
+      ? "#ffbe5b"
+      : "#ffdf95"; // Warm/deep gold vs default gold
 
-  const ambientIntensity = hoverMode === "engineering" ? 0.35 : isMini ? 0.28 : 0.08;
-  const keyIntensity = hoverMode === "engineering" ? 6 : isMini ? 4.5 : 3;
+  const ambientIntensity = isMini ? 0.28 : 0.08;
+  const keyIntensity = isMini ? 4.5 : 3;
 
   return (
     <>
@@ -356,7 +354,7 @@ function CinematicLights({ isMini, hoverMode = "none" }: { isMini: boolean; hove
         <directionalLight
           ref={sweepLightRef}
           position={[-8, 3, 4]}
-          intensity={hoverMode === "engineering" ? 10 : 8}
+          intensity={8}
           color={lightColor}
         />
       )}
@@ -378,11 +376,11 @@ function CinematicLights({ isMini, hoverMode = "none" }: { isMini: boolean; hove
         shadow-bias={-0.0001}
       />
 
-      {/* Cool fill light (shifts to deep tech blue in engineering mode) */}
+      {/* Cool fill light */}
       <pointLight
         position={[-3, 1, 3]}
         intensity={isMini ? 12 : 8}
-        color={hoverMode === "engineering" ? "#0d47a1" : "#ffffff"}
+        color="#ffffff"
       />
 
       {/* Golden rim light from below */}
@@ -396,7 +394,7 @@ function CinematicLights({ isMini, hoverMode = "none" }: { isMini: boolean; hove
       <pointLight
         position={[0, 4, 0]}
         intensity={isMini ? 6 : 4}
-        color={hoverMode === "engineering" ? "#80deea" : "#ffeebb"}
+        color="#ffeebb"
       />
     </>
   );
