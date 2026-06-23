@@ -110,7 +110,6 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
         end: "+=800%", // Balanced scroll distance
         pin: true,
         scrub: 2.5, // High inertia for a very smooth, heavy feel
-        invalidateOnRefresh: true,
       },
     });
 
@@ -337,9 +336,6 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
           <h2 className="font-serif text-[clamp(1.6rem,3.2vw,2.8rem)] text-[#F5ECD7] font-light tracking-wide text-center leading-tight">
             {PRIMARY_TAGLINE}
           </h2>
-          <span className="text-[clamp(0.55rem,1vw,0.75rem)] tracking-[0.2em] uppercase opacity-50 mt-[12px] text-white font-mono">
-            Scroll to explore
-          </span>
         </div>
       </div>
     </div>
