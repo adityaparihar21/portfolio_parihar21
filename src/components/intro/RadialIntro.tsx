@@ -122,10 +122,9 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
         end: isMobile ? "+=150%" : "+=300%",
         pin: true,
         scrub: isMobile ? 1 : 2.5,
-        onUpdate: (self) => {
-          if (self.progress === 1 && !introCompleteRef.current) {
+        onLeave: (self) => {
+          if (!introCompleteRef.current) {
             introCompleteRef.current = true;
-            // Remove the scroll trigger without resetting the timeline
             self.kill(false); 
             requestAnimationFrame(() => {
               setIntroComplete(true);
