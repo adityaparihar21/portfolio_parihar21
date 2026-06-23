@@ -1968,11 +1968,6 @@ function Index() {
         {/* CONDITIONAL RENDER: CREATIVE PATH */}
         {themeMode === "creative" && (
           <>
-            <div className="w-full h-[100svh] bg-black flex items-center justify-center relative z-20">
-              <span className="text-white/40 font-serif text-[14px] md:text-[16px] tracking-wide lowercase">
-                scroll to explore
-              </span>
-            </div>
             <RadialIntroSequence>
               <CreativeHero
                 data={data}
