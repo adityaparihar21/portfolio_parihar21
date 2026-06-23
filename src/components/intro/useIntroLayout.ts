@@ -89,7 +89,7 @@ export function useIntroLayout(count: number) {
       const baseRotation = (angle * 180) / Math.PI + 90;
       const radialRot = baseRotation + (rand2 - 0.5) * 16; // ±8deg
       
-      const scale = isMobile ? 0.7 + rand3 * 0.3 : 0.85 + rand3 * 0.25;
+      const scale = isMobile ? 0.45 + rand3 * 0.2 : 0.85 + rand3 * 0.25;
 
       // -- Thread Positions (Final Phase) --
       // Randomly assign to thread 1 or 2, balancing the count

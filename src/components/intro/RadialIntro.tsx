@@ -38,7 +38,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     }
   }, []);
 
-  const cardCount = isMobile ? 16 : 24;
+  const cardCount = isMobile ? 8 : 24;
   const { layout, isReady } = useIntroLayout(cardCount);
 
   const selectedImages = React.useMemo(() => {
@@ -62,7 +62,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
   useGSAP(() => {
     if (prefersReducedMotion || !isReady || !containerRef.current) return;
 
-    const cardElements = cardsRef.current.filter(Boolean);
+    const cardElements = cardsRef.current.filter(Boolean).slice(0, layout.length);
     if (cardElements.length === 0) return;
 
     // 1. Initial State: Horizontal Strip
@@ -107,9 +107,9 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top 1px",
-        end: "+=300%", // Reduced scroll distance as requested
+        end: isMobile ? "+=150%" : "+=300%",
         pin: true,
-        scrub: 2.5, // High inertia for a very smooth, heavy feel
+        scrub: isMobile ? 1 : 2.5,
       },
     });
 
