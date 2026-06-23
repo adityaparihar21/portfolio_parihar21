@@ -152,10 +152,10 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
             overwrite: "auto"
           });
           
-          // Animate the progress bar fill
+          // Animate the progress bar dot
           if (progressFillRef.current) {
             gsap.to(progressFillRef.current, {
-              scaleY: maxProgress,
+              top: `${maxProgress * 100}%`,
               duration: isMobile ? 1.5 : 3,
               ease: "power2.out",
               overwrite: "auto"
@@ -302,13 +302,16 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
       {/* Scroll Progress Indicator */}
       <div 
         ref={progressBarContainerRef} 
-        className="absolute right-4 md:right-8 top-[25%] bottom-[25%] w-[1px] bg-white/15 z-[100] flex flex-col items-center justify-start pointer-events-none"
+        className="absolute right-4 md:right-8 top-[25%] bottom-[25%] flex justify-end pointer-events-none z-[100]"
       >
+        {/* The moving dot (outside the bar) */}
         <div 
           ref={progressFillRef} 
-          className="w-[2px] md:w-[3px] h-full bg-[#C8A951] origin-top scale-y-0 rounded-full"
-          style={{ boxShadow: "0 0 12px rgba(200,169,81,0.4)" }}
+          className="absolute top-0 right-[8px] md:right-[12px] w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-[#C8A951] -mt-[3px] md:-mt-[4px]"
+          style={{ boxShadow: "0 0 10px rgba(200,169,81,0.5)" }}
         />
+        {/* The static track (bar) */}
+        <div className="h-full w-[1px] bg-white/20" />
       </div>
 
       {/* Intro Sequence Layer */}
