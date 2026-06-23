@@ -241,7 +241,7 @@ function Preloader({
       />
 
       {/* Loading & Enter UI - Positioned at Bottom */}
-      <div className="absolute bottom-20 md:bottom-28 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-6 w-full px-6 preloader-content pointer-events-none">
+      <div className="absolute bottom-8 md:bottom-28 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-4 md:gap-6 w-full px-4 md:px-6 preloader-content pointer-events-none">
         {/* ALWAYS VISIBLE: Cycling words + Timer bar */}
         <AnimatePresence>
           {wordsVisible && (
@@ -319,7 +319,7 @@ function Preloader({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.7, ease: EASE_OUT_EXPO }}
-              className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-5 w-full pointer-events-auto"
+              className="mt-4 md:mt-6 flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-5 w-full pointer-events-auto"
             >
               {/* Creative Work Pill */}
               <button
