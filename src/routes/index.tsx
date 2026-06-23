@@ -1447,7 +1447,9 @@ function CallToAction({
   return (
     <footer
       id="contact"
-      className="relative overflow-hidden border-t border-border px-6 py-32 md:px-12 md:py-44"
+      className={`relative overflow-hidden border-t border-border px-6 pt-32 md:px-12 md:pt-44 ${
+        !isEngineering ? "pb-0" : "pb-32 md:pb-44"
+      }`}
     >
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
@@ -1525,7 +1527,7 @@ function CallToAction({
               {data.brand.monogram}
             </span>
             <span className="text-[11px] font-medium tracking-[0.3em] uppercase text-muted-foreground">
-              {data.brand.location} · {data.brand.name}
+              {data.brand.location}
             </span>
           </div>
           <div className="flex flex-col gap-3 md:items-end">
@@ -1568,11 +1570,27 @@ function CallToAction({
                 </a>
               ))}
             </div>
-            <h1 className="text-[13vw] 2xl:text-[200px] leading-[0.75] font-sans font-black tracking-tighter text-foreground/90 uppercase w-full text-center whitespace-nowrap overflow-hidden flex justify-between">
+            
+            {/* Desktop / Tablet layout */}
+            <h1 className="hidden md:flex text-[9vw] 2xl:text-[144px] leading-[0.75] font-sans font-black tracking-tighter text-foreground/90 uppercase w-full text-center whitespace-nowrap overflow-hidden justify-between">
               {"Aditya Parihar".split("").map((letter, i) => (
                 <span key={i}>{letter === " " ? "\u00A0" : letter}</span>
               ))}
             </h1>
+
+            {/* Mobile layout (Stacked) */}
+            <div className="flex md:hidden flex-col w-full text-[14vw] leading-[0.8] font-sans font-black tracking-tighter text-foreground/90 uppercase text-center overflow-hidden">
+              <div className="flex justify-between w-full">
+                {"Aditya".split("").map((letter, i) => (
+                  <span key={i}>{letter}</span>
+                ))}
+              </div>
+              <div className="flex justify-between w-full">
+                {"Parihar".split("").map((letter, i) => (
+                  <span key={i}>{letter}</span>
+                ))}
+              </div>
+            </div>
           </div>
         )}
       </div>
