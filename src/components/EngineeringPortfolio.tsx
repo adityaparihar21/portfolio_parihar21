@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, X, Terminal as TerminalIcon } from "lucide-react";
 import { useContent } from "../lib/use-content";
 import { TerminalOverlay } from "./TerminalOverlay";
+import { GitHubCalendar } from "react-github-calendar";
 
 // Define the shape of a project extending the existing content structure
 type TechProject = ReturnType<typeof useContent>["selectedWork"]["projects"][0] & {
