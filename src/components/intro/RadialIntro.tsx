@@ -115,23 +115,42 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     const clothespins = introRef.current?.querySelectorAll(".polaroid-clothespin");
     if (clothespins) gsap.set(clothespins, { autoAlpha: 0, scale: 0.8 });
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top 1px",
-        end: isMobile ? "+=150%" : "+=300%",
-        pin: true,
-        scrub: isMobile ? 1 : 2.5,
-        onLeave: (self) => {
-          if (!introCompleteRef.current) {
-            introCompleteRef.current = true;
+    let maxProgress = 0;
+    const tl = gsap.timeline({ paused: true });
+
+    ScrollTrigger.create({
+      trigger: containerRef.current,
+      start: "top 1px",
+      // Require significantly more scrolling to complete the animation 
+      // so users don't accidentally skip the cinematic intro.
+      end: isMobile ? "+=300%" : "+=600%",
+      pin: true,
+      scrub: false, // We will manually scrub forward only
+      onUpdate: (self) => {
+        // Strictly forward-only tracking
+        if (self.progress > maxProgress) {
+          maxProgress = self.progress;
+          // Smoothly advance timeline to match the new furthest scroll point
+          gsap.to(tl, {
+            progress: maxProgress,
+            duration: isMobile ? 1.5 : 3, // cinematic lag (equivalent to scrub value)
+            ease: "power2.out",
+            overwrite: "auto"
+          });
+        }
+      },
+      onLeave: (self) => {
+        if (!introCompleteRef.current) {
+          introCompleteRef.current = true;
+          // Wait for the smoothing tween to finish before snapping out
+          setTimeout(() => {
             self.kill(false); 
             requestAnimationFrame(() => {
               setIntroComplete(true);
             });
-          }
+          }, isMobile ? 1500 : 3000);
         }
-      },
+      }
     });
 
     // --- Phase 1 -> 2: Strip to Radial Ring (0 - 0.2) ---
