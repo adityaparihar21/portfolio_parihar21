@@ -119,9 +119,12 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top 1px",
-        end: isMobile ? "+=150%" : "+=300%",
+        // Require significantly more scrolling to complete the animation 
+        // so users don't accidentally skip the cinematic intro.
+        end: isMobile ? "+=300%" : "+=600%",
         pin: true,
-        scrub: isMobile ? 1 : 2.5,
+        // Higher scrub values add more "weight" to the animation, smoothing it out
+        scrub: isMobile ? 1.5 : 3,
         onLeave: (self) => {
           if (!introCompleteRef.current) {
             introCompleteRef.current = true;
