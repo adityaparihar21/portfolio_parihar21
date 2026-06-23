@@ -44,7 +44,7 @@ export function NameStage() {
         </div>
 
         <div className="flex items-baseline justify-center whitespace-nowrap px-4 pb-2 md:pb-4 relative z-10">
-          <span className="font-bebas text-[clamp(72px,18vw,160px)] tracking-[0.06em] leading-[0.88] text-transparent transition-colors duration-500 group-hover:text-[#e8dfc8]">
+          <span className="font-bebas text-[clamp(72px,18vw,160px)] tracking-[0.06em] leading-[0.88] text-[#e8dfc8]/[0.03] transition-colors duration-500 group-hover:text-[#e8dfc8]">
             ADITYA&nbsp;
           </span>
           <span className="font-bebas text-[clamp(72px,18vw,160px)] tracking-[0.06em] leading-[0.88] text-[#e8dfc8]">
