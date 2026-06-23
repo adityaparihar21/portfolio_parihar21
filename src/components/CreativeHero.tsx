@@ -77,9 +77,9 @@ export function CreativeHero({
           ))}
         </h3>
         
-        <h1 className="creative-hero-headline relative z-10 font-serif text-white text-[clamp(2.2rem,12vw,85px)] leading-none tracking-tight mb-4 drop-shadow-[0_4px_32px_rgba(0,0,0,1)] font-medium">
+        <h1 className="creative-hero-headline relative z-10 font-serif text-white text-[clamp(2.2rem,12vw,85px)] leading-[1.1] tracking-tight mb-2 pb-3 drop-shadow-[0_4px_32px_rgba(0,0,0,1)] font-medium">
           {"Aditya Parihar".split(" ").map((word, i) => (
-            <span key={i} className="inline-block mr-4 creative-hero-word opacity-0">
+            <span key={i} className="inline-block mr-4 creative-hero-word opacity-0 pb-2">
               {word}
             </span>
           ))}
