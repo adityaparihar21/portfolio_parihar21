@@ -3,13 +3,14 @@
 import React, { useRef, useState, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Observer } from "gsap/Observer";
 import { useGSAP } from "@gsap/react";
 import { domeGalleryImages } from "@/lib/domeGalleryImages";
 import { useIntroLayout, PRNG } from "./useIntroLayout";
 import { RadialCard } from "./RadialCard";
 
 if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger, useGSAP);
+  gsap.registerPlugin(ScrollTrigger, Observer, useGSAP);
 }
 
 const PRIMARY_TAGLINE = "Built on craft & curiosity";
@@ -115,27 +116,50 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     const clothespins = introRef.current?.querySelectorAll(".polaroid-clothespin");
     if (clothespins) gsap.set(clothespins, { autoAlpha: 0, scale: 0.8 });
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top 1px",
-        // Require significantly more scrolling to complete the animation 
-        // so users don't accidentally skip the cinematic intro.
-        end: isMobile ? "+=300%" : "+=600%",
-        pin: true,
-        // Higher scrub values add more "weight" to the animation, smoothing it out
-        scrub: isMobile ? 1.5 : 3,
-        onLeave: (self) => {
-          if (!introCompleteRef.current) {
-            introCompleteRef.current = true;
-            self.kill(false); 
-            requestAnimationFrame(() => {
-              setIntroComplete(true);
-            });
-          }
+    const tl = gsap.timeline({ paused: true });
+
+    // Strict one-way virtual scroll interceptor
+    let virtualProgress = 0;
+    const scrollTarget = isMobile ? 3000 : 6000;
+    
+    // Lock native scroll
+    document.body.style.overflow = "hidden";
+
+    const obs = Observer.create({
+      target: window,
+      type: "wheel,touch,pointer",
+      wheelSpeed: -1,
+      preventDefault: true,
+      onChange: (self) => {
+        // Only accept forward (down) scrolls. Positive deltaY = scroll down.
+        if (self.deltaY > 0) {
+          virtualProgress += self.deltaY / scrollTarget;
+          virtualProgress = Math.min(1, Math.max(0, virtualProgress));
+          
+          gsap.to(tl, {
+            progress: virtualProgress,
+            duration: 0.8, // cinematic lag
+            ease: "power2.out",
+            overwrite: "auto",
+            onUpdate: () => {
+              if (tl.progress() >= 0.999 && !introCompleteRef.current) {
+                introCompleteRef.current = true;
+                obs.kill();
+                document.body.style.overflow = "";
+                requestAnimationFrame(() => {
+                  setIntroComplete(true);
+                });
+              }
+            }
+          });
         }
-      },
+      }
     });
+
+    return () => {
+      obs.kill();
+      document.body.style.overflow = "";
+    };
 
     // --- Phase 1 -> 2: Strip to Radial Ring (0 - 0.2) ---
     tl.to(cardElements, {
