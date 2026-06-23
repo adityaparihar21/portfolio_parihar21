@@ -30,6 +30,8 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
 
   const [isMobile, setIsMobile] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [introComplete, setIntroComplete] = useState(false);
+  const introCompleteRef = useRef(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -37,6 +39,16 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
       setPrefersReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     }
   }, []);
+  
+  useEffect(() => {
+    if (introComplete) {
+      window.scrollTo(0, 0);
+      document.body.style.overflow = "hidden"; // lock temporarily during snap
+      setTimeout(() => {
+        document.body.style.overflow = "";
+      }, 100);
+    }
+  }, [introComplete]);
 
   const cardCount = isMobile ? 8 : 24;
   const { layout, isReady } = useIntroLayout(cardCount);
@@ -110,6 +122,16 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
         end: isMobile ? "+=150%" : "+=300%",
         pin: true,
         scrub: isMobile ? 1 : 2.5,
+        onUpdate: (self) => {
+          if (self.progress === 1 && !introCompleteRef.current) {
+            introCompleteRef.current = true;
+            // Remove the scroll trigger without resetting the timeline
+            self.kill(false); 
+            requestAnimationFrame(() => {
+              setIntroComplete(true);
+            });
+          }
+        }
       },
     });
 
@@ -232,12 +254,13 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
       </div>
 
       {/* Intro Sequence Layer */}
-      <div
-        ref={introRef}
-        className="absolute inset-0 z-10 w-full h-full overflow-hidden flex flex-col items-center justify-center pointer-events-none"
-      >
-        {/* Jute Threads Background Elements */}
-        <div ref={threadsGroupRef} className="absolute inset-0 z-2 origin-center pointer-events-none opacity-0">
+      {!introComplete && (
+        <div
+          ref={introRef}
+          className="absolute inset-0 z-10 w-full h-full overflow-hidden flex flex-col items-center justify-center pointer-events-none"
+        >
+          {/* Jute Threads Background Elements */}
+          <div ref={threadsGroupRef} className="absolute inset-0 z-2 origin-center pointer-events-none opacity-0">
           
           {/* Thread 1 (38%) */}
           <svg 
@@ -331,13 +354,14 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
         {/* Center Text Block */}
         <div 
           ref={textBlockRef} 
-          className="relative z-20 flex flex-col items-center justify-center pointer-events-none drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)] max-w-[80vw] opacity-0"
+          className="relative z-20 flex flex-col items-center justify-center pointer-events-none drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)] w-full px-4 md:px-0 md:max-w-[80vw] opacity-0"
         >
-          <h2 className="font-serif text-[clamp(1rem,3.5vmin,2.4rem)] text-[#F5ECD7] font-light tracking-wide text-center leading-tight max-w-[45vmin] md:max-w-[50vmin]">
+          <h2 className="font-serif text-[clamp(1.2rem,4vmin,2.4rem)] text-[#F5ECD7] font-light tracking-wide text-center leading-tight max-w-[90%] md:max-w-[50vmin]">
             {PRIMARY_TAGLINE}
           </h2>
         </div>
       </div>
+      )}
     </div>
     </div>
   );

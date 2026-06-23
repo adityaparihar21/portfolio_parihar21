@@ -69,7 +69,7 @@ export function CreativeHero({
       <div className="relative z-10 w-full h-full flex flex-col items-start justify-end pl-4 md:pl-8 pr-6 md:pr-12 pb-12 md:pb-16">
         <div className="creative-hero-glass-panel opacity-0 relative z-10">
           
-          <h3 className="creative-hero-eyebrow relative z-10 text-[#C8A951] uppercase text-[10px] md:text-[11px] font-bold tracking-[0.25em] mb-4 flex gap-3 overflow-hidden drop-shadow-md">
+          <h3 className="creative-hero-eyebrow relative z-10 text-[#C8A951] uppercase text-[10px] md:text-[11px] font-bold tracking-[0.25em] mb-4 flex flex-wrap gap-3 overflow-hidden drop-shadow-md">
           {["THE", "CREATIVE", "ENGINEER"].map((word, i) => (
             <span key={i} className="creative-hero-eyebrow-word opacity-0 block">
               {word}
@@ -77,7 +77,7 @@ export function CreativeHero({
           ))}
         </h3>
         
-        <h1 className="creative-hero-headline relative z-10 font-serif text-white text-[clamp(2.5rem,10vw,85px)] leading-none tracking-tight mb-4 drop-shadow-[0_4px_32px_rgba(0,0,0,1)] font-medium">
+        <h1 className="creative-hero-headline relative z-10 font-serif text-white text-[clamp(2.2rem,12vw,85px)] leading-none tracking-tight mb-4 drop-shadow-[0_4px_32px_rgba(0,0,0,1)] font-medium">
           {"Aditya Parihar".split(" ").map((word, i) => (
             <span key={i} className="inline-block mr-4 creative-hero-word opacity-0">
               {word}
