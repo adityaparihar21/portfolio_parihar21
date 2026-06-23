@@ -104,7 +104,8 @@ export function InteractiveTerminal() {
       {/* Body */}
       <div 
         ref={scrollRef}
-        className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-[rgba(100,150,210,0.2)]"
+        className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-[rgba(100,150,210,0.2)] overscroll-contain"
+        data-lenis-prevent="true"
       >
         <div className="flex flex-col gap-4">
           {history.map((item, i) => (
