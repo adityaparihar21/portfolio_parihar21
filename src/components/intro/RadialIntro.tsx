@@ -21,6 +21,8 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
   const ringRef = useRef<HTMLDivElement>(null);
   const textBlockRef = useRef<HTMLDivElement>(null);
   const heroWrapperRef = useRef<HTMLDivElement>(null);
+  const progressBarContainerRef = useRef<HTMLDivElement>(null);
+  const progressFillRef = useRef<HTMLDivElement>(null);
   
   const thread1Ref = useRef<SVGSVGElement>(null);
   const thread2Ref = useRef<SVGSVGElement>(null);
@@ -118,6 +120,18 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     let maxProgress = 0;
     const tl = gsap.timeline({ paused: true });
 
+    // Show the progress bar shortly after load
+    if (progressBarContainerRef.current) {
+      gsap.set(progressBarContainerRef.current, { autoAlpha: 0, x: 20 });
+      gsap.to(progressBarContainerRef.current, {
+        autoAlpha: 1,
+        x: 0,
+        duration: 1,
+        delay: 0.5,
+        ease: "power3.out"
+      });
+    }
+
     ScrollTrigger.create({
       trigger: containerRef.current,
       start: "top 1px",
@@ -137,6 +151,16 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
             ease: "power2.out",
             overwrite: "auto"
           });
+          
+          // Animate the progress bar fill
+          if (progressFillRef.current) {
+            gsap.to(progressFillRef.current, {
+              scaleY: maxProgress,
+              duration: isMobile ? 1.5 : 3,
+              ease: "power2.out",
+              overwrite: "auto"
+            });
+          }
         }
       },
       onLeave: (self) => {
@@ -239,6 +263,10 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     
     if (heroCtas && heroCtas.length > 0) tl.to(heroCtas, { autoAlpha: 1, x: 0, ease: "back.out(1.5)", stagger: 0.05 }, 0.98);
 
+    if (progressBarContainerRef.current) {
+      tl.to(progressBarContainerRef.current, { autoAlpha: 0, x: 20, duration: 0.05, ease: "power2.in" }, 0.95);
+    }
+
   }, { dependencies: [isReady, prefersReducedMotion, layout], scope: scopeRef });
 
   if (prefersReducedMotion) {
@@ -266,9 +294,21 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
         }} 
       />
 
-      {/* Hero Content Layer (Underneath the Intro, so it can fade in) */}
+      {/* Hero Content Layer */}
       <div ref={heroWrapperRef} className="absolute inset-0 z-0 w-full h-full pointer-events-auto">
         {children}
+      </div>
+
+      {/* Scroll Progress Indicator */}
+      <div 
+        ref={progressBarContainerRef} 
+        className="absolute right-4 md:right-8 top-[25%] bottom-[25%] w-[1px] bg-white/15 z-[100] flex flex-col items-center justify-start pointer-events-none"
+      >
+        <div 
+          ref={progressFillRef} 
+          className="w-[2px] md:w-[3px] h-full bg-[#C8A951] origin-top scale-y-0 rounded-full"
+          style={{ boxShadow: "0 0 12px rgba(200,169,81,0.4)" }}
+        />
       </div>
 
       {/* Intro Sequence Layer */}
