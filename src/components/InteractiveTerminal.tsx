@@ -91,7 +91,7 @@ export function InteractiveTerminal() {
   };
 
   return (
-    <div className="w-full bg-[#050810] border border-[rgba(100,150,210,0.2)] rounded-lg shadow-2xl flex flex-col font-mono text-[13px] overflow-hidden max-w-[800px] mx-auto h-[400px]"
+    <div className="w-full bg-[#050810] border border-[rgba(100,150,210,0.2)] rounded-lg shadow-2xl flex flex-col font-mono text-[11px] md:text-[13px] overflow-hidden max-w-[800px] mx-auto h-[300px] md:h-[400px]"
          onClick={() => inputRef.current?.focus()}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 bg-[rgba(100,150,210,0.05)] border-b border-[rgba(100,150,210,0.1)]">

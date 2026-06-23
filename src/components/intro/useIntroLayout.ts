@@ -110,7 +110,7 @@ export function useIntroLayout(count: number) {
       // Catenary Sag (parabola approximation)
       // x ranges from -totalWidth/2 to totalWidth/2
       const normalizedX = threadX / (totalThreadWidth / 2); // -1 to 1
-      const maxSag = isMobile ? 25 : 60;
+      const maxSag = isMobile ? 15 : 60;
       const sag = (1 - normalizedX * normalizedX) * maxSag; // 0 at edges, maxSag at center
 
       const threadY = (threadIndex === 1 ? thread1BaseY : thread2BaseY) + sag + (rng() - 0.5) * 10;

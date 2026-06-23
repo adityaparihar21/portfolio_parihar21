@@ -244,7 +244,7 @@ export function EngineeringPortfolio({ data, onSwitchToCreative }: { data: Retur
       </section>
 
       {/* About & Philosophy Section */}
-      <section id="about" className="w-full px-6 md:px-12 py-32 border-t border-[rgba(100,150,210,0.08)]">
+      <section id="about" className="w-full px-6 md:px-12 py-[clamp(4rem,10vw,8rem)] border-t border-[rgba(100,150,210,0.08)]">
         <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-24">
           {/* About */}
           <div>
@@ -284,7 +284,7 @@ export function EngineeringPortfolio({ data, onSwitchToCreative }: { data: Retur
       </section>
 
       {/* Strict CSS Project Grid with Images */}
-      <section id="work" className="w-full px-6 md:px-12 pb-32">
+      <section id="work" className="w-full px-6 md:px-12 pb-[clamp(4rem,10vw,8rem)]">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-l border-t border-[rgba(100,150,210,0.08)]">
           {filteredProjects.map((p, idx) => (
             <div
@@ -406,7 +406,7 @@ export function EngineeringPortfolio({ data, onSwitchToCreative }: { data: Retur
                   />
                 </div>
 
-                <h1 className="text-4xl md:text-[48px] font-light tracking-[-0.02em] text-[#a8c4e0] mb-6">
+                <h1 className="text-[clamp(2rem,5vw,3rem)] font-light tracking-[-0.02em] text-[#a8c4e0] mb-6">
                   {selectedProject.title}
                 </h1>
                 <div className="w-full h-[0.5px] bg-[rgba(100,150,210,0.15)] mb-12" />
@@ -512,7 +512,7 @@ export function EngineeringPortfolio({ data, onSwitchToCreative }: { data: Retur
             </div>
 
             {/* Next Project Block */}
-            <div className="w-full border-t border-[rgba(100,150,210,0.15)] mt-24 py-32 px-6 md:px-12 flex items-center justify-center cursor-crosshair hover:bg-[rgba(55,100,180,0.02)] transition-colors">
+            <div className="w-full border-t border-[rgba(100,150,210,0.15)] mt-[clamp(3rem,8vw,6rem)] py-[clamp(4rem,10vw,8rem)] px-6 md:px-12 flex items-center justify-center cursor-crosshair hover:bg-[rgba(55,100,180,0.02)] transition-colors">
               <div className="text-[32px] font-light text-[#a8c4e0]">
                 <span className="text-[rgba(120,160,200,0.3)] text-xl">next_</span>
                 {projects.length > 0 && projects[(projects.indexOf(selectedProject) + 1) % projects.length]?.title}
@@ -522,7 +522,7 @@ export function EngineeringPortfolio({ data, onSwitchToCreative }: { data: Retur
         )}
       </AnimatePresence>
 
-      <section id="terminal" className="w-full px-6 md:px-12 py-32 border-t border-[rgba(100,150,210,0.08)] bg-[#070b12]">
+      <section id="terminal" className="w-full px-6 md:px-12 py-[clamp(4rem,10vw,8rem)] border-t border-[rgba(100,150,210,0.08)] bg-[#070b12]">
         <div className="max-w-[1200px] mx-auto flex flex-col gap-8">
           <div className="flex flex-col items-center justify-center text-center max-w-2xl mx-auto mb-8">
             <h2 className="text-[10px] tracking-[0.2em] text-[rgba(120,160,200,0.4)] mb-4 uppercase">System Terminal</h2>
@@ -534,7 +534,7 @@ export function EngineeringPortfolio({ data, onSwitchToCreative }: { data: Retur
         </div>
       </section>
 
-      <section id="contact" className="w-full px-6 md:px-12 py-32 border-t border-[rgba(100,150,210,0.08)] bg-[rgba(55,100,180,0.02)]">
+      <section id="contact" className="w-full px-6 md:px-12 py-[clamp(4rem,10vw,8rem)] border-t border-[rgba(100,150,210,0.08)] bg-[rgba(55,100,180,0.02)]">
         <div className="max-w-[800px] mx-auto text-center">
           <h2 className="text-[10px] tracking-[0.2em] text-[rgba(120,160,200,0.4)] mb-8 uppercase">OPEN TO WORK</h2>
           
