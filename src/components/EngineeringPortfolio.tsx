@@ -4,6 +4,8 @@ import { ArrowRight, X, Terminal as TerminalIcon } from "lucide-react";
 import { useContent } from "../lib/use-content";
 import { InteractiveTerminal } from "./InteractiveTerminal";
 import { GitHubCalendar } from "react-github-calendar";
+import { PortalTeaser } from "./PortalTeaser";
+import { GithubSection } from "./GithubSection";
 
 // Define the shape of a project extending the existing content structure
 type TechProject = ReturnType<typeof useContent>["selectedWork"]["projects"][0] & {
@@ -97,7 +99,7 @@ const getExtendedProject = (
   };
 };
 
-export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useContent> }) {
+export function EngineeringPortfolio({ data, onSwitchToCreative }: { data: ReturnType<typeof useContent>, onSwitchToCreative?: () => void }) {
   const [activeFilter, setActiveFilter] = useState("ALL");
   const [typedText, setTypedText] = useState("");
   const [showCursor, setShowCursor] = useState(true);
@@ -184,9 +186,9 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
   }, [selectedProject]);
 
   return (
-    <div className="min-h-screen bg-[#070b12] text-[#a8c4e0] font-mono selection:bg-[rgba(55,138,221,0.15)] selection:text-[#b8d4f0]">
-
-
+    <>
+      <div id="engineering-root" className="relative z-10 w-full bg-[#070b12] transition-opacity duration-500">
+        <div className="min-h-screen bg-[#070b12] text-[#a8c4e0] font-mono selection:bg-[rgba(55,138,221,0.15)] selection:text-[#b8d4f0]">
       {/* Hero Section */}
       <section className="relative w-full h-screen flex flex-col justify-center items-center px-6 md:px-12">
         {/* Static Grid Background */}
@@ -550,6 +552,12 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
         </div>
       </section>
 
+      <GithubSection />
+
+      {onSwitchToCreative && (
+        <PortalTeaser onTransitionComplete={onSwitchToCreative} />
+      )}
+
       {/* Technical Footer */}
       <footer className="w-full px-6 md:px-12 py-8 border-t border-[rgba(100,150,210,0.1)] flex flex-col md:flex-row items-center justify-between gap-4">
         <span className="text-[9px] font-mono tracking-[0.22em] text-[rgba(120,160,200,0.25)] flex items-center gap-4">
@@ -559,6 +567,8 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
           Dehradun / Remote
         </span>
       </footer>
-    </div>
+        </div>
+      </div>
+    </>
   );
 }

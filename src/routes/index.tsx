@@ -2018,10 +2018,9 @@ function Index() {
 
         {/* CONDITIONAL RENDER: SYSTEMS ENGINEER PATH */}
         {themeMode === "engineering" && (
-          <>
-            <EngineeringPortfolio data={data} />
-            <GithubSection />
-          </>
+          <div className="relative z-10 w-full bg-[#050810] transition-opacity duration-1000">
+            <EngineeringPortfolio data={data} onSwitchToCreative={() => handleChoice("creative")} />
+          </div>
         )}
 
         {/* SHARED SECTIONS */}

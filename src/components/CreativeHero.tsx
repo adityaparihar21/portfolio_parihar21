@@ -12,6 +12,13 @@ export function CreativeHero({
   setActiveAudioId: (id: string | null) => void;
   onMediaReady?: () => void;
 }) {
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+
+  React.useEffect(() => {
+    if (videoRef.current && (window as any).SHARED_VIDEO_TIME !== undefined) {
+      videoRef.current.currentTime = (window as any).SHARED_VIDEO_TIME;
+    }
+  }, []);
   const isMuted = activeAudioId !== "hero";
   const mediaUrl = data?.hero?.media;
   const isVideo =
@@ -41,6 +48,7 @@ export function CreativeHero({
         {/* The video sits on top of the image and fades in at the end of the GSAP timeline */}
         {isVideo && (
           <video
+            ref={videoRef}
             src={mediaUrl}
             poster={mediaUrl.substring(0, mediaUrl.lastIndexOf(".")) + "_poster.jpg"}
             autoPlay
