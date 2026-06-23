@@ -21,11 +21,13 @@ export function InteractiveTerminal() {
   ]);
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const endRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to bottom when history changes
+  // Scroll terminal body to bottom when history changes
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
   }, [history]);
 
   const handleCommand = (cmd: string) => {
@@ -100,7 +102,10 @@ export function InteractiveTerminal() {
       </div>
 
       {/* Body */}
-      <div className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-[rgba(100,150,210,0.2)]">
+      <div 
+        ref={scrollRef}
+        className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-[rgba(100,150,210,0.2)]"
+      >
         <div className="flex flex-col gap-4">
           {history.map((item, i) => (
             <div key={i} className="flex flex-col gap-1">
@@ -129,7 +134,6 @@ export function InteractiveTerminal() {
               autoComplete="off"
             />
           </div>
-          <div ref={endRef} />
         </div>
       </div>
     </div>
