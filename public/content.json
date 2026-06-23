@@ -49,6 +49,14 @@
     },
     "projects": [
       {
+        "id": "ig-reel-collab-new",
+        "category": "Video Edit • Instagram",
+        "title": "Instagram Video Edit",
+        "description": "A creative video edit recently featured on Instagram.",
+        "image": "/fresherupes.mp4",
+        "href": "https://www.instagram.com/p/DHbL85JSo2i/"
+      },
+      {
         "id": "portfolio",
         "category": "React • GSAP • Three.js",
         "title": "Interactive Dual-Themed Portfolio",
@@ -99,6 +107,14 @@
     "eyebrow": "Creative Portfolio",
     "title": "Selected Video Edits",
     "projects": [
+      {
+        "id": "ig-reel-collab-new",
+        "category": "Video Edit • Instagram",
+        "title": "Instagram Video Edit",
+        "description": "A creative video edit recently featured on Instagram.",
+        "image": "/fresherupes.mp4",
+        "href": "https://www.instagram.com/p/DHbL85JSo2i/"
+      },
       {
         "id": "upes-branding",
         "category": "Editing • Sound Design",
@@ -169,6 +185,14 @@
     "eyebrow": "UPES Social Media",
     "title": "Campus Life & Reels",
     "projects": [
+      {
+        "id": "ig-reel-collab-new",
+        "category": "Video Edit • Instagram",
+        "title": "Instagram Video Edit",
+        "description": "A creative video edit recently featured on Instagram.",
+        "image": "/fresherupes.mp4",
+        "href": "https://www.instagram.com/p/DHbL85JSo2i/"
+      },
       {
         "id": "upes-branding-2",
         "category": "Editing • Sound Design",
