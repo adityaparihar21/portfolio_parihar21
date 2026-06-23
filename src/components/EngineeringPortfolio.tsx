@@ -534,7 +534,7 @@ export function EngineeringPortfolio({ data, onSwitchToCreative }: { data: Retur
         </div>
       </section>
 
-      <section id="contact" className="w-full px-6 md:px-12 py-[clamp(4rem,10vw,8rem)] border-t border-[rgba(100,150,210,0.08)] bg-[rgba(55,100,180,0.02)]">
+      <section className="w-full px-6 md:px-12 py-[clamp(4rem,10vw,8rem)] border-t border-[rgba(100,150,210,0.08)] bg-[rgba(55,100,180,0.02)]">
         <div className="max-w-[800px] mx-auto text-center">
           <h2 className="text-[10px] tracking-[0.2em] text-[rgba(120,160,200,0.4)] mb-8 uppercase">OPEN TO WORK</h2>
           
