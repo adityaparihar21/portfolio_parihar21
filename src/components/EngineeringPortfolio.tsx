@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, X } from "lucide-react";
 import { useContent } from "../lib/use-content";
-import GitHubCalendar from "react-github-calendar";
+import { GitHubCalendar } from "react-github-calendar";
 
 // Define the shape of a project extending the existing content structure
 type TechProject = ReturnType<typeof useContent>["selectedWork"]["projects"][0] & {
