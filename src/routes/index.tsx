@@ -585,7 +585,7 @@ function Hero({
     mediaUrl.includes("mixkit");
 
   return (
-    <section id="top" className="relative h-screen w-full overflow-hidden bg-black">
+    <section id="top" className="relative h-screen w-full bg-black">
       <motion.div style={{ y, scale }} className="absolute inset-0">
         {isVideo ? (
           <video
@@ -1580,27 +1580,23 @@ function CallToAction({
             </div>
             
             {/* Desktop / Tablet layout */}
-            <h1 className="hidden md:flex text-[9vw] 2xl:text-[144px] leading-[0.75] w-full text-center whitespace-nowrap overflow-hidden justify-between items-end">
+            <h1 className="hidden md:flex text-[9vw] 2xl:text-[144px] leading-none w-full text-center whitespace-nowrap overflow-visible justify-between items-end pb-4">
               {"ADITYA".split("").map((letter, i) => (
                 <span key={`a-${i}`} className="font-sans font-black tracking-tighter text-foreground/90 uppercase">{letter}</span>
               ))}
               <span>{"\u00A0"}</span>
-              {"Parihar".split("").map((letter, i) => (
-                <span key={`p-${i}`} className="font-serif italic font-light tracking-wide text-foreground/80">{letter}</span>
-              ))}
+              <span className="font-cursive font-normal tracking-normal text-[#E0C9A3] text-[11vw] 2xl:text-[180px] pb-4">Parihar</span>
             </h1>
 
             {/* Mobile layout (Stacked) */}
-            <div className="flex md:hidden flex-col w-full text-[14vw] leading-[0.8] text-center overflow-hidden gap-1">
+            <div className="flex md:hidden flex-col w-full text-[14vw] leading-none text-center overflow-visible gap-2 pb-2">
               <div className="flex justify-between w-full">
                 {"ADITYA".split("").map((letter, i) => (
                   <span key={i} className="font-sans font-black tracking-tighter text-foreground/90 uppercase">{letter}</span>
                 ))}
               </div>
-              <div className="flex justify-between w-full">
-                {"Parihar".split("").map((letter, i) => (
-                  <span key={i} className="font-serif italic font-light tracking-wide text-foreground/80">{letter}</span>
-                ))}
+              <div className="flex justify-center w-full">
+                <span className="font-cursive font-normal tracking-normal text-[#E0C9A3] text-[22vw]">Parihar</span>
               </div>
             </div>
           </div>
