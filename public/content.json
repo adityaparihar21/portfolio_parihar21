@@ -49,14 +49,6 @@
     },
     "projects": [
       {
-        "id": "ig-reel-collab-new",
-        "category": "Artist Reveal • Instagram",
-        "title": "Artist Reveal Collab",
-        "description": "A creative video edit recently featured on Instagram.",
-        "image": "/artist revealdate.mp4",
-        "href": "https://www.instagram.com/p/DHbL85JSo2i/"
-      },
-      {
         "id": "portfolio",
         "category": "React • GSAP • Three.js",
         "title": "Interactive Dual-Themed Portfolio",
