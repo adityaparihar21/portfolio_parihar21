@@ -13,6 +13,7 @@ type TechProject = ReturnType<typeof useContent>["selectedWork"]["projects"][0] 
   metrics?: { label: string; value: string }[];
   repo?: string;
   role?: string;
+  filterCategory?: string[];
 };
 
 const getExtendedProject = (
@@ -56,6 +57,27 @@ const getExtendedProject = (
       metrics = [];
   }
 
+  let filterCategory: string[] = [];
+  switch (p.id) {
+    case "portfolio":
+      filterCategory = ["ENGINEERING", "SYSTEMS"];
+      break;
+    case "ctj":
+      filterCategory = ["ENGINEERING", "EXPERIMENTS"];
+      break;
+    case "ascii-engine":
+      filterCategory = ["SYSTEMS", "EXPERIMENTS"];
+      break;
+    case "trip-co":
+      filterCategory = ["ENGINEERING", "SYSTEMS"];
+      break;
+    case "weather-hut":
+      filterCategory = ["ENGINEERING", "OPEN SOURCE"];
+      break;
+    default:
+      filterCategory = ["ENGINEERING"];
+  }
+
   return {
     ...p,
     status: isWip ? "In progress" : "Live",
@@ -65,6 +87,7 @@ const getExtendedProject = (
     writeup,
     codeSnippet,
     metrics,
+    filterCategory,
   };
 };
 
@@ -115,6 +138,12 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
   const projects = useMemo(() => {
     return data.selectedWork.projects.map(getExtendedProject);
   }, [data]);
+
+  // Filter projects
+  const filteredProjects = useMemo(() => {
+    if (activeFilter === "ALL") return projects;
+    return projects.filter(p => p.filterCategory?.includes(activeFilter));
+  }, [projects, activeFilter]);
 
   // Lock body scroll when a project is open
   useEffect(() => {
@@ -173,6 +202,9 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
               />
             )}
           </h1>
+          <p className="mt-8 text-[14px] md:text-[16px] text-[rgba(120,160,200,0.6)] max-w-[600px] font-mono leading-[1.8]">
+            BTech CSE student specializing in AI & Machine Learning. Focused on scalable backend architectures, computational logic, and building highly-performant software systems.
+          </p>
           <div className="mt-8 text-[9px] uppercase tracking-[0.25em] text-[rgba(120,160,200,0.35)]">
             v2.1 — 2026 — Dehradun / Remote
           </div>
@@ -196,7 +228,7 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
       {/* Strict CSS Project Grid with Images */}
       <section className="w-full px-6 md:px-12 pb-32">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-l border-t border-[rgba(100,150,210,0.08)]">
-          {projects.map((p, idx) => (
+          {filteredProjects.map((p, idx) => (
             <div
               key={p.id}
               onClick={() => setSelectedProject(p)}
