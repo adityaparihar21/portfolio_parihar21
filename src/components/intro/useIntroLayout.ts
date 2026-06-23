@@ -45,8 +45,8 @@ export function useIntroLayout(count: number) {
     const startStripX = -totalStripWidth / 2;
 
     const baseRadius = isMobile
-      ? Math.min(window.innerWidth * 0.35, window.innerHeight * 0.30, 180)
-      : Math.min(window.innerWidth * 0.22, window.innerHeight * 0.32, 350);
+      ? Math.min(window.innerWidth * 0.38, window.innerHeight * 0.35, 200)
+      : Math.min(window.innerWidth * 0.28, window.innerHeight * 0.38, 450);
 
     const step = (Math.PI * 2) / count;
     const newLayout: LayoutItem[] = [];

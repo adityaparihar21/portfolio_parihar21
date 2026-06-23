@@ -377,24 +377,32 @@ function Header({
 }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [navVisible, setNavVisible] = useState(themeMode !== "creative");
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 32);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 32);
+      if (themeMode === "creative") {
+        setNavVisible(window.scrollY > window.innerHeight * 2.5);
+      } else {
+        setNavVisible(true);
+      }
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [themeMode]);
 
   return (
     <motion.header
-      initial={{ y: -40, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: navVisible ? 0 : -100, opacity: navVisible ? 1 : 0 }}
       transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
         scrolled || menuOpen
           ? "backdrop-blur-xl bg-background/75 border-b border-border"
           : "bg-transparent"
-      }`}
+      } ${!navVisible ? "pointer-events-none" : ""}`}
     >
       <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-4 md:px-12">
         <a
