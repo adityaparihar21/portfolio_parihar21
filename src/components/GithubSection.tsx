@@ -1,16 +1,23 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Github, GitCommit, GitPullRequest, Star, ArrowRight } from "lucide-react";
+import { Github, ArrowRight } from "lucide-react";
+
+interface Commit {
+  repo: string;
+  msg: string;
+  time: string;
+  hash: string;
+}
 
 export function GithubSection() {
-  const stats = [
+  const defaultStats = [
     { label: "Repositories", value: "34+" },
     { label: "Commits (YTD)", value: "1.2k" },
     { label: "Pull Requests", value: "89" },
     { label: "Stars", value: "210" },
   ];
 
-  const recentCommits = [
+  const defaultCommits = [
     {
       repo: "adityaparihar21/trip-co",
       msg: "feat: implemented AI itinerary generation pipeline",
@@ -30,6 +37,84 @@ export function GithubSection() {
       hash: "9f8e7d6",
     },
   ];
+
+  const [stats, setStats] = useState(defaultStats);
+  const [commits, setCommits] = useState<Commit[]>(defaultCommits);
+
+  useEffect(() => {
+    async function fetchGithubData() {
+      try {
+        const username = "adityaparihar21";
+        
+        // Fetch User Data for Repos
+        const userRes = await fetch(`https://api.github.com/users/${username}`);
+        if (!userRes.ok) throw new Error("Rate limit or error");
+        const userData = await userRes.json();
+
+        // Fetch Repos for Stars
+        const reposRes = await fetch(`https://api.github.com/users/${username}/repos?per_page=100`);
+        if (!reposRes.ok) throw new Error("Rate limit or error");
+        const reposData = await reposRes.json();
+        
+        const totalStars = reposData.reduce((acc: number, repo: any) => acc + repo.stargazers_count, 0);
+
+        setStats([
+          { label: "Repositories", value: userData.public_repos.toString() },
+          { label: "Commits (YTD)", value: "1.2k+" }, 
+          { label: "Pull Requests", value: "89+" },   
+          { label: "Stars", value: totalStars.toString() },
+        ]);
+
+        // Fetch Events for Commits
+        const eventsRes = await fetch(`https://api.github.com/users/${username}/events/public`);
+        if (!eventsRes.ok) throw new Error("Rate limit or error");
+        const eventsData = await eventsRes.json();
+
+        const pushEvents = eventsData.filter((event: any) => event.type === "PushEvent");
+        const recentCommits: Commit[] = [];
+        
+        for (const event of pushEvents) {
+          if (recentCommits.length >= 3) break;
+          for (const commit of event.payload.commits) {
+            if (recentCommits.length >= 3) break;
+            recentCommits.push({
+              repo: event.repo.name,
+              msg: commit.message.split('\n')[0].substring(0, 50) + (commit.message.length > 50 ? '...' : ''),
+              time: getTimeAgo(event.created_at),
+              hash: commit.sha.substring(0, 7),
+            });
+          }
+        }
+        
+        if (recentCommits.length > 0) {
+          setCommits(recentCommits);
+        }
+
+      } catch (error) {
+        console.error("Failed to fetch GitHub data, falling back to cached data:", error);
+      }
+    }
+
+    fetchGithubData();
+  }, []);
+
+  function getTimeAgo(dateString: string) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + " yrs ago";
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + " mos ago";
+    interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + " days ago";
+    interval = seconds / 3600;
+    if (interval > 1) return Math.floor(interval) + " hrs ago";
+    interval = seconds / 60;
+    if (interval > 1) return Math.floor(interval) + " mins ago";
+    return Math.floor(seconds) + " secs ago";
+  }
 
   return (
     <section className="w-full px-6 md:px-12 py-32 border-t border-[rgba(100,150,210,0.08)] bg-[#070b12] relative overflow-hidden font-mono">
@@ -95,7 +180,7 @@ export function GithubSection() {
               </div>
 
               <div className="flex flex-col gap-5 pl-2 border-l border-[rgba(100,150,210,0.1)] ml-1">
-                {recentCommits.map((c, i) => (
+                {commits.map((c, i) => (
                   <motion.div
                     initial={{ opacity: 0, x: -10 }}
                     whileInView={{ opacity: 1, x: 0 }}
