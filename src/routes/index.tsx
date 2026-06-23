@@ -1558,6 +1558,23 @@ function CallToAction({
           </span>
           <span>Cinematic Storytelling</span>
         </div>
+
+        {!isEngineering && (
+          <div className="mt-12 md:mt-24 w-full flex flex-col items-center select-none pointer-events-none">
+            <div className="w-full flex justify-between items-center text-[8px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-widest text-muted-foreground/60 mb-1 px-1 border-b border-border/40 pb-2 pointer-events-auto">
+              {socials.slice(0, 5).map((s, i) => (
+                <a key={i} href={s.href} target="_blank" rel="noreferrer" className="hover:text-primary transition-colors flex items-center gap-1">
+                  {s.label === "Instagram" ? "Insta" : s.label === "LinkedIn" ? "Lnkn" : s.label === "YouTube" ? "YT" : s.label} <span className="text-[6px] md:text-[8px]">↗</span>
+                </a>
+              ))}
+            </div>
+            <h1 className="text-[13vw] 2xl:text-[200px] leading-[0.75] font-sans font-black tracking-tighter text-foreground/90 uppercase w-full text-center whitespace-nowrap overflow-hidden flex justify-between">
+              {"Aditya Parihar".split("").map((letter, i) => (
+                <span key={i}>{letter === " " ? "\u00A0" : letter}</span>
+              ))}
+            </h1>
+          </div>
+        )}
       </div>
     </footer>
   );
