@@ -333,7 +333,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
           ref={textBlockRef} 
           className="relative z-20 flex flex-col items-center justify-center pointer-events-none drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)] max-w-[80vw] opacity-0"
         >
-          <h2 className="font-serif text-[clamp(1.5rem,2.8vw,2.5rem)] text-[#F5ECD7] font-light tracking-wide text-center leading-tight max-w-[60vw]">
+          <h2 className="font-serif text-[clamp(1rem,3.5vmin,2.4rem)] text-[#F5ECD7] font-light tracking-wide text-center leading-tight max-w-[45vmin] md:max-w-[50vmin]">
             {PRIMARY_TAGLINE}
           </h2>
         </div>
