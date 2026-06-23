@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, X, Terminal as TerminalIcon } from "lucide-react";
 import { useContent } from "../lib/use-content";
-import { TerminalOverlay } from "./TerminalOverlay";
+import { InteractiveTerminal } from "./InteractiveTerminal";
 import { GitHubCalendar } from "react-github-calendar";
 
 // Define the shape of a project extending the existing content structure
@@ -98,19 +98,6 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
   const [showCursor, setShowCursor] = useState(true);
   const [sysTime, setSysTime] = useState("");
   const [selectedProject, setSelectedProject] = useState<TechProject | null>(null);
-  const [isTerminalOpen, setIsTerminalOpen] = useState(false);
-
-  // Terminal keyboard shortcut
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "`" || e.key === "~") {
-        e.preventDefault();
-        setIsTerminalOpen((prev) => !prev);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
 
   const filters = ["ALL", "ENGINEERING", "SYSTEMS", "OPEN SOURCE", "EXPERIMENTS"];
   const targetTexts = [
@@ -254,7 +241,7 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
         <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-24">
           {/* About */}
           <div>
-            <h2 className="text-[10px] tracking-[0.2em] text-[rgba(120,160,200,0.4)] mb-8 uppercase">01 / Engineering meets cinematography</h2>
+            <h2 className="text-[10px] tracking-[0.2em] text-[rgba(120,160,200,0.4)] mb-8 uppercase">Engineering meets cinematography</h2>
             <div className="space-y-6 text-[14px] md:text-[15px] font-light leading-relaxed text-[rgba(168,196,224,0.8)]">
               <p>I'm Aditya Parihar — a BTech CSE student specializing in AI & Machine Learning at UPES, with a focus on backend architecture, computational logic, and software systems that are highly performant.</p>
               <p>But I don't just write code. I edit film.</p>
@@ -265,7 +252,7 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
 
           {/* Philosophy */}
           <div>
-            <h2 className="text-[10px] tracking-[0.2em] text-[rgba(120,160,200,0.4)] mb-8 uppercase">02 / What drives the work</h2>
+            <h2 className="text-[10px] tracking-[0.2em] text-[rgba(120,160,200,0.4)] mb-8 uppercase">What drives the work</h2>
             
             <blockquote className="border-l-2 border-[#a8c4e0] pl-6 py-2 mb-10 text-[16px] md:text-[18px] text-[#a8c4e0] italic">
               "Most code solves a problem. Good code tells a story. Great code doesn't need to explain itself."
@@ -528,9 +515,21 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
         )}
       </AnimatePresence>
 
+      <section id="terminal" className="w-full px-6 md:px-12 py-32 border-t border-[rgba(100,150,210,0.08)] bg-[#070b12]">
+        <div className="max-w-[1200px] mx-auto flex flex-col gap-8">
+          <div className="flex flex-col items-center justify-center text-center max-w-2xl mx-auto mb-8">
+            <h2 className="text-[10px] tracking-[0.2em] text-[rgba(120,160,200,0.4)] mb-4 uppercase">System Terminal</h2>
+            <p className="text-[13px] text-[rgba(168,196,224,0.7)] leading-relaxed">
+              Explore the system architecture. Type commands to discover hidden sections, tools, and philosophy.
+            </p>
+          </div>
+          <InteractiveTerminal />
+        </div>
+      </section>
+
       <section id="contact" className="w-full px-6 md:px-12 py-32 border-t border-[rgba(100,150,210,0.08)] bg-[rgba(55,100,180,0.02)]">
         <div className="max-w-[800px] mx-auto text-center">
-          <h2 className="text-[10px] tracking-[0.2em] text-[rgba(120,160,200,0.4)] mb-8 uppercase">06 / OPEN TO WORK</h2>
+          <h2 className="text-[10px] tracking-[0.2em] text-[rgba(120,160,200,0.4)] mb-8 uppercase">OPEN TO WORK</h2>
           
           <div className="space-y-6 text-[15px] md:text-[18px] font-light leading-relaxed text-[rgba(168,196,224,0.9)]">
             <p>I'm currently looking for Software Engineering roles, particularly in backend systems, AI integration, and full-stack architecture.</p>
@@ -550,19 +549,11 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
       <footer className="w-full px-6 md:px-12 py-8 border-t border-[rgba(100,150,210,0.1)] flex flex-col md:flex-row items-center justify-between gap-4">
         <span className="text-[9px] font-mono tracking-[0.22em] text-[rgba(120,160,200,0.25)] flex items-center gap-4">
           ap@portfolioparihar21 — technical_work — build 2.1.0
-          <button 
-            onClick={() => setIsTerminalOpen(true)}
-            className="flex items-center gap-2 hover:text-[#a8c4e0] transition-colors bg-[rgba(100,150,210,0.05)] px-3 py-1.5 rounded cursor-crosshair border border-[rgba(100,150,210,0.1)] hover:border-[rgba(100,150,210,0.3)]"
-          >
-            <TerminalIcon className="w-3 h-3" /> [~] TERMINAL
-          </button>
         </span>
         <span className="text-[9px] font-mono tracking-[0.22em] text-[rgba(120,160,200,0.25)]">
           Dehradun / Remote
         </span>
       </footer>
-
-      <TerminalOverlay isOpen={isTerminalOpen} onClose={() => setIsTerminalOpen(false)} />
     </div>
   );
 }
