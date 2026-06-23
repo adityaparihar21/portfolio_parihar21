@@ -824,7 +824,7 @@ function SelectedWork({
 }) {
   const { eyebrow, title, projects, viewAll } = data.selectedWork;
   return (
-    <section id="work" className="bg-background px-6 py-32 md:px-12 md:py-44">
+    <section id="work" className="relative z-20 bg-background px-6 py-32 md:px-12 md:py-44">
       <div className="mx-auto max-w-[1600px]">
         <motion.div
           variants={staggerParent}
@@ -932,7 +932,7 @@ function CreativeWork({
   return (
     <section
       id="creative"
-      className="bg-background px-6 py-32 md:px-12 md:py-44 border-t border-border"
+      className="relative z-20 bg-background px-6 py-32 md:px-12 md:py-44 border-t border-border"
     >
       <div className="mx-auto max-w-[1600px]">
         <motion.div
@@ -1039,7 +1039,7 @@ function UPESWork({
   return (
     <section
       id="upes-social"
-      className="bg-background px-6 py-32 md:px-12 md:py-44 border-t border-border overflow-hidden"
+      className="relative z-20 bg-background px-6 py-32 md:px-12 md:py-44 border-t border-border overflow-hidden"
     >
       <div className="mx-auto max-w-[1600px]">
         <div className="mb-14 flex flex-col md:flex-row md:items-end md:justify-between gap-8">

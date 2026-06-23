@@ -107,7 +107,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top 1px",
-        end: "+=800%", // Balanced scroll distance
+        end: "+=300%", // Reduced scroll distance as requested
         pin: true,
         scrub: 2.5, // High inertia for a very smooth, heavy feel
       },
