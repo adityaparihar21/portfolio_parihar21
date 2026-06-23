@@ -213,8 +213,8 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div ref={scopeRef} className="relative w-full overflow-hidden">
-      <div ref={containerRef} className="relative w-full h-screen overflow-hidden bg-[#080808]">
+    <div ref={scopeRef} className="relative w-full overflow-x-clip">
+      <div ref={containerRef} className="relative w-full h-[100svh] overflow-hidden bg-[#080808]">
       
       {/* Film Grain Overlay */}
       <div 

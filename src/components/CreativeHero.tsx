@@ -20,7 +20,7 @@ export function CreativeHero({
       mediaUrl.includes("video") ||
       mediaUrl.includes("mixkit"));
   return (
-    <section className="relative h-screen w-full overflow-hidden bg-[#080808]">
+    <section className="relative h-[100svh] w-full overflow-hidden bg-[#080808]">
       {/* Background Image is handled by RadialIntro.tsx which fades it in early. 
           But wait, the user says "Act 3: Crossfade to Hero layout content". 
           We can just have the background exist in RadialIntro.tsx and this Hero 
@@ -35,7 +35,7 @@ export function CreativeHero({
         <img
           src="/intro bg.jpeg"
           alt="Cinematic background"
-          className="absolute inset-0 h-[110%] w-full object-cover object-[center_30%]"
+          className="absolute inset-0 h-full w-full object-cover object-[center_30%]"
           onLoad={onMediaReady}
         />
         {/* The video sits on top of the image and fades in at the end of the GSAP timeline */}
@@ -48,7 +48,7 @@ export function CreativeHero({
             muted={isMuted}
             playsInline
             preload="auto"
-            className="creative-hero-video absolute inset-0 h-[110%] w-full object-cover opacity-0 transition-opacity duration-1000"
+            className="creative-hero-video absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-1000"
           />
         )}
       </div>
