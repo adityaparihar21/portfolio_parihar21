@@ -158,33 +158,7 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
 
   return (
     <div className="min-h-screen bg-[#070b12] text-[#a8c4e0] font-mono selection:bg-[rgba(55,138,221,0.15)] selection:text-[#b8d4f0]">
-      {/* Sub-navigation Filters */}
-      <div className="fixed top-24 md:top-28 left-0 w-full px-6 md:px-12 z-40 mix-blend-difference pointer-events-none">
-        <div className="flex gap-4 md:gap-8 pointer-events-auto overflow-x-auto scrollbar-none">
-          {filters.map((f) => (
-            <button
-              key={f}
-              onClick={() => setActiveFilter(f)}
-              className="text-[9px] uppercase tracking-[0.22em] flex items-center gap-1 cursor-crosshair pb-1 relative transition-colors duration-200"
-              style={{ color: activeFilter === f ? "#a8c4e0" : "rgba(120,160,200,0.45)" }}
-            >
-              {f}
-              {activeFilter === f && (
-                <span className="absolute bottom-0 left-0 w-full h-[0.5px] bg-[rgba(100,150,210,0.55)]" />
-              )}
-              {activeFilter === f && (
-                <motion.span
-                  animate={{ opacity: [1, 0, 1] }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  className="text-[rgba(106,159,216,0.7)] ml-1"
-                >
-                  |
-                </motion.span>
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
+
 
       {/* Hero Section */}
       <section className="relative w-full h-screen flex flex-col justify-center items-center px-6 md:px-12">
@@ -226,7 +200,7 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
       </section>
 
       {/* Strict CSS Project Grid with Images */}
-      <section className="w-full px-6 md:px-12 pb-32">
+      <section id="work" className="w-full px-6 md:px-12 pb-32">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-l border-t border-[rgba(100,150,210,0.08)]">
           {filteredProjects.map((p, idx) => (
             <div
@@ -300,7 +274,7 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
         </div>
 
         {/* GitHub Contributions Box */}
-        <div className="mt-32 w-full flex flex-col items-center">
+        <div id="open-source" className="mt-32 w-full flex flex-col items-center">
           <h2 className="text-[12px] font-mono text-[rgba(120,160,200,0.5)] tracking-[0.2em] uppercase mb-8">
             Open Source Contributions
           </h2>

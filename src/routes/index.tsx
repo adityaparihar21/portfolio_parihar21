@@ -413,6 +413,15 @@ function Header({
                 return false;
               return true;
             })
+            .flatMap((item) => {
+              if (themeMode === "engineering" && item.label.toLowerCase() === "work") {
+                return [
+                  { ...item, label: "Projects" },
+                  { label: "Open Source", href: "#open-source" }
+                ];
+              }
+              return item;
+            })
             .map((item, i) => (
               <a
                 key={item.href}
@@ -480,6 +489,15 @@ function Header({
                 if (themeMode === "engineering" && item.label.toLowerCase() === "creative")
                   return false;
                 return true;
+              })
+              .flatMap((item) => {
+                if (themeMode === "engineering" && item.label.toLowerCase() === "work") {
+                  return [
+                    { ...item, label: "Projects" },
+                    { label: "Open Source", href: "#open-source" }
+                  ];
+                }
+                return item;
               })
               .map((item) => (
                 <a
