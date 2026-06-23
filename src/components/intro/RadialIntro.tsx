@@ -23,6 +23,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
   const heroWrapperRef = useRef<HTMLDivElement>(null);
   const progressBarContainerRef = useRef<HTMLDivElement>(null);
   const progressFillRef = useRef<HTMLDivElement>(null);
+  const scrollTextRef = useRef<HTMLDivElement>(null);
   
   const thread1Ref = useRef<SVGSVGElement>(null);
   const thread2Ref = useRef<SVGSVGElement>(null);
@@ -119,6 +120,11 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
 
     let maxProgress = 0;
     const tl = gsap.timeline({ paused: true });
+
+    // Fade out scroll text immediately upon scrolling
+    if (scrollTextRef.current) {
+      tl.to(scrollTextRef.current, { autoAlpha: 0, duration: 0.05, ease: "power2.inOut" }, 0.01);
+    }
 
     // Show the progress bar shortly after load
     if (progressBarContainerRef.current) {
