@@ -58,11 +58,22 @@ export function PortalTeaser({ onTransitionComplete }: PortalTeaserProps) {
     // Make the original invisible
     containerRef.current.style.opacity = "0";
 
-    // Grab the video inside the clone to ensure it plays
+    // Grab the video inside the clone to ensure it plays from the start
     const cloneVideo = clone.querySelector("video");
     if (cloneVideo) {
-      cloneVideo.currentTime = videoRef.current.currentTime;
+      // The user requested the video to play from the start upon clicking
+      cloneVideo.currentTime = 0;
+      window.SHARED_VIDEO_TIME = 0;
+      
+      // Remove loop so it actually ends
+      cloneVideo.removeAttribute("loop");
       cloneVideo.play().catch(() => {});
+    }
+
+    // Hide the text inside the clone immediately so only the video shows
+    const textOverlay = clone.querySelector(".flex-col");
+    if (textOverlay) {
+      (textOverlay as HTMLElement).style.display = "none";
     }
 
     // Animate the clone to full viewport
@@ -85,17 +96,34 @@ export function PortalTeaser({ onTransitionComplete }: PortalTeaserProps) {
           opacity: 0,
           duration: 0.5,
           onComplete: () => {
-            // Trigger the app to switch modes
-            onTransitionComplete();
-            
-            // Clean up the clone after a small delay to allow React to mount the new CreativeHero
-            setTimeout(() => {
-              gsap.to(clone, {
-                opacity: 0,
-                duration: 0.5,
-                onComplete: () => clone.remove()
-              });
-            }, 100);
+            // Wait for the cinematic video to finish before switching layouts
+            if (cloneVideo) {
+              const handleVideoEnd = () => {
+                // Reset global time so the Creative Hero starts from the beginning too
+                window.SHARED_VIDEO_TIME = 0;
+                onTransitionComplete();
+                
+                // Clean up the clone after a small delay to allow React to mount the new CreativeHero
+                setTimeout(() => {
+                  gsap.to(clone, {
+                    opacity: 0,
+                    duration: 0.5,
+                    onComplete: () => clone.remove()
+                  });
+                }, 100);
+              };
+
+              // If it already ended (unlikely for a 21s video, but safe to check)
+              if (cloneVideo.ended) {
+                handleVideoEnd();
+              } else {
+                cloneVideo.addEventListener("ended", handleVideoEnd, { once: true });
+              }
+            } else {
+              // Fallback if video isn't there
+              onTransitionComplete();
+              clone.remove();
+            }
           }
         });
       }
