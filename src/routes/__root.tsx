@@ -74,13 +74,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "My Portfolio" },
-      { name: "description", content: "My Portfolio Application" },
+      { title: "Aditya Parihar — Software Engineer & Visual Editor" },
+      { name: "description", content: "BTech CSE student at UPES. Building high-performance backend systems, AI workflows, and cinematic web experiences." },
       { name: "author", content: "Aditya Parihar" },
-      { property: "og:title", content: "My Portfolio" },
-      { property: "og:description", content: "My Portfolio Application" },
+      { property: "og:title", content: "Aditya Parihar — Software Engineer" },
+      { property: "og:description", content: "Backend architecture, computational logic, and visual storytelling." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, X } from "lucide-react";
+import { ArrowRight, X, Terminal as TerminalIcon } from "lucide-react";
 import { useContent } from "../lib/use-content";
-import { GitHubCalendar } from "react-github-calendar";
+import { TerminalOverlay } from "./TerminalOverlay";
 
 // Define the shape of a project extending the existing content structure
 type TechProject = ReturnType<typeof useContent>["selectedWork"]["projects"][0] & {
@@ -27,27 +27,27 @@ const getExtendedProject = (
 
   switch (p.id) {
     case "portfolio":
-      writeup = "Architectural Overview:\n\nThe primary engineering challenge for the portfolio involved orchestrating high-performance WebGL context alongside complex GSAP scroll timelines. \n\nApproach:\nI implemented a custom Lenis smooth-scroll instance synchronized with Three.js rendering loops, decoupling the DOM layout from 3D transformations to maintain a strict 60fps budget. The routing system utilizes a split-theme approach (Creative vs Technical) leveraging React Context and Framer Motion for seamless page transitions.";
+      writeup = "Problem: Most developer portfolios look identical. Bootstrap + dark theme + card grid.\n\nMy approach: Built a custom 3D WebGL environment integrated seamlessly with a DOM-based split theme layout. I didn't want the user to choose between \"looks good\" and \"functions well\" — I wanted both.\n\nTechnical decisions: Three.js for 3D processing, GSAP for timeline animations, and a decoupled React architecture to maintain strict 60fps performance across devices.\n\nResult: A portfolio that feels like a product, not a resume.";
       codeSnippet = "// Synchronized Scroll Loop\nuseFrame((state) => {\n  if (!lenisRef.current) return;\n  const scrollY = lenisRef.current.scroll;\n  camera.position.y = THREE.MathUtils.lerp(\n    camera.position.y,\n    -scrollY * 0.05,\n    0.1\n  );\n});";
       metrics = [{ label: "fps", value: "60" }, { label: "lighthouse score", value: "100" }];
       break;
     case "ctj":
-      writeup = "Architectural Overview:\n\nCommunal Typewriter Journal required a robust state management system to handle real-time ink ribbon switching, sound design triggers, and analog typography emulation.\n\nApproach:\nI utilized a functional reactive model to isolate side-effects like audio playback and DOM mutations from the React render cycle. The typewriter sounds are preloaded and managed via a custom AudioContext hook to ensure zero-latency playback on keydown.";
+      writeup = "Problem: Standard journaling apps feel sterile. I wanted to build something that had the tactile, atmospheric feel of an old typewriter in a dark room.\n\nMy approach: Focused heavily on sensory feedback — keystroke audio latency, visual \"ink\" bleeding effects, and an analog design language.\n\nTechnical decisions: Managed complex audio/visual state using functional reactive models to ensure zero-latency feedback on keystrokes.\n\nResult: A moody, cinematic web experience that people actually want to write in.";
       codeSnippet = "// AudioContext Keydown Handler\nconst playKeystroke = useCallback((key) => {\n  if (!audioCtx.current) return;\n  const buffer = keyBuffers.current[key] || defaultKeyBuffer;\n  const source = audioCtx.current.createBufferSource();\n  source.buffer = buffer;\n  source.connect(audioCtx.current.destination);\n  source.start(0);\n}, []);";
       metrics = [{ label: "audio latency", value: "<10ms" }, { label: "state updates", value: "O(1)" }];
       break;
     case "ascii-engine":
-      writeup = "Architectural Overview:\n\nThe ASCII Engine transforms high-resolution webcam feeds into dynamic character matrices in real-time, requiring intensive matrix operations.\n\nApproach:\nBuilt using Java and OpenCV, the engine maps pixel luminance to a predefined ASCII density string. I optimized the frame processing pipeline by downscaling the capture matrix and applying parallel stream processing to compute character brightness indices, achieving high framerates without native GPU acceleration.";
+      writeup = "Problem: Processing video into ASCII usually requires GPU acceleration to run smoothly. I wanted to see if I could do it in pure Java.\n\nMy approach: Downscaled the webcam capture matrix and applied parallel stream processing.\n\nTechnical decisions: Mapped pixel luminance to an ASCII density string. Highly optimized matrix operations to achieve 30fps purely on the CPU.\n\nResult: A raw, functional CLI tool that turns reality into text in real time.";
       codeSnippet = "// Luminance to ASCII Mapping\npublic char getAsciiChar(int r, int g, int b) {\n  double luminance = 0.299 * r + 0.587 * g + 0.114 * b;\n  int index = (int) Math.round((luminance / 255.0) * (ASCII_CHARS.length() - 1));\n  return ASCII_CHARS.charAt(index);\n}";
       metrics = [{ label: "throughput", value: "30fps" }, { label: "cpu footprint", value: "optimized" }];
       break;
     case "trip-co":
-      writeup = "Architectural Overview:\n\nTrip Co leverages LLMs to generate structured travel itineraries based on dynamic user constraints like budget, duration, and dietary preferences.\n\nApproach:\nCurrently in development, the system uses prompt-chaining and JSON schemas to enforce strict data structures from the AI provider. The frontend is built with React, focusing on a highly responsive timeline view to visualize the generated itineraries.";
+      writeup = "Problem: Travel planning takes hours of research. AI can do it, but standard ChatGPT output is unformatted and hard to read.\n\nMy approach: Building a structured, visually appealing itinerary generator.\n\nTechnical decisions: Using prompt-chaining and strict JSON schemas to force LLMs to return predictable data. React frontend renders this as a clean, responsive timeline.\n\nResult: (In progress) A tool that gives you a full trip plan in seconds.";
       codeSnippet = "// AI Payload Schema\nconst itinerarySchema = z.object({\n  days: z.array(z.object({\n    date: z.string(),\n    activities: z.array(z.object({\n      time: z.string(),\n      location: z.string(),\n      costEstimate: z.number()\n    }))\n  }))\n});";
       metrics = [{ label: "status", value: "active dev" }, { label: "stack", value: "AI + React" }];
       break;
     case "weather-hut":
-      writeup = "Architectural Overview:\n\nWeatherHUT is a minimalist weather visualization dashboard designed to fetch and display meteorological data with high reliability.\n\nApproach:\nI integrated multiple weather APIs with fallback mechanisms to ensure data availability. The UI adapts its color palette dynamically based on the current weather condition using CSS variables and React Context, creating an immersive, context-aware user experience.";
+      writeup = "Problem: Most weather apps are cluttered with ads and unnecessary data.\n\nMy approach: Built a minimalist dashboard focused only on what matters, with an interface that adapts to the data it receives.\n\nTechnical decisions: Integrated multiple weather APIs with fallback routing for reliability. Used CSS variables tied to React Context for dynamic color palette shifts based on weather conditions.\n\nResult: A reliable, aesthetically pleasing utility app.";
       codeSnippet = "// Dynamic Weather Theme Injection\nuseEffect(() => {\n  const theme = getThemeForCondition(weather.id);\n  document.documentElement.style.setProperty('--bg-primary', theme.primary);\n  document.documentElement.style.setProperty('--bg-secondary', theme.secondary);\n}, [weather]);";
       metrics = [{ label: "api fallback", value: "active" }, { label: "ux pattern", value: "adaptive" }];
       break;
@@ -97,24 +97,58 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
   const [showCursor, setShowCursor] = useState(true);
   const [sysTime, setSysTime] = useState("");
   const [selectedProject, setSelectedProject] = useState<TechProject | null>(null);
+  const [isTerminalOpen, setIsTerminalOpen] = useState(false);
+
+  // Terminal keyboard shortcut
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "`" || e.key === "~") {
+        e.preventDefault();
+        setIsTerminalOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const filters = ["ALL", "ENGINEERING", "SYSTEMS", "OPEN SOURCE", "EXPERIMENTS"];
-  const targetText = "building systems\nthat don't ask\nfor attention.";
+  const targetTexts = [
+    "building systems\nthat don't ask\nfor attention.",
+    "building things\nthat outlive\nthe hype.",
+    "writing code\nlike editing film —\nwith intention."
+  ];
+
+  const [textIndex, setTextIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Typewriter effect
   useEffect(() => {
-    let i = 0;
-    const interval = setInterval(() => {
-      setTypedText(targetText.slice(0, i));
-      i++;
-      if (i > targetText.length) {
-        clearInterval(interval);
-        // Blinking cursor for 1.2s then fade
-        setTimeout(() => setShowCursor(false), 1200);
+    const currentText = targetTexts[textIndex];
+    let timeoutId: NodeJS.Timeout;
+
+    if (isDeleting) {
+      if (typedText.length > 0) {
+        timeoutId = setTimeout(() => {
+          setTypedText(currentText.substring(0, typedText.length - 1));
+        }, 20); // Fast delete
+      } else {
+        setIsDeleting(false);
+        setTextIndex((prev) => (prev + 1) % targetTexts.length);
       }
-    }, 38);
-    return () => clearInterval(interval);
-  }, []);
+    } else {
+      if (typedText.length < currentText.length) {
+        timeoutId = setTimeout(() => {
+          setTypedText(currentText.substring(0, typedText.length + 1));
+        }, 50); // Typing speed
+      } else {
+        timeoutId = setTimeout(() => {
+          setIsDeleting(true);
+        }, 3000); // Wait before deleting
+      }
+    }
+
+    return () => clearTimeout(timeoutId);
+  }, [typedText, isDeleting, textIndex]);
 
   // Clock
   useEffect(() => {
@@ -176,11 +210,26 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
               />
             )}
           </h1>
-          <p className="mt-8 text-[14px] md:text-[16px] text-[rgba(120,160,200,0.6)] max-w-[600px] font-mono leading-[1.8]">
-            BTech CSE student specializing in AI & Machine Learning. Focused on scalable backend architectures, computational logic, and building highly-performant software systems.
-          </p>
-          <div className="mt-8 text-[9px] uppercase tracking-[0.25em] text-[rgba(120,160,200,0.35)]">
-            v2.1 — 2026 — Dehradun / Remote
+          <div className="mt-8 text-[14px] md:text-[16px] text-[rgba(120,160,200,0.6)] max-w-[600px] font-mono leading-[1.8]">
+            <p>BTech CSE · AI & ML · UPES Dehradun</p>
+            <p>Backend architecture. Computational logic. Things that work.</p>
+            <p className="mt-2 text-[rgba(120,160,200,0.4)]">Also: Lead Video Editor @life_at_upes — because one obsession isn't enough.</p>
+          </div>
+
+          <div className="mt-10 flex flex-wrap justify-center gap-6 text-[11px] tracking-widest uppercase">
+            <a href="#work" className="text-[#a8c4e0] hover:text-white transition-colors flex items-center gap-2">
+              [ VIEW PROJECTS <ArrowRight className="w-3 h-3 inline" /> ]
+            </a>
+            <a href="/AP_ENG_RESUME.docx" download className="text-[#a8c4e0] hover:text-white transition-colors flex items-center gap-2">
+              [ DOWNLOAD RESUME ↓ ]
+            </a>
+            <div className="text-[rgba(120,160,200,0.5)] flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> OPEN TO WORK
+            </div>
+          </div>
+
+          <div className="mt-12 text-[9px] uppercase tracking-[0.25em] text-[rgba(120,160,200,0.35)]">
+            V2.1 — 2026 — DEHRADUN / REMOTE
           </div>
         </div>
 
@@ -196,6 +245,46 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
         </div>
         <div className="absolute bottom-8 right-6 md:right-12 text-[11px] tracking-widest text-[rgba(120,160,200,0.3)] tabular-nums">
           {sysTime}
+        </div>
+      </section>
+
+      {/* About & Philosophy Section */}
+      <section id="about" className="w-full px-6 md:px-12 py-32 border-t border-[rgba(100,150,210,0.08)]">
+        <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-24">
+          {/* About */}
+          <div>
+            <h2 className="text-[10px] tracking-[0.2em] text-[rgba(120,160,200,0.4)] mb-8 uppercase">01 / Engineering meets cinematography</h2>
+            <div className="space-y-6 text-[14px] md:text-[15px] font-light leading-relaxed text-[rgba(168,196,224,0.8)]">
+              <p>I'm Aditya Parihar — a BTech CSE student specializing in AI & Machine Learning at UPES, with a focus on backend architecture, computational logic, and software systems that are highly performant.</p>
+              <p>But I don't just write code. I edit film.</p>
+              <p>For the past few years, I've worked as the Lead Video Editor & Collaborator for @life_at_upes, directing and editing visual narratives. That background completely changes how I engineer software. I don't just see functions and databases; I see pacing, rhythm, and structure.</p>
+              <p>I believe the best codebases are like the best films: every frame has a purpose, every cut is intentional, and the final product feels effortless — even if it took 100 hours to build.</p>
+            </div>
+          </div>
+
+          {/* Philosophy */}
+          <div>
+            <h2 className="text-[10px] tracking-[0.2em] text-[rgba(120,160,200,0.4)] mb-8 uppercase">02 / What drives the work</h2>
+            
+            <blockquote className="border-l-2 border-[#a8c4e0] pl-6 py-2 mb-10 text-[16px] md:text-[18px] text-[#a8c4e0] italic">
+              "Most code solves a problem. Good code tells a story. Great code doesn't need to explain itself."
+            </blockquote>
+
+            <div className="space-y-8">
+              <div>
+                <h3 className="text-[11px] tracking-widest text-[rgba(120,160,200,0.6)] uppercase mb-2">1. Intention</h3>
+                <p className="text-[13px] text-[rgba(168,196,224,0.7)] leading-relaxed">No boilerplate. No bloated dependencies just because they're popular. If it's in the stack, it has a reason to be there.</p>
+              </div>
+              <div>
+                <h3 className="text-[11px] tracking-widest text-[rgba(120,160,200,0.6)] uppercase mb-2">2. Rhythm</h3>
+                <p className="text-[13px] text-[rgba(168,196,224,0.7)] leading-relaxed">A well-architected system has a natural flow. The data models make sense. The API routes are predictable. The UI responds exactly when the user expects it to.</p>
+              </div>
+              <div>
+                <h3 className="text-[11px] tracking-widest text-[rgba(120,160,200,0.6)] uppercase mb-2">3. Obsession</h3>
+                <p className="text-[13px] text-[rgba(168,196,224,0.7)] leading-relaxed">I don't stop when it "works." I stop when the edge cases are handled, the rendering is 60fps, and the terminal output looks as good as the GUI.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -438,12 +527,41 @@ export function EngineeringPortfolio({ data }: { data: ReturnType<typeof useCont
         )}
       </AnimatePresence>
 
+      <section id="contact" className="w-full px-6 md:px-12 py-32 border-t border-[rgba(100,150,210,0.08)] bg-[rgba(55,100,180,0.02)]">
+        <div className="max-w-[800px] mx-auto text-center">
+          <h2 className="text-[10px] tracking-[0.2em] text-[rgba(120,160,200,0.4)] mb-8 uppercase">06 / OPEN TO WORK</h2>
+          
+          <div className="space-y-6 text-[15px] md:text-[18px] font-light leading-relaxed text-[rgba(168,196,224,0.9)]">
+            <p>I'm currently looking for Software Engineering roles, particularly in backend systems, AI integration, and full-stack architecture.</p>
+            <p className="text-[rgba(120,160,200,0.7)]">Whether you're building something interesting, need a developer who understands both the system and the story, or just want to chat about code — my inbox is open.</p>
+            <p className="text-[#a8c4e0] font-normal pt-4">Let's build something that matters.</p>
+          </div>
+
+          <div className="mt-12">
+            <a href="mailto:adityaparihar21@gmail.com" className="inline-block border border-[rgba(100,150,210,0.3)] px-8 py-4 text-[11px] tracking-widest text-[#a8c4e0] hover:bg-[#a8c4e0] hover:text-[#070b12] transition-colors uppercase">
+              Email Me →
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* Technical Footer */}
-      <footer className="w-full px-6 md:px-12 py-8 border-t border-[rgba(100,150,210,0.1)] flex items-center justify-start">
-        <span className="text-[9px] font-mono tracking-[0.22em] text-[rgba(120,160,200,0.25)]">
+      <footer className="w-full px-6 md:px-12 py-8 border-t border-[rgba(100,150,210,0.1)] flex flex-col md:flex-row items-center justify-between gap-4">
+        <span className="text-[9px] font-mono tracking-[0.22em] text-[rgba(120,160,200,0.25)] flex items-center gap-4">
           ap@portfolioparihar21 — technical_work — build 2.1.0
+          <button 
+            onClick={() => setIsTerminalOpen(true)}
+            className="flex items-center gap-2 hover:text-[#a8c4e0] transition-colors bg-[rgba(100,150,210,0.05)] px-3 py-1.5 rounded cursor-crosshair border border-[rgba(100,150,210,0.1)] hover:border-[rgba(100,150,210,0.3)]"
+          >
+            <TerminalIcon className="w-3 h-3" /> [~] TERMINAL
+          </button>
+        </span>
+        <span className="text-[9px] font-mono tracking-[0.22em] text-[rgba(120,160,200,0.25)]">
+          Dehradun / Remote
         </span>
       </footer>
+
+      <TerminalOverlay isOpen={isTerminalOpen} onClose={() => setIsTerminalOpen(false)} />
     </div>
   );
 }

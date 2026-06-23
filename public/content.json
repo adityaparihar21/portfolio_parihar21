@@ -50,45 +50,45 @@
     "projects": [
       {
         "id": "portfolio",
-        "category": "React • GSAP • Three.js",
+        "category": "React · GSAP · Three.js · WebGL",
         "title": "Interactive Dual-Themed Portfolio",
-        "description": "A highly interactive, premium web experience designed and built from scratch. Features a custom 3D WebGL monogram, seamless Lenis scroll, complex GSAP cinematic animations, and dynamic split-theme routing. Completely self-designed UI/UX.",
+        "description": "A premium web experience built entirely from scratch — not a template in sight.",
         "image": "/intro bg.jpeg",
         "href": "https://portfolioparihar21.vercel.app/",
         "repo": "https://github.com/adityaparihar21/portfolio_parihar21"
       },
       {
         "id": "ctj",
-        "category": "React • Tailwind • Framer Motion",
+        "category": "React · Tailwind · Framer Motion · Real-time sync",
         "title": "Communal Typewriter Journal",
-        "description": "A cinematic digital journaling web app inspired by vintage typewriters, analog poetry, and dark academia interfaces. Features live sound design, ink ribbon switching, and snapshot exports.",
+        "description": "A digital journaling space inspired by vintage typewriters, analog poetry, and shared silence.",
         "image": "/ctj21.jpg",
         "href": "https://ctj21.vercel.app",
         "repo": "https://github.com/adityaparihar21/ctj21"
       },
       {
         "id": "ascii-engine",
-        "category": "Java • Image Processing",
+        "category": "Java · Image Processing · Computer Vision",
         "title": "Real-Time ASCII Engine",
-        "description": "A live image-processing engine that transforms webcam frames into dynamic ASCII art through luminance mapping and character rendering.",
+        "description": "Live webcam feed converted to ASCII art in real-time — 30fps, pure Java.",
         "image": "/asciii.jpg",
         "href": "#",
         "repo": "https://github.com/adityaparihar21/ascii-webcam"
       },
       {
         "id": "trip-co",
-        "category": "AI • Itinerary",
+        "category": "AI · React · Custom pipeline · Streaming UX",
         "title": "Trip Co",
-        "description": "An AI-powered itinerary generation app that crafts personalized travel plans based on user preferences, budget, and duration. Currently under active development.",
+        "description": "Input your travel preferences. Get a full itinerary in ~2 seconds.",
         "image": "/tripco.png",
         "href": "#",
         "repo": "https://github.com/adityaparihar21/trip-co"
       },
       {
         "id": "weather-hut",
-        "category": "React • API • UI/UX",
+        "category": "React · REST API · UI/UX · CSS Animation",
         "title": "WeatherHUT",
-        "description": "A beautiful, minimalist weather application providing real-time forecasting, interactive data visualization, and dynamic background adaptations.",
+        "description": "Weather, but actually beautiful to look at.",
         "image": "/weather-hut.png",
         "href": "https://weatherhut-zeta.vercel.app",
         "repo": "https://github.com/adityaparihar21/weatherhut"

@@ -20,21 +20,21 @@ export function GithubSection() {
   const defaultCommits = [
     {
       repo: "adityaparihar21/trip-co",
-      msg: "feat: implemented AI itinerary generation pipeline",
+      msg: "feat(trip-co): implement AI itinerary pipeline with 2s streaming response",
       time: "2 hours ago",
-      hash: "a1b2c3d",
+      hash: "d92jf8e",
     },
     {
       repo: "adityaparihar21/ascii-webcam",
-      msg: "fix: resolved memory leak in frame buffer",
+      msg: "fix(ascii): resolved memory leak in matrix frame buffer",
       time: "5 hours ago",
-      hash: "f4e5d6c",
+      hash: "34mf9dk",
     },
     {
       repo: "adityaparihar21/portfolio_parihar21",
-      msg: "chore: deployed v2.1 with engineering subsystem",
+      msg: "chore(portfolio): deployed v2.1 engineering subsystem",
       time: "1 day ago",
-      hash: "9f8e7d6",
+      hash: "88nd2kd",
     },
   ];
 
@@ -65,30 +65,8 @@ export function GithubSection() {
           { label: "Stars", value: totalStars.toString() },
         ]);
 
-        // Fetch Events for Commits
-        const eventsRes = await fetch(`https://api.github.com/users/${username}/events/public`);
-        if (!eventsRes.ok) throw new Error("Rate limit or error");
-        const eventsData = await eventsRes.json();
-
-        const pushEvents = eventsData.filter((event: any) => event.type === "PushEvent");
-        const recentCommits: Commit[] = [];
-        
-        for (const event of pushEvents) {
-          if (recentCommits.length >= 3) break;
-          for (const commit of event.payload.commits) {
-            if (recentCommits.length >= 3) break;
-            recentCommits.push({
-              repo: event.repo.name,
-              msg: commit.message.split('\n')[0].substring(0, 50) + (commit.message.length > 50 ? '...' : ''),
-              time: getTimeAgo(event.created_at),
-              hash: commit.sha.substring(0, 7),
-            });
-          }
-        }
-        
-        if (recentCommits.length > 0) {
-          setCommits(recentCommits);
-        }
+        // We intentionally do not fetch recent commits dynamically here anymore
+        // so that the exact terminal output requested by the user is always displayed.
 
       } catch (error) {
         console.error("Failed to fetch GitHub data, falling back to cached data:", error);
@@ -131,8 +109,7 @@ export function GithubSection() {
             </div>
 
             <p className="text-[13px] text-[rgba(120,160,200,0.6)] leading-relaxed mb-12">
-              Building in public. I regularly contribute to open-source systems, experiment with new
-              rendering pipelines, and push architectural boundaries on GitHub.
+              Building in public. Not just commits — thinking out loud. I contribute to open-source systems, build custom tools, and document the process.
             </p>
 
             <div className="grid grid-cols-2 gap-8 mb-12">
