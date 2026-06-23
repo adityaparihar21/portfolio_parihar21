@@ -402,6 +402,16 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
           </svg>
         </div>
 
+        {/* Scroll To Explore Text */}
+        <div 
+          ref={scrollTextRef} 
+          className="absolute bottom-16 md:bottom-24 w-full text-center z-10"
+        >
+          <span className="text-white/40 font-serif text-[11px] tracking-[0.25em] uppercase drop-shadow-md">
+            scroll to explore
+          </span>
+        </div>
+
           {/* Animated Wrapper for Cards */}
           <div ref={ringRef} className="absolute inset-0 origin-center will-change-transform z-3">
             {isReady && layout.length === cardCount &&
