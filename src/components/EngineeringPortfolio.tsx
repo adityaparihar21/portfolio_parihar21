@@ -390,7 +390,7 @@ export function EngineeringPortfolio({ data, onSwitchToCreative }: { data: Retur
             {/* Close Button */}
             <button
               onClick={() => setSelectedProject(null)}
-              className="fixed top-8 right-8 z-[110] p-4 text-[rgba(120,160,200,0.5)] hover:text-[#a8c4e0] transition-colors cursor-crosshair bg-[#070b12]/80 backdrop-blur-md rounded-full"
+              className="fixed top-24 right-8 z-[110] p-4 text-[rgba(120,160,200,0.5)] hover:text-[#a8c4e0] transition-colors cursor-crosshair bg-[#070b12]/80 backdrop-blur-md rounded-full"
             >
               <X className="w-6 h-6" strokeWidth={1} />
             </button>

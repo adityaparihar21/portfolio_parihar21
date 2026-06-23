@@ -399,7 +399,7 @@ function Header({
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: navVisible ? 0 : -100, opacity: navVisible ? 1 : 0 }}
       transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
+      className={`fixed inset-x-0 top-0 z-[200] transition-all duration-500 ${
         scrolled || menuOpen
           ? "backdrop-blur-xl bg-background/75 border-b border-border"
           : "bg-transparent"
