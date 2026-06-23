@@ -1567,7 +1567,7 @@ function CallToAction({
           <span>
             © {new Date().getFullYear()} {data.brand.name}. All rights reserved.
           </span>
-          <span>Cinematic Storytelling</span>
+          {!isEngineering && <span>Cinematic Storytelling</span>}
         </div>
 
         {!isEngineering && (
