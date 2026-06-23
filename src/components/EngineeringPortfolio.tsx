@@ -27,6 +27,11 @@ const getExtendedProject = (
   let metrics: { label: string; value: string }[] = [];
 
   switch (p.id) {
+    case "lingo":
+      writeup = "Problem: 90% of global markets ignore content that isn't native to their culture. Most translation tools just translate words, ignoring context, emotion, and intent.\n\nMy approach: Designed LINGO.. as an enterprise-grade semantic platform built on governed models that powers translation, generation, and company-wide intelligence.\n\nTechnical decisions: Advanced CSS to create a modern, high-conversion landing page. The design prioritizes readability, semantic structure, and immediate emotional resonance with enterprise clients.\n\nResult: Stop speaking to the world. Start resonating with it.";
+      codeSnippet = "// Semantic Layout Structure\n<section className=\"semantic-core\">\n  <header className=\"context-aware-nav\">\n    <Logo />\n    <nav>Models | Capabilities | Pricing</nav>\n  </header>\n  <main className=\"hero-messaging\">\n    <h1>AI language for faster insights and zero chaos</h1>\n    <p>LINGO.. is an enterprise-grade semantic platform built on governed models that powers translation, generation, and company-wide intelligence.</p>\n  </main>\n</section>";
+      metrics = [{ label: "status", value: "live" }, { label: "stack", value: "Advanced CSS" }];
+      break;
     case "portfolio":
       writeup = "Problem: Most developer portfolios look identical. Bootstrap + dark theme + card grid.\n\nMy approach: Built a custom 3D WebGL environment integrated seamlessly with a DOM-based split theme layout. I didn't want the user to choose between \"looks good\" and \"functions well\" — I wanted both.\n\nTechnical decisions: Three.js for 3D processing, GSAP for timeline animations, and a decoupled React architecture to maintain strict 60fps performance across devices.\n\nResult: A portfolio that feels like a product, not a resume.";
       codeSnippet = "// Synchronized Scroll Loop\nuseFrame((state) => {\n  if (!lenisRef.current) return;\n  const scrollY = lenisRef.current.scroll;\n  camera.position.y = THREE.MathUtils.lerp(\n    camera.position.y,\n    -scrollY * 0.05,\n    0.1\n  );\n});";

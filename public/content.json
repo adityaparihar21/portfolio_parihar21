@@ -49,6 +49,15 @@
     },
     "projects": [
       {
+        "id": "lingo",
+        "category": "CSS · Semantic AI · Enterprise",
+        "title": "LINGO..",
+        "description": "AI language for faster insights and zero chaos.",
+        "image": "/lingo.png",
+        "href": "https://lingooo-one.vercel.app",
+        "repo": "https://github.com/adityaparihar21/day3-advanced-css"
+      },
+      {
         "id": "portfolio",
         "category": "React · GSAP · Three.js · WebGL",
         "title": "Interactive Dual-Themed Portfolio",
