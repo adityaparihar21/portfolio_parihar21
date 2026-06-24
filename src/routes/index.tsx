@@ -384,7 +384,8 @@ function Header({
     const onScroll = () => {
       setScrolled(window.scrollY > 32);
       if (themeMode === "creative") {
-        setNavVisible(window.scrollY > window.innerHeight * 2.5);
+        const isMobile = window.innerWidth < 768;
+        setNavVisible(isMobile || window.scrollY > window.innerHeight * 2.5);
       } else {
         setNavVisible(true);
       }
