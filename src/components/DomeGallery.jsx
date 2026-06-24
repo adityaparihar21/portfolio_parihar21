@@ -203,7 +203,7 @@ export default function DomeGallery({
 
       let effectiveMinRadius = minRadius;
       if (w < 768) {
-        effectiveMinRadius = 400; // Compact the dome for mobile screens but keep items legible
+        effectiveMinRadius = 200; // Compact the dome for mobile screens but keep items legible
       }
 
       radius = clamp(radius, effectiveMinRadius, maxRadius);

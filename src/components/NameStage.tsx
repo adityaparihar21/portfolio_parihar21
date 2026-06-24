@@ -44,16 +44,16 @@ export function NameStage() {
         </div>
 
         <div className="flex items-baseline justify-center whitespace-nowrap px-4 pb-2 md:pb-4 relative z-10">
-          <span className="font-bebas text-[clamp(72px,18vw,160px)] tracking-[0.06em] leading-[0.88] text-[#e8dfc8]/[0.03] transition-colors duration-500 group-hover:text-[#e8dfc8]">
+          <span className="font-bebas text-[clamp(32px,11vw,160px)] md:text-[clamp(72px,18vw,160px)] tracking-[0.06em] leading-[0.88] text-[#e8dfc8]/[0.03] transition-colors duration-500 group-hover:text-[#e8dfc8]">
             ADITYA&nbsp;
           </span>
-          <span className="font-bebas text-[clamp(72px,18vw,160px)] tracking-[0.06em] leading-[0.88] text-[#e8dfc8]">
+          <span className="font-bebas text-[clamp(32px,11vw,160px)] md:text-[clamp(72px,18vw,160px)] tracking-[0.06em] leading-[0.88] text-[#e8dfc8]">
             PARIHAR
           </span>
         </div>
 
         <span 
-          className="block font-bebas text-[clamp(72px,18vw,160px)] tracking-[0.06em] leading-[0.88] text-center text-transparent relative z-0 transition-all duration-300 whitespace-nowrap"
+          className="block font-bebas text-[clamp(32px,11vw,160px)] md:text-[clamp(72px,18vw,160px)] tracking-[0.06em] leading-[0.88] text-center text-transparent relative z-0 transition-all duration-300 whitespace-nowrap"
           style={{
             WebkitTextStroke: isHovering ? '1px rgba(201, 169, 110, 0.4)' : '1px rgba(255, 255, 255, 0.1)',
           }}
