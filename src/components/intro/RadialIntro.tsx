@@ -31,8 +31,18 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
 
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
-  const [isMobile, setIsMobile] = useState(false);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth < 768;
+    }
+    return false;
+  });
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    }
+    return false;
+  });
   const [introComplete, setIntroComplete] = useState(false);
   const introCompleteRef = useRef(false);
 
@@ -105,8 +115,10 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     const heroSubtext = heroWrapperRef.current?.querySelector(".creative-hero-subtext");
     const heroCtas = heroWrapperRef.current?.querySelectorAll(".creative-hero-cta");
     const heroVideo = heroWrapperRef.current?.querySelector(".creative-hero-video");
+    const glassPanel = heroWrapperRef.current?.querySelector(".creative-hero-glass-panel");
 
     if (heroBg) gsap.set(heroBg, { autoAlpha: 0, scale: 1.04 });
+    if (glassPanel) gsap.set(glassPanel, { autoAlpha: 0 });
     if (heroEyebrow) gsap.set(heroEyebrow, { autoAlpha: 0, y: 8, letterSpacing: "0.05em" });
     if (heroWords) gsap.set(heroWords, { autoAlpha: 0, y: 24 });
     if (heroSubtext) gsap.set(heroSubtext, { autoAlpha: 0 });
@@ -244,8 +256,6 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     if (clothespins) tl.to(clothespins, { autoAlpha: 0, scale: 0.5, duration: 0.1 }, 0.75);
     tl.to(cardElements, { autoAlpha: 0, scale: 0.8, ease: "power2.inOut", duration: 0.1 }, 0.75);
 
-    const glassPanel = heroWrapperRef.current?.querySelector(".creative-hero-glass-panel");
-
     if (heroBg) tl.to(heroBg, { autoAlpha: 1, ease: "power2.inOut", duration: 0.15 }, 0.78);
     if (glassPanel) tl.to(glassPanel, { autoAlpha: 1, ease: "power2.inOut", duration: 0.15 }, 0.78);
 
@@ -284,6 +294,10 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
         {children}
       </div>
     );
+  }
+
+  if (isMobile) {
+    return <>{children}</>;
   }
 
   return (

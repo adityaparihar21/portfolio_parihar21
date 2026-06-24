@@ -38,7 +38,7 @@ export function CreativeHero({
           OR we put it here and RadialIntro fades it in. Let's put it here and make it visible,
           but RadialIntro's timeline will control its opacity from 0 -> 0.6 -> 1. */}
 
-      <div className="absolute inset-0 creative-hero-bg z-0 will-change-[transform,opacity] opacity-0">
+      <div className="absolute inset-0 creative-hero-bg z-0 will-change-[transform,opacity]">
         <img
           src="/intro bg.jpeg"
           alt="Cinematic background"
@@ -56,7 +56,7 @@ export function CreativeHero({
             muted={isMuted}
             playsInline
             preload="auto"
-            className="creative-hero-video absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-1000"
+            className="creative-hero-video absolute inset-0 h-full w-full object-cover transition-opacity duration-1000"
           />
         )}
       </div>
@@ -67,11 +67,11 @@ export function CreativeHero({
 
       {/* Content wrapper */}
       <div className="relative z-10 w-full h-full flex flex-col items-start justify-end pl-4 md:pl-8 pr-6 md:pr-12 pb-12 md:pb-16">
-        <div className="creative-hero-glass-panel opacity-0 relative z-10">
+        <div className="creative-hero-glass-panel relative z-10">
           
           <h3 className="creative-hero-eyebrow relative z-10 text-[#C8A951] uppercase text-[10px] md:text-[11px] font-bold tracking-[0.25em] mb-4 flex flex-wrap gap-3 overflow-hidden drop-shadow-md">
           {["THE", "CREATIVE", "ENGINEER"].map((word, i) => (
-            <span key={i} className="creative-hero-eyebrow-word opacity-0 block">
+            <span key={i} className="creative-hero-eyebrow-word block">
               {word}
             </span>
           ))}
@@ -79,21 +79,21 @@ export function CreativeHero({
         
         <h1 className="creative-hero-headline relative z-10 font-serif text-white text-[clamp(2.2rem,12vw,85px)] leading-[1.1] tracking-tight mb-2 pb-3 drop-shadow-[0_4px_32px_rgba(0,0,0,1)] font-medium">
           {"Aditya Parihar".split(" ").map((word, i) => (
-            <span key={i} className="inline-block mr-4 creative-hero-word opacity-0 pb-2">
+            <span key={i} className="inline-block mr-4 creative-hero-word pb-2">
               {word}
             </span>
           ))}
         </h1>
         
-        <p className="creative-hero-subtext relative z-10 opacity-0 text-white/90 text-[16px] md:text-[20px] font-light mb-10 md:mb-12 tracking-wide drop-shadow-[0_2px_16px_rgba(0,0,0,1)]">
+        <p className="creative-hero-subtext relative z-10 text-white/90 text-[16px] md:text-[20px] font-light mb-10 md:mb-12 tracking-wide drop-shadow-[0_2px_16px_rgba(0,0,0,1)]">
           Code. Vision. Cinematography.
         </p>
 
         <div className="relative z-10 flex flex-col md:flex-row items-stretch md:items-center gap-3 md:gap-5 w-full md:w-auto">
-          <button className="creative-hero-cta opacity-0 bg-[#C8A951] text-[#111] px-6 md:px-8 py-4 uppercase text-[11px] md:text-[12px] tracking-[0.15em] font-medium transition-colors hover:bg-[#D4B55A] rounded-none">
+          <button className="creative-hero-cta bg-[#C8A951] text-[#111] px-6 md:px-8 py-4 uppercase text-[11px] md:text-[12px] tracking-[0.15em] font-medium transition-colors hover:bg-[#D4B55A] rounded-none">
             View Projects
           </button>
-          <button className="creative-hero-cta opacity-0 border border-[#C8A951] text-[#C8A951] px-6 md:px-8 py-4 uppercase text-[11px] md:text-[12px] tracking-[0.15em] font-medium transition-colors hover:bg-[#C8A951]/10 rounded-none bg-black/20">
+          <button className="creative-hero-cta border border-[#C8A951] text-[#C8A951] px-6 md:px-8 py-4 uppercase text-[11px] md:text-[12px] tracking-[0.15em] font-medium transition-colors hover:bg-[#C8A951]/10 rounded-none bg-black/20">
             GitHub Profile
           </button>
         </div>
