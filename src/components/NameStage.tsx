@@ -1,9 +1,16 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 export function NameStage() {
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
+  const [isTouch, setIsTouch] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
+      setIsTouch(true);
+    }
+  }, []);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!stageRef.current) return;
@@ -35,8 +42,8 @@ export function NameStage() {
           style={{
             left: cursorPos.x,
             top: cursorPos.y,
-            transform: `translate(-50%, -50%) scale(${isHovering ? 1 : 0})`,
-            opacity: isHovering ? 1 : 0,
+            transform: `translate(-50%, -50%) scale(${isHovering && !isTouch ? 1 : 0})`,
+            opacity: isHovering && !isTouch ? 1 : 0,
             transitionTimingFunction: 'cubic-bezier(.34, 1.56, .64, 1)'
           }}
         >
@@ -44,7 +51,7 @@ export function NameStage() {
         </div>
 
         <div className="flex items-baseline justify-center whitespace-nowrap px-4 pb-2 md:pb-4 relative z-10">
-          <span className="font-bebas text-[clamp(32px,11vw,160px)] md:text-[clamp(72px,18vw,160px)] tracking-[0.06em] leading-[0.88] text-[#e8dfc8]/[0.03] transition-colors duration-500 group-hover:text-[#e8dfc8]">
+          <span className={`font-bebas text-[clamp(32px,11vw,160px)] md:text-[clamp(72px,18vw,160px)] tracking-[0.06em] leading-[0.88] transition-colors duration-500 ${isTouch ? 'text-[#e8dfc8]' : 'text-[#e8dfc8]/[0.03] group-hover:text-[#e8dfc8]'}`}>
             ADITYA&nbsp;
           </span>
           <span className="font-bebas text-[clamp(32px,11vw,160px)] md:text-[clamp(72px,18vw,160px)] tracking-[0.06em] leading-[0.88] text-[#e8dfc8]">
@@ -55,7 +62,7 @@ export function NameStage() {
         <span 
           className="block font-bebas text-[clamp(32px,11vw,160px)] md:text-[clamp(72px,18vw,160px)] tracking-[0.06em] leading-[0.88] text-center text-transparent relative z-0 transition-all duration-300 whitespace-nowrap"
           style={{
-            WebkitTextStroke: isHovering ? '1px rgba(201, 169, 110, 0.4)' : '1px rgba(255, 255, 255, 0.1)',
+            WebkitTextStroke: (isHovering || isTouch) ? '1px rgba(201, 169, 110, 0.4)' : '1px rgba(255, 255, 255, 0.1)',
           }}
         >
           ADITYA&nbsp;&nbsp;PARIHAR
