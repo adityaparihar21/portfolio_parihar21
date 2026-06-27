@@ -96,7 +96,7 @@ function VideoPanel({ project, position, onClick, isClicked, hideUI, cameraDist 
         onPointerOut={() => setHovered(false)}
         cursor={isClicked ? "auto" : "pointer"}
       >
-        <RoundedBox args={[w + 0.3, h + 0.3, 0.15]} radius={0.05} position={[0, 0, -0.1]}>
+        <RoundedBox key={`box-${aspect}`} args={[w + 0.3, h + 0.3, 0.15]} radius={0.05} position={[0, 0, -0.1]}>
           <MeshTransmissionMaterial 
             backdropBlur={10} 
             roughness={0.2} 
@@ -106,7 +106,7 @@ function VideoPanel({ project, position, onClick, isClicked, hideUI, cameraDist 
           />
         </RoundedBox>
 
-        <planeGeometry args={[w, h]} />
+        <planeGeometry key={`plane-${aspect}`} args={[w, h]} />
         <meshBasicMaterial map={texture} toneMapped={true} />
       </mesh>
 
@@ -248,45 +248,7 @@ export default function MinorityReportGrid({ projects }: { projects: any[] }) {
     };
   }, [clickedIdx]);
 
-  const audioCtxRef = useRef<any>(null);
-  const gainNodeRef = useRef<any>(null);
-
-  useEffect(() => {
-    const initAudio = () => {
-      if (audioCtxRef.current) return;
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      
-      osc.type = "sine";
-      osc.frequency.value = 45;
-      
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      
-      gain.gain.value = 0;
-      osc.start();
-
-      audioCtxRef.current = ctx;
-      gainNodeRef.current = gain;
-    };
-
-    window.addEventListener("pointerdown", initAudio, { once: true });
-    window.addEventListener("wheel", initAudio, { once: true });
-    return () => {
-      if (audioCtxRef.current) audioCtxRef.current.close();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (gainNodeRef.current && audioCtxRef.current) {
-      if (clickedIdx !== null) {
-        gainNodeRef.current.gain.setTargetAtTime(0, audioCtxRef.current.currentTime, 0.3);
-      } else {
-        gainNodeRef.current.gain.setTargetAtTime(0.2, audioCtxRef.current.currentTime, 1.0);
-      }
-    }
-  }, [clickedIdx]);
+  // Audio SFX removed based on user feedback
 
   return (
     <section
