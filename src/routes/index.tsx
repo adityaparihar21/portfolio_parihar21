@@ -961,23 +961,30 @@ function CreativeCard({
   setActiveAudioId: (id: string | null) => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  // Correct offset to track the container's entire journey past the top of the viewport
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start start", "start end"],
+    offset: ["start start", "end start"],
   });
 
+  // Scale from top-center so the staggered top edge doesn't move when shrinking
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
   const brightness = useTransform(scrollYProgress, [0, 1], [1, 0.4]);
   const filter = useTransform(brightness, (b) => `brightness(${b})`);
 
   return (
-    <div ref={containerRef} className="h-[140vh] w-full relative">
+    <div ref={containerRef} className="h-[120vh] w-full relative flex justify-center">
       <motion.a
         href={p.href}
-        style={{ scale, filter }}
-        className="sticky top-[10vh] w-full h-[80vh] flex flex-col md:flex-row items-center gap-8 md:gap-12 bg-card/90 backdrop-blur-2xl rounded-[32px] overflow-hidden border border-border/50 shadow-2xl p-6 md:p-12 group"
+        style={{ 
+          scale, 
+          filter,
+          transformOrigin: "top center",
+          top: `calc(8vh + ${i * 16}px)` 
+        }}
+        className="sticky w-[90%] max-w-5xl h-[65vh] flex flex-col md:flex-row items-center gap-6 md:gap-10 bg-zinc-900/90 dark:bg-zinc-900/90 backdrop-blur-3xl rounded-[32px] overflow-hidden border border-white/10 shadow-[0_-15px_40px_rgba(0,0,0,0.4)] p-6 md:p-10 group"
       >
-        <div className={`w-full md:w-[65%] h-[40vh] md:h-full overflow-hidden rounded-2xl ${i % 2 === 1 ? "md:order-2" : ""}`}>
+        <div className={`w-full md:w-[60%] h-[40vh] md:h-full overflow-hidden rounded-2xl bg-black ${i % 2 === 1 ? "md:order-2" : ""}`}>
           <div className="relative w-full h-full">
             {p.image ? (
               <ProjectMedia
@@ -996,15 +1003,15 @@ function CreativeCard({
             )}
           </div>
         </div>
-        <div className="w-full md:w-[35%] flex flex-col gap-4">
+        <div className="w-full md:w-[40%] flex flex-col gap-4">
           <span className="text-[10px] font-medium tracking-[0.3em] uppercase text-primary">
             {p.category}
           </span>
-          <h3 className="font-serif text-3xl font-medium leading-tight tracking-tight md:text-5xl">
+          <h3 className="font-serif text-3xl font-medium leading-tight tracking-tight md:text-4xl text-white">
             {p.title}
           </h3>
           <p
-            className="text-sm font-light leading-relaxed text-muted-foreground md:text-base line-clamp-4"
+            className="text-sm font-light leading-relaxed text-zinc-400 md:text-base line-clamp-4"
             dangerouslySetInnerHTML={{ __html: p.description }}
           />
           <span className="mt-4 inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.25em] uppercase text-primary transition-all group-hover:gap-3">
