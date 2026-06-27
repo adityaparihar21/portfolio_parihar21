@@ -947,6 +947,75 @@ function SelectedWork({
 }
 
 /* ---------------- Creative Work ---------------- */
+function CreativeCard({
+  p,
+  i,
+  total,
+  activeAudioId,
+  setActiveAudioId,
+}: {
+  p: any;
+  i: number;
+  total: number;
+  activeAudioId: string | null;
+  setActiveAudioId: (id: string | null) => void;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "start end"],
+  });
+
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
+  const brightness = useTransform(scrollYProgress, [0, 1], [1, 0.4]);
+  const filter = useTransform(brightness, (b) => `brightness(${b})`);
+
+  return (
+    <div ref={containerRef} className="h-[140vh] w-full relative">
+      <motion.a
+        href={p.href}
+        style={{ scale, filter }}
+        className="sticky top-[10vh] w-full h-[80vh] flex flex-col md:flex-row items-center gap-8 md:gap-12 bg-card/90 backdrop-blur-2xl rounded-[32px] overflow-hidden border border-border/50 shadow-2xl p-6 md:p-12 group"
+      >
+        <div className={`w-full md:w-[65%] h-[40vh] md:h-full overflow-hidden rounded-2xl ${i % 2 === 1 ? "md:order-2" : ""}`}>
+          <div className="relative w-full h-full">
+            {p.image ? (
+              <ProjectMedia
+                src={p.image}
+                title={p.title}
+                id={p.id}
+                activeAudioId={activeAudioId}
+                setActiveAudioId={setActiveAudioId}
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center border border-border bg-card/60">
+                <span className="text-[10px] font-medium tracking-[0.3em] uppercase text-muted-foreground/60">
+                  Image coming soon
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="w-full md:w-[35%] flex flex-col gap-4">
+          <span className="text-[10px] font-medium tracking-[0.3em] uppercase text-primary">
+            {p.category}
+          </span>
+          <h3 className="font-serif text-3xl font-medium leading-tight tracking-tight md:text-5xl">
+            {p.title}
+          </h3>
+          <p
+            className="text-sm font-light leading-relaxed text-muted-foreground md:text-base line-clamp-4"
+            dangerouslySetInnerHTML={{ __html: p.description }}
+          />
+          <span className="mt-4 inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.25em] uppercase text-primary transition-all group-hover:gap-3">
+            View Edit <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.5} />
+          </span>
+        </div>
+      </motion.a>
+    </div>
+  );
+}
+
 function CreativeWork({
   data,
   activeAudioId,
@@ -980,60 +1049,16 @@ function CreativeWork({
           </motion.h2>
         </motion.div>
 
-        <div className="flex flex-col gap-20 md:gap-28">
+        <div className="flex flex-col relative w-full">
           {projects.map((p, i) => (
-            <motion.a
+            <CreativeCard
               key={p.id}
-              href={p.href}
-              initial={{ opacity: 0, y: 80 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-120px" }}
-              transition={{ duration: 1.1, ease: EASE_OUT_EXPO }}
-              className={`group grid items-center gap-8 md:grid-cols-12 md:gap-12 ${
-                i % 2 === 1 ? "md:[&>div:first-child]:order-2" : ""
-              }`}
-            >
-              <div className="md:col-span-8 overflow-hidden bg-card">
-                <div className="aspect-[16/10] overflow-hidden relative w-full h-full">
-                  {p.image ? (
-                    <ProjectMedia
-                      src={p.image}
-                      title={p.title}
-                      id={p.id}
-                      activeAudioId={activeAudioId}
-                      setActiveAudioId={setActiveAudioId}
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center border border-border bg-card/60">
-                      <span className="text-[10px] font-medium tracking-[0.3em] uppercase text-muted-foreground/60">
-                        Image coming soon
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-120px" }}
-                transition={{ duration: 0.9, delay: 0.2, ease: EASE_OUT_EXPO }}
-                className="md:col-span-4 flex flex-col gap-4"
-              >
-                <span className="text-[10px] font-medium tracking-[0.3em] uppercase text-primary">
-                  {p.category}
-                </span>
-                <h3 className="font-serif text-3xl font-medium leading-tight tracking-tight md:text-4xl">
-                  {p.title}
-                </h3>
-                <p
-                  className="text-sm font-light leading-relaxed text-muted-foreground md:text-base"
-                  dangerouslySetInnerHTML={{ __html: p.description }}
-                />
-                <span className="mt-2 inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.25em] uppercase text-primary transition-all group-hover:gap-3">
-                  View Edit <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.5} />
-                </span>
-              </motion.div>
-            </motion.a>
+              p={p}
+              i={i}
+              total={projects.length}
+              activeAudioId={activeAudioId}
+              setActiveAudioId={setActiveAudioId}
+            />
           ))}
         </div>
       </div>
