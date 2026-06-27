@@ -4,7 +4,7 @@ import { useRef, useState, useMemo, useEffect } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Html, Stars, Sparkles, MeshTransmissionMaterial, RoundedBox, Float } from "@react-three/drei";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
-import { useScroll, useSpring } from "framer-motion";
+import { useScroll, useSpring, motion, useTransform } from "framer-motion";
 import * as THREE from "three";
 import { ArrowRight, Code2, ExternalLink, Github } from "lucide-react";
 
@@ -451,9 +451,80 @@ export default function MinorityReportGrid({ projects }: { projects: any[] }) {
     stiffness: 60, 
   });
 
+  const fadeOut = useTransform(smoothScroll, [0, 0.05], [1, 0]);
+  const scaleDown = useTransform(smoothScroll, [0, 0.05], [1, 0.95]);
+
   type InteractionState = "IDLE" | "LOCKING" | "ENTERING" | "INSIDE" | "EXITING";
   const [interactionState, setInteractionState] = useState<InteractionState>("IDLE");
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
+
+  // Background Audio Setup
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [audioStarted, setAudioStarted] = useState(false);
+
+  useEffect(() => {
+    audioRef.current = new Audio("/interstellar.mp3");
+    audioRef.current.loop = true;
+    audioRef.current.volume = 0.3;
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, []);
+
+  // Activate audio on first scroll
+  useEffect(() => {
+    const handleFirstInteraction = () => {
+      if (!audioStarted && audioRef.current) {
+        audioRef.current.play().catch(() => {
+          console.warn("Autoplay blocked, waiting for click");
+        });
+        setAudioStarted(true);
+      }
+    };
+    
+    window.addEventListener("wheel", handleFirstInteraction, { once: true });
+    window.addEventListener("touchmove", handleFirstInteraction, { once: true });
+    window.addEventListener("click", handleFirstInteraction, { once: true });
+    
+    return () => {
+      window.removeEventListener("wheel", handleFirstInteraction);
+      window.removeEventListener("touchmove", handleFirstInteraction);
+      window.removeEventListener("click", handleFirstInteraction);
+    };
+  }, [audioStarted]);
+
+  // Handle audio dimming/pausing during portal interaction
+  useEffect(() => {
+    if (!audioRef.current || !audioStarted) return;
+    
+    if (interactionState === "ENTERING" || interactionState === "INSIDE") {
+      let vol = audioRef.current.volume;
+      const fade = setInterval(() => {
+        vol -= 0.05;
+        if (vol <= 0) {
+          vol = 0;
+          clearInterval(fade);
+          audioRef.current?.pause();
+        }
+        if (audioRef.current) audioRef.current.volume = vol;
+      }, 50);
+      return () => clearInterval(fade);
+    } else if (interactionState === "EXITING" || interactionState === "IDLE") {
+      audioRef.current.play().catch(console.warn);
+      let vol = audioRef.current.volume;
+      const fade = setInterval(() => {
+        vol += 0.05;
+        if (vol >= 0.3) {
+          vol = 0.3;
+          clearInterval(fade);
+        }
+        if (audioRef.current) audioRef.current.volume = vol;
+      }, 50);
+      return () => clearInterval(fade);
+    }
+  }, [interactionState, audioStarted]);
 
   useEffect(() => {
     if (interactionState === "IDLE") return;
@@ -478,6 +549,23 @@ export default function MinorityReportGrid({ projects }: { projects: any[] }) {
       style={{ height: `${projects.length * 150}vh` }}
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden">
+        
+        {/* Intro Overlay Frame */}
+        <motion.div 
+          style={{ opacity: fadeOut, scale: scaleDown }}
+          className="absolute inset-0 z-50 pointer-events-none flex flex-col items-center justify-center bg-[#050505]/30 backdrop-blur-[2px]"
+        >
+          <h1 className="text-white text-[12vw] md:text-[8vw] font-serif tracking-widest drop-shadow-[0_0_30px_rgba(255,255,255,0.2)] ml-[4vw]">
+            STAY
+          </h1>
+          <div className="absolute bottom-16 flex flex-col items-center gap-6">
+            <div className="w-[1px] h-16 bg-gradient-to-b from-transparent via-white/50 to-transparent animate-pulse" />
+            <span className="font-mono text-[9px] tracking-[0.4em] uppercase text-white/60">
+              Scroll to explore
+            </span>
+          </div>
+        </motion.div>
+
         <div className="pointer-events-none absolute inset-0 z-10 shadow-[inset_0_0_200px_rgba(0,0,0,1)]" />
         <Canvas camera={{ fov: 60, position: [0, 0, 45] }} gl={{ antialias: true, alpha: false }}>
           <color attach="background" args={["#050505"]} />
