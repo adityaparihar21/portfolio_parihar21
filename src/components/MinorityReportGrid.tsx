@@ -48,13 +48,20 @@ function VideoPanel({ project, position, onClick, isClicked, hideUI, cameraDist 
   useEffect(() => {
     if (texture && texture.image) {
       const updateAspect = () => {
-        if (texture.image.videoWidth && texture.image.videoHeight) {
-          setAspect(texture.image.videoWidth / texture.image.videoHeight);
+        const vid = texture.image as HTMLVideoElement;
+        if (vid.videoWidth && vid.videoHeight) {
+          setAspect(vid.videoWidth / vid.videoHeight);
         }
       };
       updateAspect();
+      
+      // Video metadata can sometimes load silently in WebGL, polling ensures we catch it
+      const interval = setInterval(updateAspect, 500);
       texture.image.addEventListener("loadedmetadata", updateAspect);
-      return () => texture.image.removeEventListener("loadedmetadata", updateAspect);
+      return () => {
+        clearInterval(interval);
+        texture.image.removeEventListener("loadedmetadata", updateAspect);
+      };
     }
   }, [texture]);
 
@@ -65,7 +72,7 @@ function VideoPanel({ project, position, onClick, isClicked, hideUI, cameraDist 
     scaleRef.current = THREE.MathUtils.lerp(scaleRef.current, targetScale, 0.1);
   });
 
-  const w = 5;
+  const w = 4; // Decreased size
   const h = w / aspect;
   
   const lightColor = useMemo(() => {
@@ -104,28 +111,40 @@ function VideoPanel({ project, position, onClick, isClicked, hideUI, cameraDist 
       </mesh>
 
       <Html
-        position={isClicked ? [w / 2 + 1, 0, 0.5] : [0, -(h / 2 + 0.8), 0.2]}
+        position={isClicked ? [w / 2 + 1, 0, 0.5] : [0, -(h / 2 + 0.6), 0.2]}
         center
         transform
         className={`pointer-events-none transition-all duration-700 ${hideUI || !isClose ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}
       >
-        <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-6 flex flex-col w-[320px] shadow-[0_10px_40px_rgba(0,0,0,0.5)]">
-          <div className="flex justify-between items-center opacity-60 text-white font-mono text-[9px] uppercase tracking-widest mb-2">
-            <span>TARGET: {project.category}</span>
-            <div className="w-1.5 h-1.5 rounded-full shadow-[0_0_10px_currentColor]" style={{ backgroundColor: lightColor, color: lightColor }} />
-          </div>
-          <h3 className="text-white text-3xl font-serif tracking-wide">{project.title}</h3>
+        <div className={`flex flex-col transition-all duration-700 ${isClicked ? 'w-[280px] items-start text-left' : 'w-[400px] items-center text-center'}`}>
           
-          <div className={`mt-4 pt-4 border-t border-white/10 flex gap-4 transition-all duration-500 delay-100 ${hovered || isClicked ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}>
-             <div className="flex flex-col">
-               <span className="text-white/40 text-[8px] uppercase tracking-widest font-mono">Status</span>
-               <span className="text-white/80 text-xs font-mono mt-1">Active</span>
-             </div>
-             <div className="flex flex-col">
-               <span className="text-white/40 text-[8px] uppercase tracking-widest font-mono">Distance</span>
-               <span className="text-white/80 text-xs font-mono mt-1">{cameraDist.toFixed(1)}u</span>
-             </div>
+          <div className={`flex items-center gap-2 opacity-60 text-white font-mono text-[9px] uppercase tracking-widest transition-all duration-700 ${isClicked ? 'mb-2 opacity-100' : 'mb-0 opacity-0 h-0 overflow-hidden'}`}>
+            <div className="w-1.5 h-1.5 rounded-full shadow-[0_0_10px_currentColor]" style={{ backgroundColor: lightColor, color: lightColor }} />
+            <span>TARGET: {project.category}</span>
           </div>
+          
+          <h3 className={`text-white font-serif tracking-wide transition-all duration-700 ${isClicked ? 'text-4xl leading-tight drop-shadow-2xl' : 'text-2xl text-white/70 drop-shadow-lg'}`}>
+            {project.title}
+          </h3>
+          
+          {!isClicked && (
+            <span className="text-white/30 text-[9px] font-mono tracking-[0.3em] uppercase mt-2">
+              {project.category}
+            </span>
+          )}
+          
+          {isClicked && (
+            <div className="mt-6 flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 drop-shadow-2xl">
+               <div className="flex flex-col">
+                 <span className="text-white/40 text-[9px] uppercase tracking-widest font-mono">Status</span>
+                 <span className="text-white/80 text-sm font-mono mt-1">Active</span>
+               </div>
+               <div className="flex flex-col">
+                 <span className="text-white/40 text-[9px] uppercase tracking-widest font-mono">Distance</span>
+                 <span className="text-white/80 text-sm font-mono mt-1">{cameraDist.toFixed(1)}u</span>
+               </div>
+            </div>
+          )}
         </div>
       </Html>
     </group>
@@ -138,7 +157,7 @@ function Scene({ projects, smoothScroll, clickedIdx, setClickedIdx }: any) {
   const [dists, setDists] = useState<number[]>([]);
 
   useMemo(() => {
-    camera.position.set(0, 0, 15);
+    camera.position.set(0, 0, 45); // Start very far back
   }, [camera]);
 
   useFrame(({ clock }) => {
@@ -148,12 +167,12 @@ function Scene({ projects, smoothScroll, clickedIdx, setClickedIdx }: any) {
     if (clickedIdx !== null) {
       const [px, py, pz] = getPosition(clickedIdx);
       const isRight = px > 0;
-      dummy.set(isRight ? px - 1.5 : px + 1.5, py, pz + 5.5);
+      dummy.set(isRight ? px - 1.5 : px + 1.5, py, pz + 7.5); // 7.5 leaves more room for background
       camera.position.lerp(dummy, 0.05);
       camera.lookAt(px, py, pz);
     } else {
       const maxZ = -(projects.length * SPACING_Z) + SPACING_Z;
-      targetZ = 25 + (maxZ - 25) * currentScroll;
+      targetZ = 45 + (maxZ - 45) * currentScroll; // Start at 45
 
       if (currentScroll > 0.95) {
         const finale = (currentScroll - 0.95) / 0.05;
@@ -277,7 +296,7 @@ export default function MinorityReportGrid({ projects }: { projects: any[] }) {
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         <div className="pointer-events-none absolute inset-0 z-10 shadow-[inset_0_0_200px_rgba(0,0,0,1)]" />
-        <Canvas camera={{ fov: 60, position: [0, 0, 15] }} gl={{ antialias: true, alpha: false }}>
+        <Canvas camera={{ fov: 60, position: [0, 0, 45] }} gl={{ antialias: true, alpha: false }}>
           <color attach="background" args={["#050505"]} />
           <Scene
             projects={projects}
