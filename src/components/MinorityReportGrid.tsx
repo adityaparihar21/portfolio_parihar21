@@ -151,14 +151,16 @@ function VideoPanel({ project, position, onClick, isClicked, hideUI, cameraDist 
         transform
         className={`pointer-events-none transition-all duration-700 ${hideUI || !isClose ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}
       >
-        <div className={`flex flex-col transition-all duration-700 ${isClicked ? 'w-[280px] items-start text-left' : 'w-[400px] items-center text-center'}`}>
+        <div 
+          className={`flex flex-col transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${isClicked ? 'w-[280px] items-start text-left' : 'w-[400px] items-center text-center'}`}
+        >
           
-          <div className={`flex items-center gap-2 opacity-60 text-white font-mono text-[9px] uppercase tracking-widest transition-all duration-700 ${isClicked ? 'mb-2 opacity-100' : 'mb-0 opacity-0 h-0 overflow-hidden'}`}>
+          <div className={`flex items-center gap-2 opacity-60 text-white font-mono text-[9px] uppercase tracking-widest transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${isClicked ? 'mb-2 opacity-100' : 'mb-0 opacity-0 h-0 overflow-hidden'}`}>
             <div className="w-1.5 h-1.5 rounded-full shadow-[0_0_10px_currentColor]" style={{ backgroundColor: lightColor, color: lightColor }} />
             <span>TARGET: {project.category}</span>
           </div>
           
-          <h3 className={`text-white font-serif tracking-wide transition-all duration-700 ${isClicked ? 'text-4xl leading-tight drop-shadow-2xl' : 'text-2xl text-white/70 drop-shadow-lg'}`}>
+          <h3 className={`text-white font-serif tracking-wide transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${isClicked ? 'text-4xl leading-tight drop-shadow-2xl' : 'text-2xl text-white/70 drop-shadow-lg'}`}>
             {project.title}
           </h3>
           
@@ -202,24 +204,26 @@ function Scene({ projects, smoothScroll, clickedIdx, setClickedIdx }: any) {
     if (clickedIdx !== null) {
       const [px, py, pz] = getPosition(clickedIdx);
       const isRight = px > 0;
-      dummy.set(isRight ? px - 1.5 : px + 1.5, py, pz + 7.5); // 7.5 leaves more room for background
-      camera.position.lerp(dummy, 0.05);
+      dummy.set(isRight ? px - 1.5 : px + 1.5, py, pz + 7.5);
+      camera.position.lerp(dummy, 0.08); // Keep clicked zoom smooth and cinematic
       camera.lookAt(px, py, pz);
     } else {
       const maxZ = -(projects.length * SPACING_Z) + SPACING_Z;
-      targetZ = 45 + (maxZ - 45) * currentScroll; // Start at 45
+      targetZ = 45 + (maxZ - 45) * currentScroll; 
 
       if (currentScroll > 0.95) {
         const finale = (currentScroll - 0.95) / 0.05;
         dummy.set(0, finale * 15, targetZ + finale * 40);
-        camera.position.lerp(dummy, 0.08);
+        camera.position.lerp(dummy, 0.15);
         const targetRotX = -Math.PI / 8;
         camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, targetRotX, 0.08);
       } else {
         const bobX = Math.sin(clock.elapsedTime * 0.4) * 0.8;
         const bobY = Math.cos(clock.elapsedTime * 0.3) * 0.6;
         dummy.set(bobX, bobY, targetZ);
-        camera.position.lerp(dummy, 0.08);
+        // Extremely fast lerp here (0.3) so the camera physically tracking the targetZ 
+        // doesn't dampen the beautiful elastic overshoot of the Framer Motion spring!
+        camera.position.lerp(dummy, 0.3);
         camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, 0, 0.1);
         const lookDummy = new THREE.Vector3(Math.sin(clock.elapsedTime * 0.2) * 2, 0, targetZ - 20);
         camera.lookAt(lookDummy);
@@ -263,9 +267,9 @@ export default function MinorityReportGrid({ projects }: { projects: any[] }) {
   });
 
   const smoothScroll = useSpring(scrollYProgress, {
-    damping: 20,
-    mass: 1.5,
-    stiffness: 40,
+    damping: 12, // Lower damping = more elastic overshoot on fast scrolls
+    mass: 1.0,
+    stiffness: 60, // Snappier return
   });
 
   const [clickedIdx, setClickedIdx] = useState<number | null>(null);
