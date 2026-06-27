@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState, useMemo, useEffect } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useVideoTexture, Html } from "@react-three/drei";
+import { useVideoTexture, Html, Stars, Sparkles } from "@react-three/drei";
+import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import { useScroll } from "framer-motion";
 import * as THREE from "three";
 import { X } from "lucide-react";
@@ -43,12 +44,6 @@ function VideoPanel({ project, position, onClick, isClicked }: any) {
       >
         <planeGeometry args={[4.8, 2.7]} />
         <meshBasicMaterial map={texture} toneMapped={false} />
-      </mesh>
-
-      {/* Sci-Fi crosshair frame */}
-      <mesh position={[0, 0, 0.01]}>
-        <ringGeometry args={[3, 3.02, 64]} />
-        <meshBasicMaterial color={isClicked || hovered ? "#e8744a" : "#444"} transparent opacity={0.6} />
       </mesh>
 
       {/* HUD Info Box */}
@@ -107,6 +102,10 @@ function Scene({ projects, scrollYProgress, clickedIdx, setClickedIdx }: any) {
     <>
       <ambientLight intensity={0.5} />
       
+      {/* Deep Space Background */}
+      <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
+      <Sparkles count={300} scale={30} size={2} speed={0.4} opacity={0.2} color="#c9a876" />
+      
       {/* Floor and Ceiling Grids to enhance speed perception */}
       <gridHelper args={[200, 100, "#e8744a", "#222"]} position={[0, -4, 0]} />
       <gridHelper args={[200, 100, "#e8744a", "#222"]} position={[0, 4, 0]} />
@@ -133,6 +132,20 @@ export default function MinorityReportGrid({ projects }: { projects: any[] }) {
 
   const [clickedIdx, setClickedIdx] = useState<number | null>(null);
 
+  // Automatically break focus if the user scrolls
+  useEffect(() => {
+    if (clickedIdx === null) return;
+    const handleScroll = () => {
+      setClickedIdx(null);
+    };
+    window.addEventListener("wheel", handleScroll, { once: true });
+    window.addEventListener("touchmove", handleScroll, { once: true });
+    return () => {
+      window.removeEventListener("wheel", handleScroll);
+      window.removeEventListener("touchmove", handleScroll);
+    };
+  }, [clickedIdx]);
+
   return (
     <section
       ref={containerRef}
@@ -143,17 +156,6 @@ export default function MinorityReportGrid({ projects }: { projects: any[] }) {
         
         {/* 2D Overlay UI elements */}
         <div className="pointer-events-none absolute inset-0 z-10 shadow-[inset_0_0_150px_rgba(0,0,0,0.9)]" />
-        
-        {clickedIdx !== null && (
-          <div className="absolute top-8 right-8 z-50 animate-in fade-in zoom-in duration-300">
-            <button
-              onClick={() => setClickedIdx(null)}
-              className="flex items-center gap-2 px-6 py-3 border border-[#e8744a] text-[#e8744a] bg-black/80 backdrop-blur-md font-mono text-xs tracking-[0.2em] uppercase hover:bg-[#e8744a] hover:text-black transition-all cursor-pointer shadow-[0_0_20px_rgba(232,116,74,0.3)]"
-            >
-              <X size={14} strokeWidth={2} /> Abort Target
-            </button>
-          </div>
-        )}
 
         {/* The 3D Engine */}
         <Canvas camera={{ fov: 60, position: [0, 0, 8] }} gl={{ antialias: true, alpha: false }}>
@@ -167,6 +169,10 @@ export default function MinorityReportGrid({ projects }: { projects: any[] }) {
             clickedIdx={clickedIdx}
             setClickedIdx={setClickedIdx}
           />
+
+          <EffectComposer>
+            <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} height={300} />
+          </EffectComposer>
         </Canvas>
       </div>
     </section>
