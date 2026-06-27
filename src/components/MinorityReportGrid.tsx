@@ -40,8 +40,39 @@ function FloatingGeometry() {
   );
 }
 
+function useSafeVideoTexture(src: string) {
+  const [texture, setTexture] = useState<THREE.VideoTexture | null>(null);
+
+  useEffect(() => {
+    const video = document.createElement("video");
+    video.src = src;
+    video.crossOrigin = "Anonymous";
+    video.loop = true;
+    video.muted = true;
+    video.playsInline = true;
+    video.setAttribute("playsinline", "true");
+    video.setAttribute("webkit-playsinline", "true");
+
+    video.play().catch((e) => console.warn("Video play failed", e));
+
+    const tex = new THREE.VideoTexture(video);
+    tex.colorSpace = THREE.SRGBColorSpace;
+
+    setTexture(tex);
+
+    return () => {
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+      tex.dispose();
+    };
+  }, [src]);
+
+  return texture;
+}
+
 function VideoPanel({ project, position, onClick, isClicked, hideUI, cameraDist }: any) {
-  const texture = useVideoTexture(project.image);
+  const texture = useSafeVideoTexture(project.image);
   const [hovered, setHovered] = useState(false);
   const [aspect, setAspect] = useState(16 / 9);
 
@@ -107,7 +138,11 @@ function VideoPanel({ project, position, onClick, isClicked, hideUI, cameraDist 
         </RoundedBox>
 
         <planeGeometry key={`plane-${aspect}`} args={[w, h]} />
-        <meshBasicMaterial map={texture} toneMapped={true} />
+        {texture ? (
+          <meshBasicMaterial map={texture} toneMapped={true} />
+        ) : (
+          <meshBasicMaterial color="#111" />
+        )}
       </mesh>
 
       <Html
