@@ -52,6 +52,7 @@ function useSafeVideoTexture(src: string) {
   useEffect(() => {
     const video = document.createElement("video");
     video.src = src;
+    video.crossOrigin = "Anonymous";
     video.loop = true;
     video.muted = true;
     video.playsInline = true;
@@ -71,14 +72,18 @@ function useSafeVideoTexture(src: string) {
 
     video.addEventListener("loadeddata", onCanPlay);
     video.addEventListener("canplay", onCanPlay);
+    video.addEventListener("playing", onCanPlay);
 
-    if (video.readyState >= 2) {
+    if (video.readyState >= 3) {
       onCanPlay();
+    } else {
+      video.load();
     }
 
     return () => {
       video.removeEventListener("loadeddata", onCanPlay);
       video.removeEventListener("canplay", onCanPlay);
+      video.removeEventListener("playing", onCanPlay);
       video.pause();
       video.removeAttribute("src");
       video.load();
