@@ -109,6 +109,30 @@
     "title": "Selected Video Edits",
     "projects": [
       {
+        "id": "blackedout",
+        "category": "Creative Edit",
+        "title": "Blackedout",
+        "description": "A dynamic and creative visual edit.",
+        "image": "/blackedout.mp4",
+        "href": "#"
+      },
+      {
+        "id": "ezdeekid",
+        "category": "Creative Edit",
+        "title": "Ezdeekid",
+        "description": "A high-energy creative video project.",
+        "image": "/ezdeekid.mp4",
+        "href": "#"
+      },
+      {
+        "id": "himym-intro",
+        "category": "Editing • Motion Graphics",
+        "title": "HIMYM Intro",
+        "description": "A creative edit inspired by the How I Met Your Mother intro.",
+        "image": "/himymintro.mp4",
+        "href": "#"
+      },
+      {
         "id": "ig-reel-collab-new",
         "category": "Artist Reveal • Instagram",
         "title": "Artist Reveal Collab",
