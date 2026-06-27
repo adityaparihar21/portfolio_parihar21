@@ -118,7 +118,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
   const isLocking = isClicked && interactionState === "LOCKING";
   const hideUI = activeIdx !== null && activeIdx !== idx;
 
-  const targetScale = (isInside || isEntering) ? 1.4 : hovered ? 1.08 : 1;
+  const targetScale = (isInside || isEntering) ? 1.15 : hovered ? 1.05 : 1;
   const scaleRef = useRef(1);
 
   useFrame(() => {
@@ -205,20 +205,21 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
         <>
           {/* Left Panel: Story & Details */}
           <Html
-            position={[-w / 2 - 1.5, 0, 0.5]}
+            position={[-w / 2 - 1.2, 0, 0.2]}
             center
             transform
+            scale={0.8}
             className={`w-[260px] transition-all duration-1000 delay-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${isInside ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"}`}
           >
             <div className="flex flex-col items-end text-right">
-              <div className="flex items-center gap-2 opacity-60 text-white font-mono text-[9px] uppercase tracking-widest mb-3">
+              <div className="flex items-center gap-2 opacity-60 text-white font-mono text-[9px] uppercase tracking-widest mb-2">
                 <span>{project.category}</span>
                 <div className="w-1.5 h-1.5 rounded-full shadow-[0_0_10px_currentColor]" style={{ backgroundColor: lightColor, color: lightColor }} />
               </div>
-              <h3 className="text-white text-5xl font-serif leading-none tracking-tight drop-shadow-2xl mb-6">
+              <h3 className="text-white text-4xl font-serif leading-tight tracking-tight drop-shadow-2xl mb-4">
                 {project.title}
               </h3>
-              <p className="text-white/60 text-sm font-light leading-relaxed">
+              <p className="text-white/70 text-xs font-light leading-relaxed">
                 {project.description}
               </p>
             </div>
@@ -226,13 +227,14 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
 
           {/* Right Panel: Tech Stack & Actions */}
           <Html
-            position={[w / 2 + 1.5, 0, 0.5]}
+            position={[w / 2 + 1.2, 0, 0.2]}
             center
             transform
+            scale={0.8}
             className={`w-[220px] transition-all duration-1000 delay-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isInside ? "opacity-100 -translate-x-0" : "opacity-0 -translate-x-8"}`}
           >
             <div className="flex flex-col items-start text-left">
-              <div className="mb-8 flex flex-col gap-3">
+              <div className="mb-6 flex flex-col gap-2">
                 <span className="text-white/40 text-[9px] uppercase tracking-widest font-mono">Status</span>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_#22c55e]" />
@@ -268,9 +270,10 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
 
           {/* Sequence 10: Continue Journey Button */}
           <Html
-            position={[w / 2 + 1.5, -(h / 2) + 0.5, 0.5]}
+            position={[0, -(h / 2) - 0.8, 0.5]}
             center
             transform
+            scale={0.9}
             className={`transition-all duration-1000 delay-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${isInside ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
           >
             <button
@@ -337,9 +340,10 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
       camera.position.lerp(baseCameraPos, 0.02);
     } else if (activeIdx !== null) {
       const [px, py, pz] = getPosition(activeIdx);
-      const isRight = px > 0;
-      // The target viewing position (slightly offset for the massive Spatial HUD)
-      const targetPos = new THREE.Vector3(isRight ? px - 1.2 : px + 1.2, py, pz + 6.5);
+      
+      // Keep the camera centered on the project, but push it back significantly 
+      // so the 80% screen constraint is maintained and HTML doesn't clip the near plane.
+      const targetPos = new THREE.Vector3(px, py, pz + 13);
 
       if (interactionState === "ENTERING") {
         transitionProgress.current += 0.012; // Speed of drone flight
@@ -350,9 +354,9 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
         
         const ease = 1 - Math.pow(1 - transitionProgress.current, 3); // Cubic Out
         
-        // Bezier Arc outward
+        // Bezier Arc outward (alternating direction based on which side the project is on)
         const curPos = new THREE.Vector3().lerpVectors(startCameraPos.current, targetPos, ease);
-        curPos.x += Math.sin(ease * Math.PI) * (isRight ? 3 : -3); // Sweeping drone curve
+        curPos.x += Math.sin(ease * Math.PI) * (px > 0 ? 4 : -4); // Sweeping drone curve
         
         camera.position.copy(curPos);
         camera.lookAt(px, py, pz);
@@ -376,7 +380,7 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
         const ease = 1 - Math.pow(1 - transitionProgress.current, 3);
         
         const curPos = new THREE.Vector3().lerpVectors(baseCameraPos, targetPos, ease);
-        curPos.x += Math.sin(ease * Math.PI) * (isRight ? 3 : -3);
+        curPos.x += Math.sin(ease * Math.PI) * (px > 0 ? 4 : -4);
         
         camera.position.copy(curPos);
         
