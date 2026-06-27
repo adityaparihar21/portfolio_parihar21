@@ -90,8 +90,8 @@
         "title": "Trip Co",
         "description": "Input your travel preferences. Get a full itinerary in ~2 seconds.",
         "image": "/tripco.png",
-        "href": "#",
-        "repo": "https://github.com/adityaparihar21/trip-co"
+        "href": "https://tripco-puce.vercel.app",
+        "repo": "https://github.com/adityaparihar21/tripco"
       },
       {
         "id": "weather-hut",

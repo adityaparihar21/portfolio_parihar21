@@ -22,7 +22,7 @@ type TechProject = ReturnType<typeof useContent>["selectedWork"]["projects"][0] 
 const getExtendedProject = (
   p: ReturnType<typeof useContent>["selectedWork"]["projects"][0],
 ): TechProject => {
-  const isWip = p.id === "trip-co";
+  const isWip = false;
   
   let writeup = "";
   let codeSnippet = "";
@@ -50,9 +50,9 @@ const getExtendedProject = (
       metrics = [{ label: "throughput", value: "30fps" }, { label: "cpu footprint", value: "optimized" }];
       break;
     case "trip-co":
-      writeup = "Problem: Travel planning takes hours of research. AI can do it, but standard ChatGPT output is unformatted and hard to read.\n\nMy approach: Building a structured, visually appealing itinerary generator.\n\nTechnical decisions: Using prompt-chaining and strict JSON schemas to force LLMs to return predictable data. React frontend renders this as a clean, responsive timeline.\n\nResult: (In progress) A tool that gives you a full trip plan in seconds.";
+      writeup = "Problem: Travel planning takes hours of research. AI can do it, but standard ChatGPT output is unformatted and hard to read.\n\nMy approach: Building a structured, visually appealing itinerary generator.\n\nTechnical decisions: Using prompt-chaining and strict JSON schemas to force LLMs to return predictable data. React frontend renders this as a clean, responsive timeline.\n\nResult: A tool that gives you a full trip plan in seconds.";
       codeSnippet = "// AI Payload Schema\nconst itinerarySchema = z.object({\n  days: z.array(z.object({\n    date: z.string(),\n    activities: z.array(z.object({\n      time: z.string(),\n      location: z.string(),\n      costEstimate: z.number()\n    }))\n  }))\n});";
-      metrics = [{ label: "status", value: "active dev" }, { label: "stack", value: "AI + React" }];
+      metrics = [{ label: "status", value: "live" }, { label: "stack", value: "AI + React" }];
       break;
     case "weather-hut":
       writeup = "Problem: Most weather apps are cluttered with ads and unnecessary data.\n\nMy approach: Built a minimalist dashboard focused only on what matters, with an interface that adapts to the data it receives.\n\nTechnical decisions: Integrated multiple weather APIs with fallback routing for reliability. Used CSS variables tied to React Context for dynamic color palette shifts based on weather conditions.\n\nResult: A reliable, aesthetically pleasing utility app.";
