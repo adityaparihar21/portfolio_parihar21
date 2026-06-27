@@ -16,6 +16,7 @@ import { CanvasSequence } from "../components/CanvasSequence";
 import DomeGallery from "../components/DomeGallery";
 import AP3DMonogram from "../components/AP3DMonogram";
 import { CreativeHero } from "../components/CreativeHero";
+import MinorityReportGrid from "../components/MinorityReportGrid";
 import { DevDashboardHero } from "../components/DevDashboardHero";
 import { EngineeringPortfolio } from "../components/EngineeringPortfolio";
 import { GithubSection } from "../components/GithubSection";
@@ -947,82 +948,6 @@ function SelectedWork({
 }
 
 /* ---------------- Creative Work ---------------- */
-function CreativeCard({
-  p,
-  i,
-  total,
-  activeAudioId,
-  setActiveAudioId,
-}: {
-  p: any;
-  i: number;
-  total: number;
-  activeAudioId: string | null;
-  setActiveAudioId: (id: string | null) => void;
-}) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  // Correct offset to track the container's entire journey past the top of the viewport
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"],
-  });
-
-  // Scale from top-center so the staggered top edge doesn't move when shrinking
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
-  const brightness = useTransform(scrollYProgress, [0, 1], [1, 0.4]);
-  const filter = useTransform(brightness, (b) => `brightness(${b})`);
-
-  return (
-    <div ref={containerRef} className="h-[120vh] w-full relative flex justify-center">
-      <motion.a
-        href={p.href}
-        style={{ 
-          scale, 
-          filter,
-          transformOrigin: "top center",
-          top: `calc(8vh + ${i * 16}px)` 
-        }}
-        className="sticky w-[90%] max-w-5xl h-[65vh] flex flex-col md:flex-row items-center gap-6 md:gap-10 bg-zinc-900/90 dark:bg-zinc-900/90 backdrop-blur-3xl rounded-[32px] overflow-hidden border border-white/10 shadow-[0_-15px_40px_rgba(0,0,0,0.4)] p-6 md:p-10 group"
-      >
-        <div className={`w-full md:w-[60%] h-[40vh] md:h-full overflow-hidden rounded-2xl bg-black ${i % 2 === 1 ? "md:order-2" : ""}`}>
-          <div className="relative w-full h-full">
-            {p.image ? (
-              <ProjectMedia
-                src={p.image}
-                title={p.title}
-                id={p.id}
-                activeAudioId={activeAudioId}
-                setActiveAudioId={setActiveAudioId}
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center border border-border bg-card/60">
-                <span className="text-[10px] font-medium tracking-[0.3em] uppercase text-muted-foreground/60">
-                  Image coming soon
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="w-full md:w-[40%] flex flex-col gap-4">
-          <span className="text-[10px] font-medium tracking-[0.3em] uppercase text-primary">
-            {p.category}
-          </span>
-          <h3 className="font-serif text-3xl font-medium leading-tight tracking-tight md:text-4xl text-white">
-            {p.title}
-          </h3>
-          <p
-            className="text-sm font-light leading-relaxed text-zinc-400 md:text-base line-clamp-4"
-            dangerouslySetInnerHTML={{ __html: p.description }}
-          />
-          <span className="mt-4 inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.25em] uppercase text-primary transition-all group-hover:gap-3">
-            View Edit <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.5} />
-          </span>
-        </div>
-      </motion.a>
-    </div>
-  );
-}
-
 function CreativeWork({
   data,
   activeAudioId,
@@ -1034,42 +959,32 @@ function CreativeWork({
 }) {
   const { eyebrow, title, projects } = data.creativeWork;
   return (
-    <section
-      id="creative"
-      className="relative z-20 bg-background px-6 py-32 md:px-12 md:py-44 border-t border-border"
-    >
-      <div className="mx-auto max-w-[1600px]">
-        <motion.div
-          variants={staggerParent}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-120px" }}
-          className="mb-20 flex flex-col items-start gap-6"
-        >
-          <SectionEyebrow>{eyebrow}</SectionEyebrow>
-          <motion.h2
-            variants={fadeUp}
-            transition={{ duration: 1, ease: EASE_OUT_EXPO }}
-            className="font-serif text-5xl font-medium leading-[1.05] tracking-tight md:text-7xl"
+    <div id="creative">
+      <section className="relative z-20 bg-[#050505] pt-32 md:pt-44 pb-12 border-t border-[#222]">
+        <div className="mx-auto max-w-[1400px] px-6 md:px-[6vw]">
+          <motion.div
+            variants={staggerParent}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-120px" }}
+            className="flex flex-col items-start gap-4 md:gap-6"
           >
-            {title}
-          </motion.h2>
-        </motion.div>
-
-        <div className="flex flex-col relative w-full">
-          {projects.map((p, i) => (
-            <CreativeCard
-              key={p.id}
-              p={p}
-              i={i}
-              total={projects.length}
-              activeAudioId={activeAudioId}
-              setActiveAudioId={setActiveAudioId}
-            />
-          ))}
+            <span className="block font-mono text-[12px] tracking-[0.3em] text-[#e8744a] uppercase">
+              {eyebrow}
+            </span>
+            <motion.h2
+              variants={fadeUp}
+              transition={{ duration: 1, ease: EASE_OUT_EXPO }}
+              className="font-serif text-5xl font-medium leading-[1.05] tracking-tight md:text-7xl text-white uppercase"
+            >
+              {title}
+            </motion.h2>
+          </motion.div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <MinorityReportGrid projects={projects} />
+    </div>
   );
 }
 
