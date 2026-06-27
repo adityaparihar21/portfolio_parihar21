@@ -17,19 +17,36 @@ function getPosition(i: number): [number, number, number] {
   return [x, y, -(i * SPACING_Z)];
 }
 
-function VideoPanel({ project, position, onClick, isClicked }: any) {
+function VideoPanel({ project, position, onClick, isClicked, hideUI }: any) {
   // useVideoTexture handles playing the video automatically.
   // Using muted/playsInline is crucial for autoplay policies.
   const texture = useVideoTexture(project.image);
   const [hovered, setHovered] = useState(false);
+  const [aspect, setAspect] = useState(16 / 9);
+
+  useEffect(() => {
+    if (texture && texture.image) {
+      const updateAspect = () => {
+        if (texture.image.videoWidth && texture.image.videoHeight) {
+          setAspect(texture.image.videoWidth / texture.image.videoHeight);
+        }
+      };
+      updateAspect();
+      texture.image.addEventListener("loadedmetadata", updateAspect);
+      return () => texture.image.removeEventListener("loadedmetadata", updateAspect);
+    }
+  }, [texture]);
 
   // When hovered or clicked, scale up slightly
-  const targetScale = isClicked ? 1.1 : hovered ? 1.05 : 1;
+  const targetScale = isClicked ? 1.02 : hovered ? 1.05 : 1;
   const scaleRef = useRef(1);
 
   useFrame(() => {
     scaleRef.current = THREE.MathUtils.lerp(scaleRef.current, targetScale, 0.1);
   });
+
+  const w = 4.8;
+  const h = w / aspect;
 
   return (
     <group position={position} scale={[scaleRef.current, scaleRef.current, scaleRef.current]}>
@@ -42,16 +59,16 @@ function VideoPanel({ project, position, onClick, isClicked }: any) {
         onPointerOut={() => setHovered(false)}
         cursor={isClicked ? "auto" : "pointer"}
       >
-        <planeGeometry args={[4.8, 2.7]} />
-        <meshBasicMaterial map={texture} toneMapped={false} />
+        <planeGeometry args={[w, h]} />
+        <meshBasicMaterial map={texture} toneMapped={true} />
       </mesh>
 
       {/* HUD Info Box */}
       <Html
-        position={[0, -1.8, 0]}
+        position={[0, -(h / 2 + 0.4), 0]}
         center
         transform
-        className={`pointer-events-none transition-opacity duration-300 ${isClicked ? "opacity-0" : "opacity-90"}`}
+        className={`pointer-events-none transition-opacity duration-300 ${hideUI ? "opacity-0" : "opacity-90"}`}
       >
         <div className="flex flex-col items-center gap-1 w-[300px] text-center">
           <span className="font-mono text-[10px] tracking-[0.3em] text-[#c9a876] uppercase">
@@ -82,16 +99,15 @@ function Scene({ projects, scrollYProgress, clickedIdx, setClickedIdx }: any) {
     if (clickedIdx !== null) {
       // Look closely at the clicked panel
       const [px, py, pz] = getPosition(clickedIdx);
-      // Offset camera slightly back (Z + 3) to frame the panel
-      dummy.set(px, py, pz + 3.2);
+      // Offset camera slightly back (Z + 6) to leave room for background
+      dummy.set(px, py, pz + 6);
       camera.position.lerp(dummy, 0.08);
     } else {
       // Scroll-driven Z-axis flythrough
       const maxZ = -(projects.length * SPACING_Z) + SPACING_Z;
-      // When scroll is 0, start slightly before the first video (Z = 5)
-      // When scroll is 1, reach the last video
+      // Start much further back (Z = 25)
       const currentScroll = scrollYProgress.get();
-      const targetZ = 5 + (maxZ - 5) * currentScroll;
+      const targetZ = 25 + (maxZ - 25) * currentScroll;
 
       dummy.set(0, 0, targetZ);
       camera.position.lerp(dummy, 0.1);
@@ -105,10 +121,6 @@ function Scene({ projects, scrollYProgress, clickedIdx, setClickedIdx }: any) {
       {/* Deep Space Background */}
       <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
       <Sparkles count={300} scale={30} size={2} speed={0.4} opacity={0.2} color="#c9a876" />
-      
-      {/* Floor and Ceiling Grids to enhance speed perception */}
-      <gridHelper args={[200, 100, "#e8744a", "#222"]} position={[0, -4, 0]} />
-      <gridHelper args={[200, 100, "#e8744a", "#222"]} position={[0, 4, 0]} />
 
       {projects.map((p: any, i: number) => (
         <VideoPanel
@@ -117,6 +129,7 @@ function Scene({ projects, scrollYProgress, clickedIdx, setClickedIdx }: any) {
           position={getPosition(i)}
           onClick={() => setClickedIdx(i)}
           isClicked={clickedIdx === i}
+          hideUI={clickedIdx !== null}
         />
       ))}
     </>
@@ -146,6 +159,52 @@ export default function MinorityReportGrid({ projects }: { projects: any[] }) {
     };
   }, [clickedIdx]);
 
+  // Space Audio Engine
+  const audioCtxRef = useRef<any>(null);
+  const gainNodeRef = useRef<any>(null);
+
+  useEffect(() => {
+    const initAudio = () => {
+      if (audioCtxRef.current) return;
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      
+      osc.type = "sine";
+      osc.frequency.value = 55; // Deep hum frequency
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      
+      gain.gain.value = 0;
+      osc.start();
+
+      audioCtxRef.current = ctx;
+      gainNodeRef.current = gain;
+    };
+
+    window.addEventListener("pointerdown", initAudio, { once: true });
+    window.addEventListener("wheel", initAudio, { once: true });
+
+    return () => {
+      if (audioCtxRef.current) {
+        audioCtxRef.current.close();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (gainNodeRef.current && audioCtxRef.current) {
+      if (clickedIdx !== null) {
+        // Mute when video is clicked
+        gainNodeRef.current.gain.setTargetAtTime(0, audioCtxRef.current.currentTime, 0.1);
+      } else {
+        // Play deep hum when scrolling
+        gainNodeRef.current.gain.setTargetAtTime(0.2, audioCtxRef.current.currentTime, 0.5);
+      }
+    }
+  }, [clickedIdx]);
+
   return (
     <section
       ref={containerRef}
@@ -171,7 +230,7 @@ export default function MinorityReportGrid({ projects }: { projects: any[] }) {
           />
 
           <EffectComposer>
-            <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} height={300} />
+            <Bloom luminanceThreshold={0.5} luminanceSmoothing={0.9} intensity={0.5} />
           </EffectComposer>
         </Canvas>
       </div>
