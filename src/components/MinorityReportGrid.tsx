@@ -10,9 +10,13 @@ import { ArrowRight, Code2, ExternalLink, Github } from "lucide-react";
 
 const SPACING_Z = 15;
 
+const positions = [
+  [-6, 3], [5, -4], [-4, -2], [7, 4], [-7, 0], [4, 5], [-3, -5], [6, -1]
+];
+
 function getPosition(i: number): [number, number, number] {
-  const x = i % 2 === 0 ? -4.5 : 4.5;
-  const y = i % 2 === 0 ? 1.5 : -1.5;
+  const x = positions[i % positions.length][0];
+  const y = positions[i % positions.length][1];
   return [x, y, -(i * SPACING_Z)];
 }
 
@@ -81,7 +85,7 @@ function NebulaClouds() {
       varying vec2 vUv;
       void main() {
         float dist = distance(vUv, vec2(0.5));
-        float alpha = smoothstep(0.5, 0.1, dist) * 0.2; 
+        float alpha = smoothstep(0.5, 0.1, dist) * 0.02; 
         gl_FragColor = vec4(color, alpha);
       }
     `,
@@ -139,9 +143,24 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
 
   const targetScale = (isInside || isEntering) ? 1.15 : hovered ? 1.05 : 1;
   const scaleRef = useRef(1);
+  const groupRef = useRef<THREE.Group>(null);
 
-  useFrame(() => {
+  useFrame((state) => {
     scaleRef.current = THREE.MathUtils.lerp(scaleRef.current, targetScale, 0.1);
+    
+    if (groupRef.current) {
+      if (isInside || isEntering || isLocking || hovered) {
+        // Face camera smoothly
+        groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, 0, 0.05);
+        groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, 0, 0.05);
+      } else {
+        // Slow orbit (0.2 degrees per second -> ~0.003 rad/sec)
+        const time = state.clock.elapsedTime;
+        // Seed unique orbital start positions using index
+        groupRef.current.rotation.y = Math.sin(time * 0.1 + idx) * 0.3;
+        groupRef.current.rotation.x = Math.cos(time * 0.15 + idx) * 0.1;
+      }
+    }
   });
 
   const w = 4;
@@ -155,7 +174,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
   const isClose = cameraDist < 30;
 
   return (
-    <group position={position} scale={[scaleRef.current, scaleRef.current, scaleRef.current]}>
+    <group position={position} scale={[scaleRef.current, scaleRef.current, scaleRef.current]} ref={groupRef}>
       
       <pointLight 
         color={lightColor} 
@@ -174,13 +193,16 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
         onPointerOut={() => setHovered(false)}
         cursor={isClicked ? "auto" : "pointer"}
       >
-        <RoundedBox key={`box-${aspect}`} args={[w + 0.3, h + 0.3, 0.15]} radius={0.05} position={[0, 0, -0.1]}>
-          <MeshTransmissionMaterial 
-            backdropBlur={10} 
-            roughness={0.2} 
-            transmission={1} 
-            thickness={0.5} 
-            color="#ffffff"
+        {/* Physical Apple Vision Pro-style Titanium Frame */}
+        <RoundedBox key={`box-${aspect}`} args={[w + 0.15, h + 0.15, 0.05]} radius={0.02} position={[0, 0, -0.05]}>
+          <meshPhysicalMaterial 
+            color="#050505"
+            metalness={0.9}
+            roughness={0.1}
+            clearcoat={1.0}
+            clearcoatRoughness={0.1}
+            transmission={0.4}
+            thickness={0.2}
           />
         </RoundedBox>
 
@@ -219,21 +241,22 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
         </Html>
       )}
 
-      {/* Default Unclicked HUD */}
-      {!isClicked && (
+      {/* Minimal Hover UI */}
+      {hovered && !isInside && !isEntering && !isLocking && (
         <Html
-          position={[0, -(h / 2 + 1.2), 0.2]}
+          position={[0, -(h / 2 + 0.8), 0.2]}
           center
           transform
-          className={`pointer-events-none transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${hideUI || !isClose ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}
+          className="pointer-events-none transition-all duration-500 animate-in fade-in slide-in-from-bottom-2"
         >
-          <div className="flex flex-col items-center text-center w-[400px]">
-            <h3 className="text-2xl text-white/70 font-serif tracking-wide drop-shadow-lg">
-              {project.title}
-            </h3>
-            <span className="text-white/30 text-[9px] font-mono tracking-[0.3em] uppercase mt-2">
+          <div className="flex flex-col items-center text-center w-[300px]">
+            <span className="text-white/80 text-[10px] font-mono tracking-[0.3em] uppercase mb-4 shadow-black drop-shadow-xl">
               {project.category}
             </span>
+            <div className="flex items-center gap-3 px-6 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
+              <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-white">Enter Memory</span>
+              <ArrowRight className="w-3 h-3 text-white" />
+            </div>
           </div>
         </Html>
       )}
@@ -363,8 +386,34 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
       baseCameraPos.set(bobX, bobY, targetZ);
     }
 
+    // --- GRAVITY ATTRACTION SYSTEM ---
+    let closestProjectIdx = -1;
+    let minDistance = Infinity;
+    
+    for (let i = 0; i < projects.length; i++) {
+      const [px, py, pz] = getPosition(i);
+      const distZ = Math.abs(pz - targetZ);
+      // If we are within 20 Z-units of a project
+      if (distZ < minDistance && distZ < 20) { 
+        minDistance = distZ;
+        closestProjectIdx = i;
+      }
+    }
+
+    if (closestProjectIdx !== -1 && currentScroll <= 0.95) {
+      const [px, py, pz] = getPosition(closestProjectIdx);
+      // Attraction is 1 at exactly aligned Z, 0 at 20 units away
+      const attraction = 1 - (minDistance / 20);
+      // Soft easing curve so it doesn't jerk
+      const attractionForce = Math.pow(attraction, 2) * 0.4; 
+      
+      // Gently pull the camera's X and Y towards the physical memory window
+      baseCameraPos.x += (px - baseCameraPos.x) * attractionForce;
+      baseCameraPos.y += (py - baseCameraPos.y) * attractionForce;
+    }
+
     if (interactionState === "IDLE") {
-      camera.position.lerp(baseCameraPos, 0.3);
+      camera.position.lerp(baseCameraPos, 0.1); // Slower, more physical lerp
       
       // DRONE INERTIA: Tilt forward when accelerating (negative velocity), backward when braking
       let tiltX = velocityZ.current * 0.06;
@@ -373,9 +422,19 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
       if (currentScroll > 0.95) {
         camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, -Math.PI / 8, 0.08);
       } else {
-        camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, tiltX, 0.1);
-        const lookDummy = new THREE.Vector3(Math.sin(clock.elapsedTime * 0.2) * 2, 0, targetZ - 20);
+        // --- ASTRONAUT DRIFT ---
+        // Sway target points to simulate handheld yaw/pitch
+        const swayX = Math.sin(clock.elapsedTime * 0.3) * 2;
+        const swayY = Math.cos(clock.elapsedTime * 0.25) * 1.5;
+        const lookDummy = new THREE.Vector3(baseCameraPos.x + swayX, baseCameraPos.y + swayY, targetZ - 20);
         camera.lookAt(lookDummy);
+        
+        // Apply Inertia
+        camera.rotateX(tiltX);
+        
+        // Apply subtle Roll (Z rotation) for floating effect
+        const rollZ = Math.sin(clock.elapsedTime * 0.4) * 0.02;
+        camera.rotateZ(rollZ);
       }
       
       // Focus on mid-distance during idle
