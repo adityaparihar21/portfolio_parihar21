@@ -51,8 +51,14 @@ function useSafeVideoTexture(src: string) {
 
   useEffect(() => {
     const video = document.createElement("video");
-    video.src = src;
-    video.crossOrigin = "Anonymous";
+    // Append to DOM invisibly. This forces strict browsers (Safari/iOS) 
+    // to actually load and play the video rather than aggressively pausing detached media.
+    video.style.display = "none";
+    document.body.appendChild(video);
+
+    // Encode spaces in filenames
+    video.src = encodeURI(src);
+    video.crossOrigin = ""; // Allow local without strict CORS block
     video.loop = true;
     video.muted = true;
     video.playsInline = true;
@@ -61,32 +67,35 @@ function useSafeVideoTexture(src: string) {
 
     let tex: THREE.VideoTexture | null = null;
 
-    const onCanPlay = () => {
+    const initTexture = () => {
       if (!tex) {
         tex = new THREE.VideoTexture(video);
         tex.colorSpace = THREE.SRGBColorSpace;
         setTexture(tex);
       }
-      video.play().catch((e) => console.warn("Video play failed", e));
+      video.play().catch((e) => console.warn("Video play failed:", e));
     };
 
-    video.addEventListener("loadeddata", onCanPlay);
-    video.addEventListener("canplay", onCanPlay);
-    video.addEventListener("playing", onCanPlay);
+    video.addEventListener("loadeddata", initTexture);
+    video.addEventListener("canplay", initTexture);
+    video.addEventListener("playing", initTexture);
 
     if (video.readyState >= 3) {
-      onCanPlay();
+      initTexture();
     } else {
       video.load();
     }
 
     return () => {
-      video.removeEventListener("loadeddata", onCanPlay);
-      video.removeEventListener("canplay", onCanPlay);
-      video.removeEventListener("playing", onCanPlay);
+      video.removeEventListener("loadeddata", initTexture);
+      video.removeEventListener("canplay", initTexture);
+      video.removeEventListener("playing", initTexture);
       video.pause();
       video.removeAttribute("src");
       video.load();
+      if (document.body.contains(video)) {
+        document.body.removeChild(video);
+      }
       if (tex) tex.dispose();
     };
   }, [src]);
