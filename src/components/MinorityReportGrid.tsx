@@ -3,7 +3,7 @@
 import { useRef, useState, useMemo, useEffect } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Html, Stars, Sparkles, MeshTransmissionMaterial, RoundedBox, Float } from "@react-three/drei";
-import { EffectComposer, Bloom, DepthOfField, ChromaticAberration, Noise } from "@react-three/postprocessing";
+import { EffectComposer, Bloom, DepthOfField } from "@react-three/postprocessing";
 import { useScroll, useSpring, motion, useTransform } from "framer-motion";
 import * as THREE from "three";
 import { ArrowRight, Code2, ExternalLink, Github } from "lucide-react";
@@ -395,7 +395,6 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
   const velocityZ = useRef(0);
   const prevZ = useRef(45);
   const dofTarget = useRef(new THREE.Vector3(0, 0, 0));
-  const chromaticOffset = useMemo(() => new THREE.Vector2(0.0015, 0.0015), []);
 
   useEffect(() => {
     if (interactionState === "ENTERING") {
@@ -573,8 +572,6 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
           height={700} 
         />
         <Bloom luminanceThreshold={0.4} luminanceSmoothing={0.9} intensity={0.6} />
-        <ChromaticAberration offset={chromaticOffset} />
-        <Noise opacity={0.04} />
       </EffectComposer>
     </>
   );
