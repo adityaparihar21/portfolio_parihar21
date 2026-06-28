@@ -107,31 +107,6 @@ function NebulaClouds() {
 
 
 
-function useSafeVideoTexture(src: string) {
-  const [texture, setTexture] = useState<THREE.VideoTexture | null>(null);
-  const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
-
-  useEffect(() => {
-    const video = document.createElement("video");
-    // Use absolute positioning with 0 opacity instead of display: none.
-    // Safari aggressively halts video processing for display: none elements, 
-    // which results in completely black WebGL textures.
-    video.style.position = "absolute";
-    video.style.opacity = "0";
-    video.style.width = "1px";
-    video.style.height = "1px";
-    video.style.pointerEvents = "none";
-    document.body.appendChild(video);
-
-    // Encode spaces in filenames
-    video.src = encodeURI(src);
-    video.crossOrigin = ""; // Allow local without strict CORS block
-    video.loop = true;
-    video.muted = true;
-    video.playsInline = true;
-    video.setAttribute("playsinline", "true");
-    video.setAttribute("webkit-playsinline", "true");
-
 // We use native HTML videos instead of WebGL VideoTextures because iOS/Safari
 // aggressively blocks detached video decoding, leading to black/white screens.
 function VideoPanel({ project, position, interactionState, activeIdx, idx, onClick, onExit, cameraDist }: any) {
@@ -332,7 +307,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
             className={`transition-all duration-1000 delay-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${isInside ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
           >
             <button
-              onClick={() => onExit(videoElement)}
+              onClick={() => onExit()}
               className="group flex items-center gap-3 px-6 py-3 rounded-full bg-[#e8d4a0]/10 border border-[#e8d4a0]/30 hover:bg-[#e8d4a0]/20 hover:border-[#e8d4a0]/60 transition-all duration-500 backdrop-blur-xl"
             >
               <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-[#e8d4a0]">Continue Journey</span>
