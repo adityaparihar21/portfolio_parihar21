@@ -132,91 +132,35 @@ function useSafeVideoTexture(src: string) {
     video.setAttribute("playsinline", "true");
     video.setAttribute("webkit-playsinline", "true");
 
-    let tex: THREE.VideoTexture | null = null;
-
-    const initTexture = () => {
-      if (!tex) {
-        tex = new THREE.VideoTexture(video);
-        tex.colorSpace = THREE.SRGBColorSpace;
-        setTexture(tex);
-      }
-      video.play().catch((e) => console.warn("Video play failed:", e));
-    };
-
-    video.addEventListener("loadedmetadata", () => {
-      // Force a frame decode so it acts as a poster
-      if (video.duration > 0.1) video.currentTime = 0.1;
-      // Try to silently play and pause to force a WebGL frame buffer update
-      video.play().then(() => video.pause()).catch(() => {});
-    });
-
-    video.addEventListener("loadeddata", initTexture);
-    video.addEventListener("canplay", initTexture);
-    video.addEventListener("playing", initTexture);
-
-    if (video.readyState >= 3) {
-      initTexture();
-    } else {
-      video.load();
-    }
-
-    return () => {
-      video.removeEventListener("loadeddata", initTexture);
-      video.removeEventListener("canplay", initTexture);
-      video.removeEventListener("playing", initTexture);
-      video.pause();
-      video.removeAttribute("src");
-      video.load();
-      if (document.body.contains(video)) {
-        document.body.removeChild(video);
-      }
-      if (tex) tex.dispose();
-    };
-  }, [src]);
-
-  return { texture, videoElement };
-}
-
+// We use native HTML videos instead of WebGL VideoTextures because iOS/Safari
+// aggressively blocks detached video decoding, leading to black/white screens.
 function VideoPanel({ project, position, interactionState, activeIdx, idx, onClick, onExit, cameraDist }: any) {
-  const { texture, videoElement } = useSafeVideoTexture(project.image);
   const [hovered, setHovered] = useState(false);
   const aspect = 16 / 9; // Enforce 16:9 for all panels to prevent UI overlap
-
-  useEffect(() => {
-    if (texture && texture.image) {
-      const updateTextureFit = () => {
-        const vid = texture.image as HTMLVideoElement;
-        if (vid.videoWidth && vid.videoHeight) {
-          const vidAspect = vid.videoWidth / vid.videoHeight;
-          const planeAspect = 16 / 9;
-          
-          // Implement "object-fit: contain" via UV mapping
-          if (vidAspect > planeAspect) {
-             // video is wider than plane (letterbox top/bottom)
-             texture.repeat.set(1, planeAspect / vidAspect);
-             texture.offset.set(0, (1 - texture.repeat.y) / 2);
-          } else {
-             // video is taller than plane (pillarbox left/right)
-             texture.repeat.set(vidAspect / planeAspect, 1);
-             texture.offset.set((1 - texture.repeat.x) / 2, 0);
-          }
-        }
-      };
-      updateTextureFit();
-      const interval = setInterval(updateTextureFit, 500);
-      texture.image.addEventListener("loadedmetadata", updateTextureFit);
-      return () => {
-        clearInterval(interval);
-        texture.image.removeEventListener("loadedmetadata", updateTextureFit);
-      };
-    }
-  }, [texture]);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const isClicked = activeIdx === idx;
   const isInside = isClicked && interactionState === "INSIDE";
   const isEntering = isClicked && interactionState === "ENTERING";
   const isLocking = isClicked && interactionState === "LOCKING";
   const hideUI = activeIdx !== null && activeIdx !== idx;
+
+  useEffect(() => {
+    if (videoRef.current) {
+      if (isInside) {
+        videoRef.current.muted = false;
+        videoRef.current.currentTime = 0;
+        videoRef.current.play().catch(() => {});
+      } else {
+        videoRef.current.muted = true;
+        videoRef.current.pause();
+        // Force poster frame when not inside
+        if (videoRef.current.readyState >= 1) {
+          videoRef.current.currentTime = 0.1;
+        }
+      }
+    }
+  }, [isInside]);
 
   const targetScale = (isInside || isEntering) ? 1.15 : hovered ? 1.05 : 1;
   const scaleRef = useRef(1);
@@ -247,7 +191,9 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
       <mesh
         onClick={(e) => {
           e.stopPropagation();
-          if (!isClicked) onClick(videoElement);
+          if (!isClicked) {
+            onClick();
+          }
         }}
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
@@ -263,12 +209,29 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
           />
         </RoundedBox>
 
-        <planeGeometry key={`plane-${aspect}`} args={[w, h]} />
-        {texture ? (
-          <meshBasicMaterial map={texture} toneMapped={true} color="#ffffff" />
-        ) : (
-          <meshBasicMaterial color="#000000" />
-        )}
+        {/* Use native HTML video overlaid perfectly on the 3D plane. */}
+        {/* Scale 0.01 and multiply dimensions by 100 to ensure crisp high-res rendering */}
+        <Html transform center position={[0, 0, 0.01]} scale={0.01} zIndexRange={[100, 0]} className={hideUI && !isClose ? "opacity-0" : "opacity-100 transition-opacity duration-1000"}>
+          <div 
+            style={{ width: `${w * 100}px`, height: `${h * 100}px` }} 
+            className="flex items-center justify-center bg-black overflow-hidden pointer-events-none"
+          >
+            <video
+              ref={videoRef}
+              src={encodeURI(project.image)}
+              loop
+              muted
+              playsInline
+              preload="metadata"
+              className="w-full h-full object-contain"
+              onLoadedMetadata={(e) => {
+                if (e.currentTarget.duration > 0.1) {
+                  e.currentTarget.currentTime = 0.1;
+                }
+              }}
+            />
+          </div>
+        </Html>
       </mesh>
 
       {/* Sequence 1: Locking Animation */}
@@ -548,25 +511,13 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
           idx={i}
           activeIdx={activeIdx}
           interactionState={interactionState}
-          onClick={(videoElement: HTMLVideoElement | null) => {
+          onClick={() => {
             if (interactionState !== "IDLE") return;
             setActiveIdx(i);
-            
-            if (videoElement) {
-              videoElement.muted = false;
-              videoElement.currentTime = 0;
-              videoElement.play().catch(e => console.warn(e));
-            }
-            
             setInteractionState("LOCKING");
             setTimeout(() => setInteractionState("ENTERING"), 300);
           }}
-          onExit={(videoElement: HTMLVideoElement | null) => {
-            if (videoElement) {
-              videoElement.muted = true;
-            }
-            setInteractionState("EXITING");
-          }}
+          onExit={() => setInteractionState("EXITING")}
           cameraDist={dists[i] || 100}
         />
       ))}
