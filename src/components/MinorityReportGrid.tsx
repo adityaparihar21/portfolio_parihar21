@@ -153,6 +153,7 @@ function WarpField({ velocityZ, interactionState }: any) {
 
 function useSafeVideoTexture(src: string) {
   const [texture, setTexture] = useState<THREE.VideoTexture | null>(null);
+  const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     const video = document.createElement("video");
@@ -181,6 +182,11 @@ function useSafeVideoTexture(src: string) {
       video.play().catch((e) => console.warn("Video play failed:", e));
     };
 
+    video.addEventListener("loadedmetadata", () => {
+      // Force a frame decode so it acts as a poster if auto-play fails
+      if (video.duration > 0.1) video.currentTime = 0.1;
+    });
+
     video.addEventListener("loadeddata", initTexture);
     video.addEventListener("canplay", initTexture);
     video.addEventListener("playing", initTexture);
@@ -205,11 +211,11 @@ function useSafeVideoTexture(src: string) {
     };
   }, [src]);
 
-  return texture;
+  return { texture, videoElement };
 }
 
 function VideoPanel({ project, position, interactionState, activeIdx, idx, onClick, onExit, cameraDist }: any) {
-  const texture = useSafeVideoTexture(project.image);
+  const { texture, videoElement } = useSafeVideoTexture(project.image);
   const [hovered, setHovered] = useState(false);
   const [aspect, setAspect] = useState(16 / 9);
 
@@ -266,7 +272,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
       <mesh
         onClick={(e) => {
           e.stopPropagation();
-          if (!isClicked) onClick();
+          if (!isClicked) onClick(videoElement);
         }}
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
@@ -335,7 +341,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
                 <span>{project.category}</span>
                 <div className="w-1.5 h-1.5 rounded-full shadow-[0_0_10px_currentColor]" style={{ backgroundColor: lightColor, color: lightColor }} />
               </div>
-              <h3 className="text-white text-4xl font-serif leading-tight tracking-tight drop-shadow-2xl mb-4">
+              <h3 className="text-white text-2xl font-serif leading-tight tracking-tight drop-shadow-2xl mb-3">
                 {project.title}
               </h3>
               <p className="text-white/70 text-xs font-light leading-relaxed">
@@ -389,14 +395,14 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
 
           {/* Sequence 10: Continue Journey Button */}
           <Html
-            position={[0, -(h / 2) - 0.8, 0.5]}
+            position={[0, -(h / 2) - 1.4, 0.5]}
             center
             transform
             scale={0.9}
             className={`transition-all duration-1000 delay-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${isInside ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
           >
             <button
-              onClick={onExit}
+              onClick={() => onExit(videoElement)}
               className="group flex items-center gap-3 px-6 py-3 rounded-full bg-[#e8d4a0]/10 border border-[#e8d4a0]/30 hover:bg-[#e8d4a0]/20 hover:border-[#e8d4a0]/60 transition-all duration-500 backdrop-blur-xl"
             >
               <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-[#e8d4a0]">Continue Journey</span>
@@ -567,13 +573,25 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
           idx={i}
           activeIdx={activeIdx}
           interactionState={interactionState}
-          onClick={() => {
+          onClick={(videoElement: HTMLVideoElement | null) => {
             if (interactionState !== "IDLE") return;
             setActiveIdx(i);
+            
+            if (videoElement) {
+              videoElement.muted = false;
+              videoElement.currentTime = 0;
+              videoElement.play().catch(e => console.warn(e));
+            }
+            
             setInteractionState("LOCKING");
             setTimeout(() => setInteractionState("ENTERING"), 300);
           }}
-          onExit={() => setInteractionState("EXITING")}
+          onExit={(videoElement: HTMLVideoElement | null) => {
+            if (videoElement) {
+              videoElement.muted = true;
+            }
+            setInteractionState("EXITING");
+          }}
           cameraDist={dists[i] || 100}
         />
       ))}
