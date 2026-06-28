@@ -111,12 +111,70 @@ function NebulaClouds() {
 
 
 
-// We use native HTML videos instead of WebGL VideoTextures because iOS/Safari
-// aggressively blocks detached video decoding, leading to black/white screens.
+function ProjectMedia({ url, isInside, isMuted, w, h }: { url: string, isInside: boolean, isMuted: boolean, w: number, h: number }) {
+  const isVideo = url.toLowerCase().endsWith('.mp4') || url.toLowerCase().endsWith('.webm');
+  
+  const [texture, setTexture] = useState<THREE.Texture | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    if (isVideo) {
+      const vid = document.createElement("video");
+      vid.src = encodeURI(url);
+      vid.crossOrigin = "Anonymous";
+      vid.loop = true;
+      vid.muted = true;
+      vid.playsInline = true;
+      vid.play().catch(() => {});
+      videoRef.current = vid;
+      
+      const tex = new THREE.VideoTexture(vid);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      setTexture(tex);
+      
+      return () => {
+        vid.pause();
+        vid.removeAttribute('src');
+        vid.load();
+        tex.dispose();
+      };
+    } else {
+      const loader = new THREE.TextureLoader();
+      loader.load(encodeURI(url), (tex) => {
+        tex.colorSpace = THREE.SRGBColorSpace;
+        setTexture(tex);
+      });
+    }
+  }, [url, isVideo]);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      if (isInside) {
+        videoRef.current.muted = isMuted;
+        if (videoRef.current.paused) {
+          videoRef.current.play().catch(() => {});
+        }
+      } else {
+        videoRef.current.muted = true;
+      }
+    }
+  }, [isInside, isMuted]);
+
+  return (
+    <mesh position={[0, 0, 0]}>
+      <planeGeometry args={[w, h]} />
+      {texture ? (
+        <meshBasicMaterial map={texture} toneMapped={false} />
+      ) : (
+        <meshBasicMaterial color="#0a0a0a" />
+      )}
+    </mesh>
+  );
+}
+
 function VideoPanel({ project, position, interactionState, activeIdx, idx, onClick, onExit, cameraDist }: any) {
   const [hovered, setHovered] = useState(false);
   const aspect = 16 / 9; // Enforce 16:9 for all panels to prevent UI overlap
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   const isClicked = activeIdx === idx;
   const isInside = isClicked && interactionState === "INSIDE";
@@ -125,26 +183,6 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
   const hideUI = activeIdx !== null && activeIdx !== idx;
 
   const [isMuted, setIsMuted] = useState(false);
-
-  useEffect(() => {
-    if (videoRef.current) {
-      if (isInside) {
-        videoRef.current.muted = isMuted;
-        // Only reset time if it was paused or at the end, otherwise let it play
-        if (videoRef.current.paused || videoRef.current.currentTime === 0) {
-          videoRef.current.currentTime = 0;
-        }
-        videoRef.current.play().catch(() => {});
-      } else {
-        videoRef.current.muted = true;
-        videoRef.current.pause();
-        // Force poster frame when not inside
-        if (videoRef.current.readyState >= 1) {
-          videoRef.current.currentTime = 0.1;
-        }
-      }
-    }
-  }, [isInside, isMuted]);
 
   const targetScale = (isInside || isEntering) ? 1.15 : hovered ? 1.05 : 1;
   const scaleRef = useRef(1);
@@ -216,30 +254,8 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
           />
         </RoundedBox>
 
-        {/* Use native HTML video overlaid perfectly on the 3D plane. */}
-        {/* Scale 0.01 and multiply dimensions by 100 to ensure crisp high-res rendering */}
-        {/* Always visible poster state so they don't blend into the stars */}
-        <Html transform center position={[0, 0, 0.01]} scale={0.01} zIndexRange={[100, 0]} className="opacity-100 transition-opacity duration-1000">
-          <div 
-            style={{ width: `${w * 100}px`, height: `${h * 100}px` }} 
-            className="flex items-center justify-center bg-black overflow-hidden pointer-events-none"
-          >
-            <video
-              ref={videoRef}
-              src={encodeURI(project.image)}
-              loop
-              muted
-              playsInline
-              preload="metadata"
-              className="w-full h-full object-contain"
-              onLoadedMetadata={(e) => {
-                if (e.currentTarget.duration > 0.1) {
-                  e.currentTarget.currentTime = 0.1;
-                }
-              }}
-            />
-          </div>
-        </Html>
+        {/* True WebGL VideoTexture for robust rendering and visibility */}
+        <ProjectMedia url={project.image} isInside={isInside} isMuted={isMuted} w={w} h={h} />
       </mesh>
 
       {/* Sequence 1: Locking Animation */}
@@ -313,9 +329,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
             </h3>
             
             <div className="flex items-center justify-center gap-2 opacity-60 text-white font-mono text-[9px] uppercase tracking-widest mb-6">
-              <div className="w-1.5 h-1.5 rounded-full shadow-[0_0_10px_currentColor]" style={{ backgroundColor: lightColor, color: lightColor }} />
               <span>{project.category}</span>
-              <div className="w-1.5 h-1.5 rounded-full shadow-[0_0_10px_currentColor]" style={{ backgroundColor: lightColor, color: lightColor }} />
             </div>
 
             <p className="text-white/70 text-sm font-light leading-relaxed max-w-[400px] mb-8">
@@ -407,30 +421,27 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
       baseCameraPos.set(bobX, bobY, targetZ);
     }
 
-    // --- GRAVITY ATTRACTION SYSTEM ---
-    let closestProjectIdx = -1;
-    let minDistance = Infinity;
+    // --- GRAVITY ATTRACTION SYSTEM (SMOOTH FLIGHT) ---
+    let totalAttractionX = 0;
+    let totalAttractionY = 0;
     
     for (let i = 0; i < projects.length; i++) {
       const [px, py, pz] = getPosition(i);
       const distZ = Math.abs(pz - targetZ);
-      // If we are within 20 Z-units of a project
-      if (distZ < minDistance && distZ < 20) { 
-        minDistance = distZ;
-        closestProjectIdx = i;
+      // Soft gaussian-like falloff for attraction based on Z distance
+      if (distZ < 30) {
+        const force = Math.max(0, 1 - (distZ / 30));
+        // Eased curve so it pulls smoothly and naturally without snapping
+        const easedForce = Math.pow(force, 3) * 0.4; 
+        
+        totalAttractionX += (px - baseCameraPos.x) * easedForce;
+        totalAttractionY += (py - baseCameraPos.y) * easedForce;
       }
     }
 
-    if (closestProjectIdx !== -1 && currentScroll <= 0.95) {
-      const [px, py, pz] = getPosition(closestProjectIdx);
-      // Attraction is 1 at exactly aligned Z, 0 at 20 units away
-      const attraction = 1 - (minDistance / 20);
-      // Soft easing curve so it doesn't jerk
-      const attractionForce = Math.pow(attraction, 2) * 0.4; 
-      
-      // Gently pull the camera's X and Y towards the physical memory window
-      baseCameraPos.x += (px - baseCameraPos.x) * attractionForce;
-      baseCameraPos.y += (py - baseCameraPos.y) * attractionForce;
+    if (currentScroll <= 0.95) {
+      baseCameraPos.x += totalAttractionX;
+      baseCameraPos.y += totalAttractionY;
     }
 
     if (interactionState === "IDLE") {
@@ -473,8 +484,8 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
       const [px, py, pz] = getPosition(activeIdx);
       
       // Keep the camera centered on the project, but push it back 
-      // just enough to frame the video perfectly.
-      const targetPos = new THREE.Vector3(px, py, pz + 10);
+      // just enough to frame the video perfectly with room for air.
+      const targetPos = new THREE.Vector3(px, py, pz + 12);
       
       // Instantly pull focus to the project
       dofTarget.current.lerp(new THREE.Vector3(px, py, pz), 0.1);
