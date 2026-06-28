@@ -113,9 +113,14 @@ function useSafeVideoTexture(src: string) {
 
   useEffect(() => {
     const video = document.createElement("video");
-    // Append to DOM invisibly. This forces strict browsers (Safari/iOS) 
-    // to actually load and play the video rather than aggressively pausing detached media.
-    video.style.display = "none";
+    // Use absolute positioning with 0 opacity instead of display: none.
+    // Safari aggressively halts video processing for display: none elements, 
+    // which results in completely black WebGL textures.
+    video.style.position = "absolute";
+    video.style.opacity = "0";
+    video.style.width = "1px";
+    video.style.height = "1px";
+    video.style.pointerEvents = "none";
     document.body.appendChild(video);
 
     // Encode spaces in filenames
@@ -279,7 +284,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
       {/* Default Unclicked HUD */}
       {!isClicked && (
         <Html
-          position={[0, -(h / 2 + 0.6), 0.2]}
+          position={[0, -(h / 2 + 1.2), 0.2]}
           center
           transform
           className={`pointer-events-none transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${hideUI || !isClose ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}
@@ -329,14 +334,6 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
             className={`w-[220px] transition-all duration-1000 delay-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isInside ? "opacity-100 -translate-x-0" : "opacity-0 -translate-x-8"}`}
           >
             <div className="flex flex-col items-start text-left">
-              <div className="mb-6 flex flex-col gap-2">
-                <span className="text-white/40 text-[9px] uppercase tracking-widest font-mono">Status</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_#22c55e]" />
-                  <span className="text-white/90 text-xs font-mono">Immersive Mode</span>
-                </div>
-              </div>
-
               {project.href && project.href !== "#" && (
                 <a
                   href={project.href}
@@ -523,15 +520,25 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
       
       <NebulaClouds />
       <FloatingGeometry interactionState={interactionState} />
-      <Stars radius={100} depth={50} count={2000} factor={4} saturation={0} fade speed={1} />
+      <Stars radius={150} depth={80} count={4000} factor={6} saturation={0} fade speed={1.5} />
       
+      {/* Background Twinkling Dust / Sparkles */}
       <Sparkles 
-        count={interactionState === "INSIDE" ? 800 : 400} 
-        scale={interactionState === "INSIDE" ? 30 : 50} 
-        size={2} 
-        speed={interactionState === "INSIDE" ? 0.8 : 0.2} 
-        opacity={0.3} 
+        count={interactionState === "INSIDE" ? 1500 : 800} 
+        scale={interactionState === "INSIDE" ? 40 : 60} 
+        size={2.5} 
+        speed={interactionState === "INSIDE" ? 0.6 : 0.3} 
+        opacity={0.4} 
         color="#ffffff" 
+        noise={0.1}
+      />
+      <Sparkles 
+        count={400} 
+        scale={80} 
+        size={4} 
+        speed={0.1} 
+        opacity={0.2} 
+        color="#e8d4a0" 
       />
       {projects.map((p: any, i: number) => (
         <VideoPanel
