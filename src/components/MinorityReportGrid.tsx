@@ -105,51 +105,7 @@ function NebulaClouds() {
   );
 }
 
-function WarpField({ velocityZ, interactionState }: any) {
-  const meshRef = useRef<THREE.InstancedMesh>(null);
-  const count = 300;
-  
-  const dummy = useMemo(() => new THREE.Object3D(), []);
-  const particles = useMemo(() => {
-    const temp = [];
-    for (let i = 0; i < count; i++) {
-      const x = (Math.random() - 0.5) * 80;
-      const y = (Math.random() - 0.5) * 50;
-      const z = (Math.random() - 1) * 200;
-      temp.push({ x, y, z });
-    }
-    return temp;
-  }, []);
 
-  useFrame(() => {
-    if (!meshRef.current) return;
-    const v = Math.abs(velocityZ.current);
-    const isWarping = interactionState === "IDLE" && v > 0.1;
-    
-    const targetStretch = isWarping ? 1 + v * 30 : 1; 
-    const targetOpacity = isWarping ? Math.min(v * 1.5, 0.5) : 0;
-    
-    const mat = meshRef.current.material as THREE.MeshBasicMaterial;
-    mat.opacity = THREE.MathUtils.lerp(mat.opacity, targetOpacity, 0.1);
-
-    if (mat.opacity > 0.01) {
-      particles.forEach((p, i) => {
-        dummy.position.set(p.x, p.y, p.z);
-        dummy.scale.set(0.05, 0.05, targetStretch);
-        dummy.updateMatrix();
-        meshRef.current!.setMatrixAt(i, dummy.matrix);
-      });
-      meshRef.current.instanceMatrix.needsUpdate = true;
-    }
-  });
-
-  return (
-    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
-      <boxGeometry args={[1, 1, 1]} />
-      <meshBasicMaterial color="#ffffff" transparent opacity={0} depthWrite={false} blending={THREE.AdditiveBlending} />
-    </instancedMesh>
-  );
-}
 
 function useSafeVideoTexture(src: string) {
   const [texture, setTexture] = useState<THREE.VideoTexture | null>(null);
@@ -183,8 +139,10 @@ function useSafeVideoTexture(src: string) {
     };
 
     video.addEventListener("loadedmetadata", () => {
-      // Force a frame decode so it acts as a poster if auto-play fails
+      // Force a frame decode so it acts as a poster
       if (video.duration > 0.1) video.currentTime = 0.1;
+      // Try to silently play and pause to force a WebGL frame buffer update
+      video.play().then(() => video.pause()).catch(() => {});
     });
 
     video.addEventListener("loadeddata", initTexture);
@@ -217,22 +175,34 @@ function useSafeVideoTexture(src: string) {
 function VideoPanel({ project, position, interactionState, activeIdx, idx, onClick, onExit, cameraDist }: any) {
   const { texture, videoElement } = useSafeVideoTexture(project.image);
   const [hovered, setHovered] = useState(false);
-  const [aspect, setAspect] = useState(16 / 9);
+  const aspect = 16 / 9; // Enforce 16:9 for all panels to prevent UI overlap
 
   useEffect(() => {
     if (texture && texture.image) {
-      const updateAspect = () => {
+      const updateTextureFit = () => {
         const vid = texture.image as HTMLVideoElement;
         if (vid.videoWidth && vid.videoHeight) {
-          setAspect(vid.videoWidth / vid.videoHeight);
+          const vidAspect = vid.videoWidth / vid.videoHeight;
+          const planeAspect = 16 / 9;
+          
+          // Implement "object-fit: contain" via UV mapping
+          if (vidAspect > planeAspect) {
+             // video is wider than plane (letterbox top/bottom)
+             texture.repeat.set(1, planeAspect / vidAspect);
+             texture.offset.set(0, (1 - texture.repeat.y) / 2);
+          } else {
+             // video is taller than plane (pillarbox left/right)
+             texture.repeat.set(vidAspect / planeAspect, 1);
+             texture.offset.set((1 - texture.repeat.x) / 2, 0);
+          }
         }
       };
-      updateAspect();
-      const interval = setInterval(updateAspect, 500);
-      texture.image.addEventListener("loadedmetadata", updateAspect);
+      updateTextureFit();
+      const interval = setInterval(updateTextureFit, 500);
+      texture.image.addEventListener("loadedmetadata", updateTextureFit);
       return () => {
         clearInterval(interval);
-        texture.image.removeEventListener("loadedmetadata", updateAspect);
+        texture.image.removeEventListener("loadedmetadata", updateTextureFit);
       };
     }
   }, [texture]);
@@ -290,9 +260,9 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
 
         <planeGeometry key={`plane-${aspect}`} args={[w, h]} />
         {texture ? (
-          <meshBasicMaterial map={texture} toneMapped={true} />
+          <meshBasicMaterial map={texture} toneMapped={true} color="#ffffff" />
         ) : (
-          <meshBasicMaterial color="#0a0a0a" />
+          <meshBasicMaterial color="#000000" />
         )}
       </mesh>
 
@@ -553,7 +523,6 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
       <fogExp2 attach="fog" args={["#030305", interactionState === "INSIDE" ? 0.04 : 0.02]} />
       
       <NebulaClouds />
-      <WarpField velocityZ={velocityZ} interactionState={interactionState} />
       <FloatingGeometry interactionState={interactionState} />
       <Stars radius={100} depth={50} count={2000} factor={4} saturation={0} fade speed={1} />
       
@@ -655,19 +624,16 @@ export default function MinorityReportGrid({ projects }: { projects: any[] }) {
         audioRef.current.play().then(() => {
           audioRef.current?.pause();
           setAudioStarted(true);
-          window.removeEventListener("wheel", handleFirstInteraction);
-          window.removeEventListener("touchmove", handleFirstInteraction);
-          window.removeEventListener("click", handleFirstInteraction);
+          window.removeEventListener("pointerdown", handleFirstInteraction);
+          window.removeEventListener("keydown", handleFirstInteraction);
         }).catch(() => {});
       }
     };
-    window.addEventListener("wheel", handleFirstInteraction);
-    window.addEventListener("touchmove", handleFirstInteraction);
-    window.addEventListener("click", handleFirstInteraction);
+    window.addEventListener("pointerdown", handleFirstInteraction);
+    window.addEventListener("keydown", handleFirstInteraction);
     return () => {
-      window.removeEventListener("wheel", handleFirstInteraction);
-      window.removeEventListener("touchmove", handleFirstInteraction);
-      window.removeEventListener("click", handleFirstInteraction);
+      window.removeEventListener("pointerdown", handleFirstInteraction);
+      window.removeEventListener("keydown", handleFirstInteraction);
     };
   }, [audioStarted]);
 
