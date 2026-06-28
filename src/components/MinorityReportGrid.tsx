@@ -3,7 +3,7 @@
 import { useRef, useState, useMemo, useEffect } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Html, Stars, Sparkles, MeshTransmissionMaterial, RoundedBox, Float } from "@react-three/drei";
-import { EffectComposer, Bloom } from "@react-three/postprocessing";
+import { EffectComposer, Bloom, DepthOfField, ChromaticAberration, Noise } from "@react-three/postprocessing";
 import { useScroll, useSpring, motion, useTransform } from "framer-motion";
 import * as THREE from "three";
 import { ArrowRight, Code2, ExternalLink, Github } from "lucide-react";
@@ -37,12 +37,117 @@ function FloatingGeometry({ interactionState }: { interactionState: string }) {
               wireframe 
               color="#444" 
               transparent 
-              opacity={interactionState === "INSIDE" ? 0.02 : 0.15} 
+              opacity={interactionState === "INSIDE" ? 0.01 : 0.1} 
             />
           </mesh>
         </Float>
       ))}
     </group>
+  );
+}
+
+function NebulaClouds() {
+  const count = 12;
+  const planes = useMemo(() => {
+    return Array.from({ length: count }).map((_, i) => ({
+      position: [(Math.random() - 0.5) * 60, (Math.random() - 0.5) * 40, -i * 30 - 20],
+      rotation: [0, 0, Math.random() * Math.PI * 2],
+      scale: Math.random() * 30 + 30,
+      color: Math.random() > 0.5 ? "#2a1542" : "#121a3b",
+      speed: (Math.random() - 0.5) * 0.05
+    }));
+  }, []);
+
+  const groupRef = useRef<THREE.Group>(null);
+  
+  useFrame(() => {
+    if (!groupRef.current) return;
+    groupRef.current.children.forEach((child, i) => {
+      child.rotation.z += planes[i].speed * 0.01;
+    });
+  });
+
+  const shaderMaterial = useMemo(() => new THREE.ShaderMaterial({
+    uniforms: { color: { value: new THREE.Color() } },
+    vertexShader: `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform vec3 color;
+      varying vec2 vUv;
+      void main() {
+        float dist = distance(vUv, vec2(0.5));
+        float alpha = smoothstep(0.5, 0.1, dist) * 0.2; 
+        gl_FragColor = vec4(color, alpha);
+      }
+    `,
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending
+  }), []);
+
+  return (
+    <group ref={groupRef}>
+      {planes.map((p, i) => {
+        const mat = shaderMaterial.clone();
+        mat.uniforms.color.value.set(p.color);
+        return (
+          <mesh key={i} position={p.position as any} rotation={p.rotation as any} scale={p.scale} material={mat}>
+            <planeGeometry args={[1, 1]} />
+          </mesh>
+        );
+      })}
+    </group>
+  );
+}
+
+function WarpField({ velocityZ, interactionState }: any) {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const count = 300;
+  
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const particles = useMemo(() => {
+    const temp = [];
+    for (let i = 0; i < count; i++) {
+      const x = (Math.random() - 0.5) * 80;
+      const y = (Math.random() - 0.5) * 50;
+      const z = (Math.random() - 1) * 200;
+      temp.push({ x, y, z });
+    }
+    return temp;
+  }, []);
+
+  useFrame(() => {
+    if (!meshRef.current) return;
+    const v = Math.abs(velocityZ.current);
+    const isWarping = interactionState === "IDLE" && v > 0.1;
+    
+    const targetStretch = isWarping ? 1 + v * 30 : 1; 
+    const targetOpacity = isWarping ? Math.min(v * 1.5, 0.5) : 0;
+    
+    const mat = meshRef.current.material as THREE.MeshBasicMaterial;
+    mat.opacity = THREE.MathUtils.lerp(mat.opacity, targetOpacity, 0.1);
+
+    if (mat.opacity > 0.01) {
+      particles.forEach((p, i) => {
+        dummy.position.set(p.x, p.y, p.z);
+        dummy.scale.set(0.05, 0.05, targetStretch);
+        dummy.updateMatrix();
+        meshRef.current!.setMatrixAt(i, dummy.matrix);
+      });
+      meshRef.current.instanceMatrix.needsUpdate = true;
+    }
+  });
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshBasicMaterial color="#ffffff" transparent opacity={0} depthWrite={false} blending={THREE.AdditiveBlending} />
+    </instancedMesh>
   );
 }
 
@@ -311,6 +416,10 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
   
   const startCameraPos = useRef(new THREE.Vector3());
   const transitionProgress = useRef(0);
+  const velocityZ = useRef(0);
+  const prevZ = useRef(45);
+  const dofTarget = useRef(new THREE.Vector3(0, 0, 0));
+  const chromaticOffset = useMemo(() => new THREE.Vector2(0.0015, 0.0015), []);
 
   useEffect(() => {
     if (interactionState === "ENTERING") {
@@ -329,6 +438,10 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
     const currentScroll = smoothScroll.get();
     let targetZ = 45 + (-(projects.length * SPACING_Z) + SPACING_Z - 45) * currentScroll; 
 
+    // Velocity Tracking for Inertia & Warp
+    velocityZ.current = targetZ - prevZ.current;
+    prevZ.current = targetZ;
+
     // Base position (The scrolling rail)
     const baseCameraPos = new THREE.Vector3();
     if (currentScroll > 0.95) {
@@ -342,22 +455,39 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
 
     if (interactionState === "IDLE") {
       camera.position.lerp(baseCameraPos, 0.3);
+      
+      // DRONE INERTIA: Tilt forward when accelerating (negative velocity), backward when braking
+      let tiltX = velocityZ.current * 0.06;
+      tiltX = THREE.MathUtils.clamp(tiltX, -Math.PI / 6, Math.PI / 6);
+
       if (currentScroll > 0.95) {
         camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, -Math.PI / 8, 0.08);
       } else {
-        camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, 0, 0.1);
+        camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, tiltX, 0.1);
         const lookDummy = new THREE.Vector3(Math.sin(clock.elapsedTime * 0.2) * 2, 0, targetZ - 20);
         camera.lookAt(lookDummy);
       }
+      
+      // Focus on mid-distance during idle
+      dofTarget.current.lerp(new THREE.Vector3(0, 0, camera.position.z - 30), 0.05);
+
     } else if (interactionState === "LOCKING") {
       // Freeze slightly
       camera.position.lerp(baseCameraPos, 0.02);
+      
+      if (activeIdx !== null) {
+        const [px, py, pz] = getPosition(activeIdx);
+        dofTarget.current.lerp(new THREE.Vector3(px, py, pz), 0.1);
+      }
     } else if (activeIdx !== null) {
       const [px, py, pz] = getPosition(activeIdx);
       
       // Keep the camera centered on the project, but push it back significantly 
       // so the 80% screen constraint is maintained and HTML doesn't clip the near plane.
       const targetPos = new THREE.Vector3(px, py, pz + 13);
+      
+      // Instantly pull focus to the project
+      dofTarget.current.lerp(new THREE.Vector3(px, py, pz), 0.1);
 
       if (interactionState === "ENTERING") {
         transitionProgress.current += 0.012; // Speed of drone flight
@@ -413,10 +543,14 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
 
   return (
     <>
-      <ambientLight intensity={interactionState === "INSIDE" ? 0.02 : 0.1} className="transition-all duration-1000" />
-      <fogExp2 attach="fog" args={["#050505", interactionState === "INSIDE" ? 0.04 : 0.025]} />
+      <ambientLight intensity={interactionState === "INSIDE" ? 0.01 : 0.05} className="transition-all duration-1000" />
+      <fogExp2 attach="fog" args={["#030305", interactionState === "INSIDE" ? 0.04 : 0.02]} />
+      
+      <NebulaClouds />
+      <WarpField velocityZ={velocityZ} interactionState={interactionState} />
       <FloatingGeometry interactionState={interactionState} />
-      <Stars radius={100} depth={50} count={3000} factor={4} saturation={0} fade speed={1} />
+      <Stars radius={100} depth={50} count={2000} factor={4} saturation={0} fade speed={1} />
+      
       <Sparkles 
         count={interactionState === "INSIDE" ? 800 : 400} 
         scale={interactionState === "INSIDE" ? 30 : 50} 
@@ -443,6 +577,18 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
           cameraDist={dists[i] || 100}
         />
       ))}
+
+      <EffectComposer disableNormalPass>
+        <DepthOfField 
+          target={dofTarget.current} 
+          focalLength={0.02} 
+          bokehScale={interactionState === "IDLE" ? 2 : 6} 
+          height={700} 
+        />
+        <Bloom luminanceThreshold={0.4} luminanceSmoothing={0.9} intensity={0.6} />
+        <ChromaticAberration offset={chromaticOffset} />
+        <Noise opacity={0.04} />
+      </EffectComposer>
     </>
   );
 }
@@ -594,8 +740,8 @@ export default function MinorityReportGrid({ projects }: { projects: any[] }) {
         </motion.div>
 
         <div className="pointer-events-none absolute inset-0 z-10 shadow-[inset_0_0_200px_rgba(0,0,0,1)]" />
-        <Canvas camera={{ fov: 60, position: [0, 0, 45] }} gl={{ antialias: true, alpha: false }}>
-          <color attach="background" args={["#050505"]} />
+        <Canvas camera={{ fov: 60, position: [0, 0, 45] }} gl={{ antialias: false, alpha: false, powerPreference: "high-performance" }}>
+          <color attach="background" args={["#030305"]} />
           <Scene
             projects={projects}
             smoothScroll={smoothScroll}
@@ -604,9 +750,6 @@ export default function MinorityReportGrid({ projects }: { projects: any[] }) {
             setInteractionState={setInteractionState}
             setActiveIdx={setActiveIdx}
           />
-          <EffectComposer>
-            <Bloom luminanceThreshold={0.5} luminanceSmoothing={0.9} intensity={0.8} />
-          </EffectComposer>
         </Canvas>
       </div>
     </section>
