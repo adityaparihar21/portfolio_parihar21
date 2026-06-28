@@ -461,11 +461,12 @@ export default function MinorityReportGrid({ projects }: { projects: any[] }) {
   // Background Audio Setup
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [audioStarted, setAudioStarted] = useState(false);
+  const audioFadeInterval = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     audioRef.current = new Audio("/interstellar.mp3");
     audioRef.current.loop = true;
-    audioRef.current.volume = 0.3;
+    audioRef.current.volume = 0; // start at 0 so it fades in cleanly
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
@@ -473,21 +474,23 @@ export default function MinorityReportGrid({ projects }: { projects: any[] }) {
     };
   }, []);
 
-  // Activate audio on first scroll
+  // Safely unlock audio engine on first trusted interaction anywhere on site
   useEffect(() => {
+    if (audioStarted) return;
     const handleFirstInteraction = () => {
-      if (!audioStarted && audioRef.current) {
-        audioRef.current.play().catch(() => {
-          console.warn("Autoplay blocked, waiting for click");
-        });
-        setAudioStarted(true);
+      if (audioRef.current) {
+        audioRef.current.play().then(() => {
+          audioRef.current?.pause();
+          setAudioStarted(true);
+          window.removeEventListener("wheel", handleFirstInteraction);
+          window.removeEventListener("touchmove", handleFirstInteraction);
+          window.removeEventListener("click", handleFirstInteraction);
+        }).catch(() => {});
       }
     };
-    
-    window.addEventListener("wheel", handleFirstInteraction, { once: true });
-    window.addEventListener("touchmove", handleFirstInteraction, { once: true });
-    window.addEventListener("click", handleFirstInteraction, { once: true });
-    
+    window.addEventListener("wheel", handleFirstInteraction);
+    window.addEventListener("touchmove", handleFirstInteraction);
+    window.addEventListener("click", handleFirstInteraction);
     return () => {
       window.removeEventListener("wheel", handleFirstInteraction);
       window.removeEventListener("touchmove", handleFirstInteraction);
@@ -495,36 +498,51 @@ export default function MinorityReportGrid({ projects }: { projects: any[] }) {
     };
   }, [audioStarted]);
 
-  // Handle audio dimming/pausing during portal interaction
+  // Unified Spatial Audio Manager: Play ONLY if in this specific section AND Idle
   useEffect(() => {
     if (!audioRef.current || !audioStarted) return;
-    
-    if (interactionState === "ENTERING" || interactionState === "INSIDE") {
-      let vol = audioRef.current.volume;
-      const fade = setInterval(() => {
-        vol -= 0.05;
-        if (vol <= 0) {
-          vol = 0;
-          clearInterval(fade);
-          audioRef.current?.pause();
+
+    const updateAudio = () => {
+      const v = scrollYProgress.get();
+      const inSection = v > 0.001 && v < 0.999;
+      const isIdle = interactionState === "IDLE";
+      
+      if (inSection && isIdle) {
+        // Play and fade in
+        if (audioRef.current?.paused) {
+          audioRef.current.play().catch(() => {});
         }
-        if (audioRef.current) audioRef.current.volume = vol;
-      }, 50);
-      return () => clearInterval(fade);
-    } else if (interactionState === "EXITING" || interactionState === "IDLE") {
-      audioRef.current.play().catch(console.warn);
-      let vol = audioRef.current.volume;
-      const fade = setInterval(() => {
-        vol += 0.05;
-        if (vol >= 0.3) {
-          vol = 0.3;
-          clearInterval(fade);
+        if (audioFadeInterval.current) clearInterval(audioFadeInterval.current);
+        audioFadeInterval.current = setInterval(() => {
+          if (!audioRef.current) return;
+          let vol = audioRef.current.volume;
+          vol += 0.05;
+          if (vol >= 0.3) { vol = 0.3; clearInterval(audioFadeInterval.current!); }
+          audioRef.current.volume = vol;
+        }, 50);
+      } else {
+        // Fade out and pause (either exited section, or clicked a video)
+        if (!audioRef.current?.paused) {
+          if (audioFadeInterval.current) clearInterval(audioFadeInterval.current);
+          audioFadeInterval.current = setInterval(() => {
+            if (!audioRef.current) return;
+            let vol = audioRef.current.volume;
+            vol -= 0.05;
+            if (vol <= 0) { 
+              vol = 0; 
+              clearInterval(audioFadeInterval.current!); 
+              audioRef.current.pause(); 
+            }
+            audioRef.current.volume = vol;
+          }, 50);
         }
-        if (audioRef.current) audioRef.current.volume = vol;
-      }, 50);
-      return () => clearInterval(fade);
-    }
-  }, [interactionState, audioStarted]);
+      }
+    };
+
+    updateAudio();
+    const unsub = scrollYProgress.onChange(updateAudio);
+    return () => unsub();
+  }, [audioStarted, interactionState, scrollYProgress]);
 
   useEffect(() => {
     if (interactionState === "IDLE") return;
