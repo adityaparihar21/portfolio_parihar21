@@ -6,7 +6,7 @@ import { Html, Stars, Sparkles, MeshTransmissionMaterial, RoundedBox, Float } fr
 import { EffectComposer, Bloom, DepthOfField } from "@react-three/postprocessing";
 import { useScroll, useSpring, motion, useTransform } from "framer-motion";
 import * as THREE from "three";
-import { ArrowRight, Code2, ExternalLink, Github } from "lucide-react";
+import { ArrowRight, Code2, ExternalLink, Github, Volume2, VolumeX } from "lucide-react";
 
 const SPACING_Z = 15;
 
@@ -124,11 +124,16 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
   const isLocking = isClicked && interactionState === "LOCKING";
   const hideUI = activeIdx !== null && activeIdx !== idx;
 
+  const [isMuted, setIsMuted] = useState(false);
+
   useEffect(() => {
     if (videoRef.current) {
       if (isInside) {
-        videoRef.current.muted = false;
-        videoRef.current.currentTime = 0;
+        videoRef.current.muted = isMuted;
+        // Only reset time if it was paused or at the end, otherwise let it play
+        if (videoRef.current.paused || videoRef.current.currentTime === 0) {
+          videoRef.current.currentTime = 0;
+        }
         videoRef.current.play().catch(() => {});
       } else {
         videoRef.current.muted = true;
@@ -139,7 +144,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
         }
       }
     }
-  }, [isInside]);
+  }, [isInside, isMuted]);
 
   const targetScale = (isInside || isEntering) ? 1.15 : hovered ? 1.05 : 1;
   const scaleRef = useRef(1);
@@ -189,9 +194,14 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
             onClick();
           }
         }}
-        onPointerOver={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
-        cursor={isClicked ? "auto" : "pointer"}
+        onPointerOver={() => {
+          setHovered(true);
+          if (!isClicked) document.body.style.cursor = "pointer";
+        }}
+        onPointerOut={() => {
+          setHovered(false);
+          document.body.style.cursor = "auto";
+        }}
       >
         {/* Physical Apple Vision Pro-style Titanium Frame */}
         <RoundedBox key={`box-${aspect}`} args={[w + 0.15, h + 0.15, 0.05]} radius={0.02} position={[0, 0, -0.05]}>
@@ -208,7 +218,8 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
 
         {/* Use native HTML video overlaid perfectly on the 3D plane. */}
         {/* Scale 0.01 and multiply dimensions by 100 to ensure crisp high-res rendering */}
-        <Html transform center position={[0, 0, 0.01]} scale={0.01} zIndexRange={[100, 0]} className={hideUI && !isClose ? "opacity-0" : "opacity-100 transition-opacity duration-1000"}>
+        {/* Always visible poster state so they don't blend into the stars */}
+        <Html transform center position={[0, 0, 0.01]} scale={0.01} zIndexRange={[100, 0]} className="opacity-100 transition-opacity duration-1000">
           <div 
             style={{ width: `${w * 100}px`, height: `${h * 100}px` }} 
             className="flex items-center justify-center bg-black overflow-hidden pointer-events-none"
@@ -234,9 +245,8 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
       {/* Sequence 1: Locking Animation */}
       {isLocking && (
         <Html position={[0, 0, 0.5]} center transform>
-          <div className="flex flex-col items-center justify-center font-mono text-[10px] text-red-500 tracking-[0.3em] uppercase bg-black/60 px-6 py-3 rounded-full backdrop-blur-md border border-red-500/30">
-            <span className="animate-pulse">Project Detected</span>
-            <span className="mt-1 opacity-70">Locking...</span>
+          <div className="flex flex-col items-center justify-center font-mono text-[10px] text-[#e8d4a0] tracking-[0.3em] uppercase bg-black/60 px-6 py-3 rounded-full backdrop-blur-md border border-[#e8d4a0]/30">
+            <span className="animate-pulse">entering the memory...</span>
           </div>
         </Html>
       )}
@@ -244,15 +254,12 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
       {/* Minimal Hover UI */}
       {hovered && !isInside && !isEntering && !isLocking && (
         <Html
-          position={[0, -(h / 2 + 0.8), 0.2]}
+          position={[0, -(h / 2 + 0.5), 0.2]}
           center
           transform
           className="pointer-events-none transition-all duration-500 animate-in fade-in slide-in-from-bottom-2"
         >
           <div className="flex flex-col items-center text-center w-[300px]">
-            <span className="text-white/80 text-[10px] font-mono tracking-[0.3em] uppercase mb-4 shadow-black drop-shadow-xl">
-              {project.category}
-            </span>
             <div className="flex items-center gap-3 px-6 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
               <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-white">Enter Memory</span>
               <ArrowRight className="w-3 h-3 text-white" />
@@ -261,49 +268,71 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
         </Html>
       )}
 
-      {/* Sequence 5 & 6: The Spatial 'Memory Chamber' Portal HUD */}
+      {/* Idle Visible Poster Title */}
+      {!isClicked && !hovered && (
+        <Html
+          position={[0, -(h / 2 + 0.6), 0.2]}
+          center
+          transform
+          className="pointer-events-none opacity-60 transition-opacity duration-1000"
+        >
+          <div className="flex flex-col items-center text-center w-[400px]">
+            <h3 className="text-sm text-white font-serif tracking-wide drop-shadow-lg">
+              {project.title}
+            </h3>
+            <span className="text-white/50 text-[8px] font-mono tracking-[0.3em] uppercase mt-1">
+              {project.category}
+            </span>
+          </div>
+        </Html>
+      )}
+
+      {/* The Spatial 'Memory Chamber' Portal HUD (Centered Layout) */}
       {(isEntering || isInside) && (
         <>
-          {/* Left Panel: Story & Details */}
+          {/* Centered Details & Actions */}
           <Html
-            position={[-w / 2 - 1.2, 0, 0.2]}
+            position={[0, -(h / 2) - 0.2, 0.2]}
             center
             transform
             scale={0.8}
-            className={`w-[260px] transition-all duration-1000 delay-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${isInside ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"}`}
+            className={`w-[500px] flex flex-col items-center text-center transition-all duration-1000 delay-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${isInside ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
           >
-            <div className="flex flex-col items-end text-right">
-              <div className="flex items-center gap-2 opacity-60 text-white font-mono text-[9px] uppercase tracking-widest mb-2">
-                <span>{project.category}</span>
-                <div className="w-1.5 h-1.5 rounded-full shadow-[0_0_10px_currentColor]" style={{ backgroundColor: lightColor, color: lightColor }} />
-              </div>
-              <h3 className="text-white text-2xl font-serif leading-tight tracking-tight drop-shadow-2xl mb-3">
-                {project.title}
-              </h3>
-              <p className="text-white/70 text-xs font-light leading-relaxed">
-                {project.description}
-              </p>
+            {/* Audio Toggle Button floating near the video edge */}
+            <div className="absolute -top-12 right-4">
+              <button 
+                onClick={(e) => { e.stopPropagation(); setIsMuted(!isMuted); }}
+                className="p-2 rounded-full bg-black/40 border border-white/10 hover:bg-white/10 transition-colors backdrop-blur-md text-white"
+              >
+                {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+              </button>
             </div>
-          </Html>
 
-          {/* Right Panel: Tech Stack & Actions */}
-          <Html
-            position={[w / 2 + 1.2, 0, 0.2]}
-            center
-            transform
-            scale={0.8}
-            className={`w-[220px] transition-all duration-1000 delay-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isInside ? "opacity-100 -translate-x-0" : "opacity-0 -translate-x-8"}`}
-          >
-            <div className="flex flex-col items-start text-left">
+            <h3 className="text-white text-3xl font-serif leading-tight tracking-tight drop-shadow-2xl mb-2 mt-6">
+              {project.title}
+            </h3>
+            
+            <div className="flex items-center justify-center gap-2 opacity-60 text-white font-mono text-[9px] uppercase tracking-widest mb-6">
+              <div className="w-1.5 h-1.5 rounded-full shadow-[0_0_10px_currentColor]" style={{ backgroundColor: lightColor, color: lightColor }} />
+              <span>{project.category}</span>
+              <div className="w-1.5 h-1.5 rounded-full shadow-[0_0_10px_currentColor]" style={{ backgroundColor: lightColor, color: lightColor }} />
+            </div>
+
+            <p className="text-white/70 text-sm font-light leading-relaxed max-w-[400px] mb-8">
+              {project.description}
+            </p>
+
+            {/* Action Links */}
+            <div className="flex items-center gap-4 mb-10">
               {project.href && project.href !== "#" && (
                 <a
                   href={project.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="group flex items-center gap-3 w-full p-4 mb-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 backdrop-blur-md"
+                  className="group flex items-center gap-3 px-5 py-3 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 backdrop-blur-md"
                 >
                   <ExternalLink className="w-4 h-4 text-white/50 group-hover:text-white" />
-                  <span className="text-xs font-mono text-white/70 group-hover:text-white uppercase tracking-wider">Live Site</span>
+                  <span className="text-[10px] font-mono text-white/70 group-hover:text-white uppercase tracking-wider">Live Site</span>
                 </a>
               )}
 
@@ -312,23 +341,15 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
                   href={project.repo}
                   target="_blank"
                   rel="noreferrer"
-                  className="group flex items-center gap-3 w-full p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 backdrop-blur-md"
+                  className="group flex items-center gap-3 px-5 py-3 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 backdrop-blur-md"
                 >
                   <Github className="w-4 h-4 text-white/50 group-hover:text-white" />
-                  <span className="text-xs font-mono text-white/70 group-hover:text-white uppercase tracking-wider">Source Code</span>
+                  <span className="text-[10px] font-mono text-white/70 group-hover:text-white uppercase tracking-wider">Source Code</span>
                 </a>
               )}
             </div>
-          </Html>
 
-          {/* Sequence 10: Continue Journey Button */}
-          <Html
-            position={[0, -(h / 2) - 1.4, 0.5]}
-            center
-            transform
-            scale={0.9}
-            className={`transition-all duration-1000 delay-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${isInside ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
-          >
+            {/* Back to Journey Button */}
             <button
               onClick={() => onExit()}
               className="group flex items-center gap-3 px-6 py-3 rounded-full bg-[#e8d4a0]/10 border border-[#e8d4a0]/30 hover:bg-[#e8d4a0]/20 hover:border-[#e8d4a0]/60 transition-all duration-500 backdrop-blur-xl"
@@ -451,9 +472,9 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
     } else if (activeIdx !== null) {
       const [px, py, pz] = getPosition(activeIdx);
       
-      // Keep the camera centered on the project, but push it back significantly 
-      // so the 80% screen constraint is maintained and HTML doesn't clip the near plane.
-      const targetPos = new THREE.Vector3(px, py, pz + 13);
+      // Keep the camera centered on the project, but push it back 
+      // just enough to frame the video perfectly.
+      const targetPos = new THREE.Vector3(px, py, pz + 10);
       
       // Instantly pull focus to the project
       dofTarget.current.lerp(new THREE.Vector3(px, py, pz), 0.1);
@@ -512,7 +533,7 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
 
   return (
     <>
-      <ambientLight intensity={interactionState === "INSIDE" ? 0.01 : 0.05} className="transition-all duration-1000" />
+      <ambientLight intensity={interactionState === "INSIDE" ? 0.01 : 0.05} />
       <fogExp2 attach="fog" args={["#030305", interactionState === "INSIDE" ? 0.04 : 0.02]} />
       
       <NebulaClouds />
@@ -556,7 +577,7 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
         />
       ))}
 
-      <EffectComposer disableNormalPass>
+      <EffectComposer>
         <DepthOfField 
           target={dofTarget.current} 
           focalLength={0.02} 
