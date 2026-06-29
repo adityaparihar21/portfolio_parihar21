@@ -123,14 +123,18 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
   const targetScale = hideUI ? 0 : (isInside || isEntering) ? 1.15 : hovered ? 1.05 : 1;
   const scaleRef = useRef(1);
   const groupRef = useRef<THREE.Group>(null);
+  
+  // Distance culling: only load and render the video if it's within 40 units
+  const isVisible = isInside || cameraDist < 40;
 
   useFrame((state) => {
     scaleRef.current = THREE.MathUtils.lerp(scaleRef.current, targetScale, 0.1);
     
     if (groupRef.current) {
       if (isInside || isEntering || isLocking || hovered) {
-        // Face camera smoothly
-        groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, 0, 0.05);
+        // Subtle elegant tilt when inside
+        const targetRotY = isInside ? 0.15 : 0;
+        groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, targetRotY, 0.05);
         groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, 0, 0.05);
       } else {
         // Slow orbit (0.2 degrees per second -> ~0.003 rad/sec)
@@ -190,8 +194,15 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
           />
         </RoundedBox>
 
-        {/* Robust WebGL Media Component with Suspense */}
-        <ProjectMedia url={project.image} isInside={isInside} isMuted={isMuted} w={w} h={h} />
+        {/* Robust WebGL Media Component with Distance Culling */}
+        {isVisible ? (
+          <ProjectMedia url={project.image} isInside={isInside} isMuted={isMuted} w={w} h={h} />
+        ) : (
+          <mesh position={[0, 0, 0.01]}>
+            <planeGeometry args={[w, h]} />
+            <meshBasicMaterial color="#050505" />
+          </mesh>
+        )}
       </mesh>
 
       {/* Sequence 1: Locking Animation */}
@@ -239,74 +250,73 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
         </Html>
       )}
 
-      {/* The Spatial 'Memory Chamber' Portal HUD (Centered Layout) */}
-      {(isEntering || isInside) && (
+      {/* Sequence 2: Inside the Memory (Split-Dimension Layout) */}
+      {isInside && (
         <>
-          {/* Centered Details & Actions */}
+          {/* Mute Button anchored to the video */}
+          <Html position={[w/2 + 0.5, h / 2, 0.2]} center transform scale={0.5}>
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsMuted(!isMuted);
+              }}
+              className="group relative p-4 rounded-full bg-black/40 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/30 transition-all duration-300"
+            >
+              {isMuted ? <VolumeX className="w-8 h-8 text-white/50 group-hover:text-white" /> : <Volume2 className="w-8 h-8 text-white" />}
+            </button>
+          </Html>
+          
+          {/* Editorial Side Panel */}
           <Html
-            position={[0, -3.2, 0.2]}
+            position={[4.5, 0, 0.2]}
             center
             transform
-            scale={0.8}
-            className={`w-[500px] flex flex-col items-center text-center transition-all duration-1000 delay-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${isInside ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+            className={`transition-all duration-1000 delay-300 w-[380px] text-left ${
+              isEntering || isLocking ? "opacity-0 translate-x-10" : "opacity-100 translate-x-0"
+            }`}
           >
-            {/* Audio Toggle Button floating near the video edge */}
-            <div className="absolute -top-12 right-4">
-              <button 
-                onClick={(e) => { e.stopPropagation(); setIsMuted(!isMuted); }}
-                className="p-2 rounded-full bg-black/40 border border-white/10 hover:bg-white/10 transition-colors backdrop-blur-md text-white"
-              >
-                {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-              </button>
-            </div>
+            <div className="flex flex-col items-start justify-center backdrop-blur-xl bg-black/20 p-10 rounded-2xl border border-white/5 shadow-2xl">
+              <div className="flex items-center gap-2 text-white/40 font-mono text-[9px] uppercase tracking-[0.3em] mb-4">
+                <span className="w-4 h-px bg-white/20"></span>
+                {project.category}
+              </div>
+              
+              <h3 className="text-white text-5xl font-serif leading-tight tracking-tight drop-shadow-2xl mb-6">
+                {project.title}
+              </h3>
+              
+              <p className="text-white/60 text-sm font-light leading-relaxed mb-10 border-l border-white/10 pl-4">
+                {project.description}
+              </p>
 
-            <h3 className="text-white text-3xl font-serif leading-tight tracking-tight drop-shadow-2xl mb-2 mt-6">
-              {project.title}
-            </h3>
-            
-            <div className="flex items-center justify-center gap-2 opacity-60 text-white font-mono text-[9px] uppercase tracking-widest mb-6">
-              <span>{project.category}</span>
-            </div>
+              <div className="flex flex-col gap-3 w-full">
+                {project.href && project.href !== "#" && (
+                  <a 
+                    href={project.href} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="w-full group relative px-6 py-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white hover:text-black transition-all flex items-center justify-between"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <span className="text-xs font-mono tracking-widest uppercase">View Project</span>
+                    <ExternalLink className="w-4 h-4 opacity-50 group-hover:opacity-100" />
+                  </a>
+                )}
 
-            <p className="text-white/70 text-sm font-light leading-relaxed max-w-[400px] mb-8">
-              {project.description}
-            </p>
-
-            {/* Action Links */}
-            <div className="flex items-center gap-4 mb-10">
-              {project.href && project.href !== "#" && (
-                <a
-                  href={project.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="group flex items-center gap-3 px-5 py-3 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 backdrop-blur-md"
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onExit();
+                  }}
+                  className="w-full group relative px-6 py-4 rounded-lg border border-transparent hover:border-white/20 transition-all flex items-center justify-between"
                 >
-                  <ExternalLink className="w-4 h-4 text-white/50 group-hover:text-white" />
-                  <span className="text-[10px] font-mono text-white/70 group-hover:text-white uppercase tracking-wider">Live Site</span>
-                </a>
-              )}
-
-              {project.repo && project.repo !== "#" && (
-                <a
-                  href={project.repo}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="group flex items-center gap-3 px-5 py-3 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 backdrop-blur-md"
-                >
-                  <Github className="w-4 h-4 text-white/50 group-hover:text-white" />
-                  <span className="text-[10px] font-mono text-white/70 group-hover:text-white uppercase tracking-wider">Source Code</span>
-                </a>
-              )}
+                  <span className="text-white/70 group-hover:text-white text-xs font-mono tracking-widest uppercase">
+                    Return to Journey
+                  </span>
+                  <ArrowRight className="w-4 h-4 text-white/50 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                </button>
+              </div>
             </div>
-
-            {/* Back to Journey Button */}
-            <button
-              onClick={() => onExit()}
-              className="group flex items-center gap-3 px-6 py-3 rounded-full bg-[#e8d4a0]/10 border border-[#e8d4a0]/30 hover:bg-[#e8d4a0]/20 hover:border-[#e8d4a0]/60 transition-all duration-500 backdrop-blur-xl"
-            >
-              <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-[#e8d4a0]">Continue Journey</span>
-              <ArrowRight className="w-3.5 h-3.5 text-[#e8d4a0] group-hover:translate-x-1 transition-transform" />
-            </button>
           </Html>
         </>
       )}
@@ -432,9 +442,8 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
     } else if (activeIdx !== null) {
       const [px, py, pz] = getPosition(activeIdx);
       
-      // Keep the camera centered on the project, but push it back 
-      // just enough to frame the video perfectly with room for air.
-      const targetPos = new THREE.Vector3(px, py, pz + 8);
+      // Move camera slightly to the right to frame the video on the left
+      const targetPos = new THREE.Vector3(px + 2.8, py, pz + 8.5);
       
       // Instantly pull focus to the project
       dofTarget.current.lerp(new THREE.Vector3(px, py, pz), 0.1);
@@ -541,12 +550,6 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
       ))}
 
       <EffectComposer>
-        <DepthOfField 
-          target={dofTarget.current} 
-          focalLength={0.02} 
-          bokehScale={interactionState === "IDLE" ? 2 : 6} 
-          height={700} 
-        />
         <Bloom luminanceThreshold={0.4} luminanceSmoothing={0.9} intensity={0.6} />
       </EffectComposer>
     </>
