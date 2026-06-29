@@ -50,64 +50,7 @@ function FloatingGeometry({ interactionState }: { interactionState: string }) {
   );
 }
 
-function NebulaClouds() {
-  const count = 12;
-  const planes = useMemo(() => {
-    return Array.from({ length: count }).map((_, i) => ({
-      position: [(Math.random() - 0.5) * 60, (Math.random() - 0.5) * 40, -i * 30 - 20],
-      rotation: [0, 0, Math.random() * Math.PI * 2],
-      scale: Math.random() * 30 + 30,
-      color: Math.random() > 0.5 ? "#2a1542" : "#121a3b",
-      speed: (Math.random() - 0.5) * 0.05
-    }));
-  }, []);
-
-  const groupRef = useRef<THREE.Group>(null);
-  
-  useFrame(() => {
-    if (!groupRef.current) return;
-    groupRef.current.children.forEach((child, i) => {
-      child.rotation.z += planes[i].speed * 0.01;
-    });
-  });
-
-  const shaderMaterial = useMemo(() => new THREE.ShaderMaterial({
-    uniforms: { color: { value: new THREE.Color() } },
-    vertexShader: `
-      varying vec2 vUv;
-      void main() {
-        vUv = uv;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      }
-    `,
-    fragmentShader: `
-      uniform vec3 color;
-      varying vec2 vUv;
-      void main() {
-        float dist = distance(vUv, vec2(0.5));
-        float alpha = smoothstep(0.5, 0.1, dist) * 0.1; 
-        gl_FragColor = vec4(color, alpha);
-      }
-    `,
-    transparent: true,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending
-  }), []);
-
-  return (
-    <group ref={groupRef}>
-      {planes.map((p, i) => {
-        const mat = shaderMaterial.clone();
-        mat.uniforms.color.value.set(p.color);
-        return (
-          <mesh key={i} position={p.position as any} rotation={p.rotation as any} scale={p.scale} material={mat}>
-            <planeGeometry args={[1, 1]} />
-          </mesh>
-        );
-      })}
-    </group>
-  );
-}
+// Removed NebulaClouds for performance optimization
 
 function VideoMaterial({ url, isInside, isMuted }: { url: string, isInside: boolean, isMuted: boolean }) {
   const texture = useVideoTexture(encodeURI(url), {
@@ -177,7 +120,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
 
   const [isMuted, setIsMuted] = useState(true);
 
-  const targetScale = (isInside || isEntering) ? 1.15 : hovered ? 1.05 : 1;
+  const targetScale = hideUI ? 0 : (isInside || isEntering) ? 1.15 : hovered ? 1.05 : 1;
   const scaleRef = useRef(1);
   const groupRef = useRef<THREE.Group>(null);
 
@@ -301,7 +244,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
         <>
           {/* Centered Details & Actions */}
           <Html
-            position={[0, -(h / 2) - 0.2, 0.2]}
+            position={[0, -3.2, 0.2]}
             center
             transform
             scale={0.8}
@@ -553,9 +496,12 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
       <ambientLight intensity={interactionState === "INSIDE" ? 0.01 : 0.05} />
       <fogExp2 attach="fog" args={["#030305", interactionState === "INSIDE" ? 0.04 : 0.02]} />
       
-      <NebulaClouds />
       <FloatingGeometry interactionState={interactionState} />
-      <Stars radius={150} depth={80} count={4000} factor={6} saturation={0} fade speed={1.5} />
+      {/* Premium Deep Space Background */}
+      <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
+      <Sparkles count={400} scale={100} size={2} speed={0.2} opacity={0.2} color="#a0c0ff" />
+      <Sparkles count={200} scale={100} size={4} speed={0.4} opacity={0.4} color="#ffa0c0" />
+      <Sparkles count={150} scale={80} size={6} speed={0.1} opacity={0.15} color="#ffffff" />
       
       {/* Background Twinkling Dust / Sparkles */}
       <Sparkles 
