@@ -52,6 +52,24 @@ function FloatingGeometry({ interactionState }: { interactionState: string }) {
 
 // Removed NebulaClouds for performance optimization
 
+function applyObjectFitContain(texture: THREE.Texture, mediaWidth: number, mediaHeight: number, meshW: number = 4, meshH: number = 2.25) {
+  if (!mediaWidth || !mediaHeight) return;
+  const mediaAspect = mediaWidth / mediaHeight;
+  const meshAspect = meshW / meshH;
+  
+  if (mediaAspect < meshAspect) {
+    // Media is narrower (vertical) -> black bars / smear on left & right
+    const scaleX = meshAspect / mediaAspect;
+    texture.repeat.set(scaleX, 1);
+    texture.offset.set((1 - scaleX) / 2, 0);
+  } else {
+    // Media is wider -> black bars on top & bottom
+    const scaleY = mediaAspect / meshAspect;
+    texture.repeat.set(1, scaleY);
+    texture.offset.set(0, (1 - scaleY) / 2);
+  }
+}
+
 function VideoMaterial({ url, isInside, isMuted }: { url: string, isInside: boolean, isMuted: boolean }) {
   const texture = useVideoTexture(encodeURI(url), {
     muted: true, // MUST default to muted for browser autoplay policy
@@ -79,6 +97,15 @@ function VideoMaterial({ url, isInside, isMuted }: { url: string, isInside: bool
           video.currentTime = 0.5;
         }
       }
+
+      // Handle Aspect Ratio (Vertical Videos)
+      const handleResize = () => applyObjectFitContain(texture, video.videoWidth, video.videoHeight);
+      video.addEventListener("loadedmetadata", handleResize);
+      if (video.videoWidth) handleResize();
+
+      return () => {
+        video.removeEventListener("loadedmetadata", handleResize);
+      };
     }
   }, [texture, isInside, isMuted]);
 
@@ -87,6 +114,14 @@ function VideoMaterial({ url, isInside, isMuted }: { url: string, isInside: bool
 
 function ImageMaterial({ url }: { url: string }) {
   const texture = useTexture(encodeURI(url));
+
+  useEffect(() => {
+    if (texture && texture.image) {
+      const img = texture.image as HTMLImageElement;
+      applyObjectFitContain(texture, img.width, img.height);
+    }
+  }, [texture]);
+
   return <meshBasicMaterial map={texture} toneMapped={false} />;
 }
 
@@ -254,7 +289,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
       {isInside && (
         <>
           {/* Mute Button anchored to the video */}
-          <Html position={[w/2 + 0.5, h / 2, 0.2]} center transform scale={0.5}>
+          <Html position={[-w/2 - 0.5, h / 2, 0.2]} center transform scale={0.5}>
             <button 
               onClick={(e) => {
                 e.stopPropagation();
@@ -266,13 +301,14 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
             </button>
           </Html>
           
-          {/* Editorial Side Panel */}
+          {/* Editorial Side Panel (Left Side) */}
           <Html
-            position={[4.5, 0, 0.2]}
+            position={[-5.2, 0, 0.2]}
             center
             transform
-            className={`transition-all duration-1000 delay-300 w-[380px] text-left ${
-              isEntering || isLocking ? "opacity-0 translate-x-10" : "opacity-100 translate-x-0"
+            scale={0.65}
+            className={`transition-all duration-1000 delay-300 w-[450px] text-left ${
+              isEntering || isLocking ? "opacity-0 -translate-x-10" : "opacity-100 translate-x-0"
             }`}
           >
             <div className="flex flex-col items-start justify-center backdrop-blur-xl bg-black/20 p-10 rounded-2xl border border-white/5 shadow-2xl">
@@ -285,9 +321,10 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
                 {project.title}
               </h3>
               
-              <p className="text-white/60 text-sm font-light leading-relaxed mb-10 border-l border-white/10 pl-4">
-                {project.description}
-              </p>
+              <div 
+                className="text-white/60 text-sm font-light leading-relaxed mb-10 border-l border-white/10 pl-4"
+                dangerouslySetInnerHTML={{ __html: project.description }}
+              />
 
               <div className="flex flex-col gap-3 w-full">
                 {project.href && project.href !== "#" && (
@@ -442,8 +479,8 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
     } else if (activeIdx !== null) {
       const [px, py, pz] = getPosition(activeIdx);
       
-      // Move camera slightly to the right to frame the video on the left
-      const targetPos = new THREE.Vector3(px + 2.8, py, pz + 8.5);
+      // Move camera to the left to perfectly frame the video on the right and text on the left
+      const targetPos = new THREE.Vector3(px - 2.6, py, pz + 5.5);
       
       // Instantly pull focus to the project
       dofTarget.current.lerp(new THREE.Vector3(px, py, pz), 0.1);
