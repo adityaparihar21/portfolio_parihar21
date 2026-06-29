@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useState, useMemo, useEffect } from "react";
+import { useRef, useState, useMemo, useEffect, Suspense } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Html, Stars, Sparkles, MeshTransmissionMaterial, RoundedBox, Float } from "@react-three/drei";
+import { Html, Stars, Sparkles, MeshTransmissionMaterial, RoundedBox, Float, useTexture, useVideoTexture } from "@react-three/drei";
 import { EffectComposer, Bloom, DepthOfField } from "@react-three/postprocessing";
 import { useScroll, useSpring, motion, useTransform } from "framer-motion";
 import * as THREE from "three";
@@ -109,14 +109,65 @@ function NebulaClouds() {
   );
 }
 
+function VideoMaterial({ url, isInside, isMuted }: { url: string, isInside: boolean, isMuted: boolean }) {
+  const texture = useVideoTexture(encodeURI(url), {
+    muted: true, // MUST default to muted for browser autoplay policy
+    loop: true,
+    start: true,
+    crossOrigin: "Anonymous"
+  });
+
+  useEffect(() => {
+    if (texture && texture.image) {
+      const video = texture.image as HTMLVideoElement;
+      if (isInside) {
+        video.muted = isMuted;
+        if (video.paused) {
+          // Play from beginning if it was paused
+          if (video.currentTime > 0 && video.currentTime < 1) {
+            video.currentTime = 0;
+          }
+          video.play().catch(() => {});
+        }
+      } else {
+        video.muted = true;
+        // Skip black frame
+        if (video.duration > 0.5 && video.currentTime === 0) {
+          video.currentTime = 0.5;
+        }
+      }
+    }
+  }, [texture, isInside, isMuted]);
+
+  return <meshBasicMaterial map={texture} toneMapped={false} />;
+}
+
+function ImageMaterial({ url }: { url: string }) {
+  const texture = useTexture(encodeURI(url));
+  return <meshBasicMaterial map={texture} toneMapped={false} />;
+}
+
+function ProjectMedia({ url, isInside, isMuted, w, h }: { url: string, isInside: boolean, isMuted: boolean, w: number, h: number }) {
+  const isVideo = url.toLowerCase().endsWith('.mp4') || url.toLowerCase().endsWith('.webm');
+  
+  return (
+    <mesh position={[0, 0, 0.01]}>
+      <planeGeometry args={[w, h]} />
+      <Suspense fallback={<meshBasicMaterial color="#111111" />}>
+        {isVideo ? (
+          <VideoMaterial url={url} isInside={isInside} isMuted={isMuted} />
+        ) : (
+          <ImageMaterial url={url} />
+        )}
+      </Suspense>
+    </mesh>
+  );
+}
 
 
 function VideoPanel({ project, position, interactionState, activeIdx, idx, onClick, onExit, cameraDist }: any) {
   const [hovered, setHovered] = useState(false);
   const aspect = 16 / 9; // Enforce 16:9 for all panels to prevent UI overlap
-  
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const isVideo = project.image.toLowerCase().endsWith('.mp4') || project.image.toLowerCase().endsWith('.webm');
 
   const isClicked = activeIdx === idx;
   const isInside = isClicked && interactionState === "INSIDE";
@@ -124,20 +175,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
   const isLocking = isClicked && interactionState === "LOCKING";
   const hideUI = activeIdx !== null && activeIdx !== idx;
 
-  const [isMuted, setIsMuted] = useState(false);
-
-  useEffect(() => {
-    if (videoRef.current && isVideo) {
-      if (isInside) {
-        videoRef.current.muted = isMuted;
-        if (videoRef.current.paused) {
-          videoRef.current.play().catch(() => {});
-        }
-      } else {
-        videoRef.current.muted = true;
-      }
-    }
-  }, [isInside, isMuted, isVideo]);
+  const [isMuted, setIsMuted] = useState(true);
 
   const targetScale = (isInside || isEntering) ? 1.15 : hovered ? 1.05 : 1;
   const scaleRef = useRef(1);
@@ -209,28 +247,8 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
           />
         </RoundedBox>
 
-        {/* Reverted to Html native elements for reliability on iOS/Safari */}
-        <Html transform center position={[0, 0, 0.01]} scale={0.01} zIndexRange={[100, 0]} className="opacity-100 transition-opacity duration-1000">
-          <div 
-            style={{ width: `${w * 100}px`, height: `${h * 100}px` }} 
-            className="flex items-center justify-center bg-black overflow-hidden pointer-events-auto"
-          >
-            {isVideo ? (
-              <video
-                ref={videoRef}
-                src={encodeURI(project.image)}
-                loop
-                muted
-                autoPlay
-                playsInline
-                preload="auto"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <img src={encodeURI(project.image)} alt={project.title} className="w-full h-full object-cover" />
-            )}
-          </div>
-        </Html>
+        {/* Robust WebGL Media Component with Suspense */}
+        <ProjectMedia url={project.image} isInside={isInside} isMuted={isMuted} w={w} h={h} />
       </mesh>
 
       {/* Sequence 1: Locking Animation */}
@@ -473,7 +491,7 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
       
       // Keep the camera centered on the project, but push it back 
       // just enough to frame the video perfectly with room for air.
-      const targetPos = new THREE.Vector3(px, py, pz + 12);
+      const targetPos = new THREE.Vector3(px, py, pz + 8);
       
       // Instantly pull focus to the project
       dofTarget.current.lerp(new THREE.Vector3(px, py, pz), 0.1);
