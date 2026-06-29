@@ -85,7 +85,7 @@ function NebulaClouds() {
       varying vec2 vUv;
       void main() {
         float dist = distance(vUv, vec2(0.5));
-        float alpha = smoothstep(0.5, 0.1, dist) * 0.02; 
+        float alpha = smoothstep(0.5, 0.1, dist) * 0.1; 
         gl_FragColor = vec4(color, alpha);
       }
     `,
@@ -111,44 +111,23 @@ function NebulaClouds() {
 
 
 
-function ProjectMedia({ url, isInside, isMuted, w, h }: { url: string, isInside: boolean, isMuted: boolean, w: number, h: number }) {
-  const isVideo = url.toLowerCase().endsWith('.mp4') || url.toLowerCase().endsWith('.webm');
+function VideoPanel({ project, position, interactionState, activeIdx, idx, onClick, onExit, cameraDist }: any) {
+  const [hovered, setHovered] = useState(false);
+  const aspect = 16 / 9; // Enforce 16:9 for all panels to prevent UI overlap
   
-  const [texture, setTexture] = useState<THREE.Texture | null>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const isVideo = project.image.toLowerCase().endsWith('.mp4') || project.image.toLowerCase().endsWith('.webm');
+
+  const isClicked = activeIdx === idx;
+  const isInside = isClicked && interactionState === "INSIDE";
+  const isEntering = isClicked && interactionState === "ENTERING";
+  const isLocking = isClicked && interactionState === "LOCKING";
+  const hideUI = activeIdx !== null && activeIdx !== idx;
+
+  const [isMuted, setIsMuted] = useState(false);
 
   useEffect(() => {
-    if (isVideo) {
-      const vid = document.createElement("video");
-      vid.src = encodeURI(url);
-      vid.crossOrigin = "Anonymous";
-      vid.loop = true;
-      vid.muted = true;
-      vid.playsInline = true;
-      vid.play().catch(() => {});
-      videoRef.current = vid;
-      
-      const tex = new THREE.VideoTexture(vid);
-      tex.colorSpace = THREE.SRGBColorSpace;
-      setTexture(tex);
-      
-      return () => {
-        vid.pause();
-        vid.removeAttribute('src');
-        vid.load();
-        tex.dispose();
-      };
-    } else {
-      const loader = new THREE.TextureLoader();
-      loader.load(encodeURI(url), (tex) => {
-        tex.colorSpace = THREE.SRGBColorSpace;
-        setTexture(tex);
-      });
-    }
-  }, [url, isVideo]);
-
-  useEffect(() => {
-    if (videoRef.current) {
+    if (videoRef.current && isVideo) {
       if (isInside) {
         videoRef.current.muted = isMuted;
         if (videoRef.current.paused) {
@@ -158,31 +137,7 @@ function ProjectMedia({ url, isInside, isMuted, w, h }: { url: string, isInside:
         videoRef.current.muted = true;
       }
     }
-  }, [isInside, isMuted]);
-
-  return (
-    <mesh position={[0, 0, 0]}>
-      <planeGeometry args={[w, h]} />
-      {texture ? (
-        <meshBasicMaterial map={texture} toneMapped={false} />
-      ) : (
-        <meshBasicMaterial color="#0a0a0a" />
-      )}
-    </mesh>
-  );
-}
-
-function VideoPanel({ project, position, interactionState, activeIdx, idx, onClick, onExit, cameraDist }: any) {
-  const [hovered, setHovered] = useState(false);
-  const aspect = 16 / 9; // Enforce 16:9 for all panels to prevent UI overlap
-
-  const isClicked = activeIdx === idx;
-  const isInside = isClicked && interactionState === "INSIDE";
-  const isEntering = isClicked && interactionState === "ENTERING";
-  const isLocking = isClicked && interactionState === "LOCKING";
-  const hideUI = activeIdx !== null && activeIdx !== idx;
-
-  const [isMuted, setIsMuted] = useState(false);
+  }, [isInside, isMuted, isVideo]);
 
   const targetScale = (isInside || isEntering) ? 1.15 : hovered ? 1.05 : 1;
   const scaleRef = useRef(1);
@@ -254,8 +209,28 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
           />
         </RoundedBox>
 
-        {/* True WebGL VideoTexture for robust rendering and visibility */}
-        <ProjectMedia url={project.image} isInside={isInside} isMuted={isMuted} w={w} h={h} />
+        {/* Reverted to Html native elements for reliability on iOS/Safari */}
+        <Html transform center position={[0, 0, 0.01]} scale={0.01} zIndexRange={[100, 0]} className="opacity-100 transition-opacity duration-1000">
+          <div 
+            style={{ width: `${w * 100}px`, height: `${h * 100}px` }} 
+            className="flex items-center justify-center bg-black overflow-hidden pointer-events-auto"
+          >
+            {isVideo ? (
+              <video
+                ref={videoRef}
+                src={encodeURI(project.image)}
+                loop
+                muted
+                autoPlay
+                playsInline
+                preload="auto"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <img src={encodeURI(project.image)} alt={project.title} className="w-full h-full object-cover" />
+            )}
+          </div>
+        </Html>
       </mesh>
 
       {/* Sequence 1: Locking Animation */}
@@ -421,27 +396,40 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
       baseCameraPos.set(bobX, bobY, targetZ);
     }
 
-    // --- GRAVITY ATTRACTION SYSTEM (SMOOTH FLIGHT) ---
-    let totalAttractionX = 0;
-    let totalAttractionY = 0;
+    // --- SMOOTH CAMERA GLIDE ---
+    let desiredX = 0;
+    let desiredY = 0;
+    let closestProjectIdx = -1;
+    let minDistance = Infinity;
     
     for (let i = 0; i < projects.length; i++) {
       const [px, py, pz] = getPosition(i);
       const distZ = Math.abs(pz - targetZ);
-      // Soft gaussian-like falloff for attraction based on Z distance
-      if (distZ < 30) {
-        const force = Math.max(0, 1 - (distZ / 30));
-        // Eased curve so it pulls smoothly and naturally without snapping
-        const easedForce = Math.pow(force, 3) * 0.4; 
-        
-        totalAttractionX += (px - baseCameraPos.x) * easedForce;
-        totalAttractionY += (py - baseCameraPos.y) * easedForce;
+      if (distZ < minDistance) {
+        minDistance = distZ;
+        closestProjectIdx = i;
       }
     }
 
-    if (currentScroll <= 0.95) {
-      baseCameraPos.x += totalAttractionX;
-      baseCameraPos.y += totalAttractionY;
+    if (closestProjectIdx !== -1 && currentScroll <= 0.95 && minDistance < 30) {
+      const [px, py] = getPosition(closestProjectIdx);
+      // Soft easing curve for attraction
+      const factor = Math.max(0, 1 - (minDistance / 30));
+      // smoothstep calculation (buttery smooth curve)
+      const easeFactor = factor * factor * (3 - 2 * factor);
+      
+      // We pull slightly towards the project (max 30% of the way)
+      desiredX = px * 0.3 * easeFactor;
+      desiredY = py * 0.3 * easeFactor;
+    }
+
+    if (currentScroll > 0.95) {
+      const finale = (currentScroll - 0.95) / 0.05;
+      baseCameraPos.set(0, finale * 15, targetZ + finale * 40);
+    } else {
+      const bobX = Math.sin(clock.elapsedTime * 0.4) * 0.8;
+      const bobY = Math.cos(clock.elapsedTime * 0.3) * 0.6;
+      baseCameraPos.set(desiredX + bobX, desiredY + bobY, targetZ);
     }
 
     if (interactionState === "IDLE") {
