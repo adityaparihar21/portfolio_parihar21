@@ -70,11 +70,11 @@ function applyObjectFitContain(texture: THREE.Texture, mediaWidth: number, media
   }
 }
 
-function VideoMaterial({ url, isInside, isMuted }: { url: string, isInside: boolean, isMuted: boolean }) {
+function VideoMaterial({ url, isInside, isMuted, onUnmuteFailed }: { url: string, isInside: boolean, isMuted: boolean, onUnmuteFailed: () => void }) {
   const texture = useVideoTexture(encodeURI(url), {
     muted: true, // MUST default to muted for browser autoplay policy
     loop: true,
-    start: true,
+    start: false, // NO background autoplay!
     crossOrigin: "Anonymous"
   });
 
@@ -88,11 +88,17 @@ function VideoMaterial({ url, isInside, isMuted }: { url: string, isInside: bool
           if (video.currentTime > 0 && video.currentTime < 1) {
             video.currentTime = 0;
           }
-          video.play().catch(() => {});
+          video.play().catch(() => {
+            // Browser blocked unmuted autoplay! Fallback to muted.
+            video.muted = true;
+            video.play().catch(() => {});
+            onUnmuteFailed();
+          });
         }
       } else {
         video.muted = true;
-        // Skip black frame
+        video.pause();
+        // Skip black frame to show a poster
         if (video.duration > 0.5 && video.currentTime === 0) {
           video.currentTime = 0.5;
         }
@@ -107,7 +113,7 @@ function VideoMaterial({ url, isInside, isMuted }: { url: string, isInside: bool
         video.removeEventListener("loadedmetadata", handleResize);
       };
     }
-  }, [texture, isInside, isMuted]);
+  }, [texture, isInside, isMuted, onUnmuteFailed]);
 
   return <meshBasicMaterial map={texture} toneMapped={false} />;
 }
@@ -125,7 +131,7 @@ function ImageMaterial({ url }: { url: string }) {
   return <meshBasicMaterial map={texture} toneMapped={false} />;
 }
 
-function ProjectMedia({ url, isInside, isMuted, w, h }: { url: string, isInside: boolean, isMuted: boolean, w: number, h: number }) {
+function ProjectMedia({ url, isInside, isMuted, w, h, onUnmuteFailed }: { url: string, isInside: boolean, isMuted: boolean, w: number, h: number, onUnmuteFailed: () => void }) {
   const isVideo = url.toLowerCase().endsWith('.mp4') || url.toLowerCase().endsWith('.webm');
   
   return (
@@ -133,7 +139,7 @@ function ProjectMedia({ url, isInside, isMuted, w, h }: { url: string, isInside:
       <planeGeometry args={[w, h]} />
       <Suspense fallback={<meshBasicMaterial color="#111111" />}>
         {isVideo ? (
-          <VideoMaterial url={url} isInside={isInside} isMuted={isMuted} />
+          <VideoMaterial url={url} isInside={isInside} isMuted={isMuted} onUnmuteFailed={onUnmuteFailed} />
         ) : (
           <ImageMaterial url={url} />
         )}
@@ -153,7 +159,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
   const isLocking = isClicked && interactionState === "LOCKING";
   const hideUI = activeIdx !== null && activeIdx !== idx;
 
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false); // Try unmuted by default
 
   const targetScale = hideUI ? 0 : (isInside || isEntering) ? 1.15 : hovered ? 1.05 : 1;
   const scaleRef = useRef(1);
@@ -167,9 +173,8 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
     
     if (groupRef.current) {
       if (isInside || isEntering || isLocking || hovered) {
-        // Subtle elegant tilt when inside
-        const targetRotY = isInside ? 0.15 : 0;
-        groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, targetRotY, 0.05);
+        // Face camera smoothly, no tilt
+        groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, 0, 0.05);
         groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, 0, 0.05);
       } else {
         // Slow orbit (0.2 degrees per second -> ~0.003 rad/sec)
@@ -216,22 +221,21 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
           document.body.style.cursor = "auto";
         }}
       >
-        {/* Physical Apple Vision Pro-style Titanium Frame */}
-        <RoundedBox key={`box-${aspect}`} args={[w + 0.15, h + 0.15, 0.05]} radius={0.02} position={[0, 0, -0.05]}>
+        {/* Soft Rounded Glass Backing */}
+        <RoundedBox key={`box-${aspect}`} args={[w + 0.15, h + 0.15, 0.05]} radius={0.08} position={[0, 0, -0.05]}>
           <meshPhysicalMaterial 
-            color="#050505"
-            metalness={0.9}
-            roughness={0.1}
-            clearcoat={1.0}
-            clearcoatRoughness={0.1}
-            transmission={0.4}
-            thickness={0.2}
+            color="#050505" 
+            metalness={0.9} 
+            roughness={0.1} 
+            clearcoat={1} 
+            clearcoatRoughness={0.1} 
+            envMapIntensity={0.2}
           />
         </RoundedBox>
 
         {/* Robust WebGL Media Component with Distance Culling */}
         {isVisible ? (
-          <ProjectMedia url={project.image} isInside={isInside} isMuted={isMuted} w={w} h={h} />
+          <ProjectMedia url={project.image} isInside={isInside} isMuted={isMuted} w={w} h={h} onUnmuteFailed={() => setIsMuted(true)} />
         ) : (
           <mesh position={[0, 0, 0.01]}>
             <planeGeometry args={[w, h]} />
@@ -285,11 +289,11 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
         </Html>
       )}
 
-      {/* Sequence 2: Inside the Memory (Split-Dimension Layout) */}
+      {/* Sequence 2: Inside the Memory (Centered Platform Layout) */}
       {isInside && (
         <>
-          {/* Mute Button anchored to the video */}
-          <Html position={[-w/2 - 0.5, h / 2, 0.2]} center transform scale={0.5}>
+          {/* Mute Button positioned on the video itself */}
+          <Html position={[w/2 + 0.5, h / 2, 0.2]} center transform scale={0.5}>
             <button 
               onClick={(e) => {
                 e.stopPropagation();
@@ -301,42 +305,43 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
             </button>
           </Html>
           
-          {/* Editorial Side Panel (Left Side) */}
+          {/* Centered Platform HUD */}
           <Html
-            position={[-5.2, 0, 0.2]}
+            position={[0, -2.4, 0.2]}
             center
             transform
-            scale={0.65}
-            className={`transition-all duration-1000 delay-300 w-[450px] text-left ${
-              isEntering || isLocking ? "opacity-0 -translate-x-10" : "opacity-100 translate-x-0"
+            scale={0.7}
+            className={`transition-all duration-1000 delay-300 w-[600px] text-center ${
+              isEntering || isLocking ? "opacity-0 translate-y-10" : "opacity-100 translate-y-0"
             }`}
           >
-            <div className="flex flex-col items-start justify-center backdrop-blur-xl bg-black/20 p-10 rounded-2xl border border-white/5 shadow-2xl">
+            <div className="flex flex-col items-center justify-center backdrop-blur-2xl bg-black/40 p-8 rounded-3xl border border-white/10 shadow-2xl">
               <div className="flex items-center gap-2 text-white/40 font-mono text-[9px] uppercase tracking-[0.3em] mb-4">
                 <span className="w-4 h-px bg-white/20"></span>
                 {project.category}
+                <span className="w-4 h-px bg-white/20"></span>
               </div>
               
-              <h3 className="text-white text-5xl font-serif leading-tight tracking-tight drop-shadow-2xl mb-6">
+              <h3 className="text-white text-4xl font-serif leading-tight tracking-tight drop-shadow-2xl mb-4">
                 {project.title}
               </h3>
               
               <div 
-                className="text-white/60 text-sm font-light leading-relaxed mb-10 border-l border-white/10 pl-4"
+                className="text-white/70 text-sm font-light leading-relaxed mb-8 max-w-[500px]"
                 dangerouslySetInnerHTML={{ __html: project.description }}
               />
 
-              <div className="flex flex-col gap-3 w-full">
+              <div className="flex items-center justify-center gap-4 w-full">
                 {project.href && project.href !== "#" && (
                   <a 
                     href={project.href} 
                     target="_blank" 
                     rel="noreferrer"
-                    className="w-full group relative px-6 py-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white hover:text-black transition-all flex items-center justify-between"
+                    className="group relative px-6 py-3 rounded-full bg-white/10 border border-white/20 hover:bg-white hover:text-black transition-all flex items-center justify-center gap-2"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <span className="text-xs font-mono tracking-widest uppercase">View Project</span>
-                    <ExternalLink className="w-4 h-4 opacity-50 group-hover:opacity-100" />
+                    <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100" />
                   </a>
                 )}
 
@@ -345,12 +350,12 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
                     e.stopPropagation();
                     onExit();
                   }}
-                  className="w-full group relative px-6 py-4 rounded-lg border border-transparent hover:border-white/20 transition-all flex items-center justify-between"
+                  className="group relative px-6 py-3 rounded-full border border-white/20 hover:border-white/50 transition-all flex items-center justify-center gap-2"
                 >
                   <span className="text-white/70 group-hover:text-white text-xs font-mono tracking-widest uppercase">
                     Return to Journey
                   </span>
-                  <ArrowRight className="w-4 h-4 text-white/50 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                  <ArrowRight className="w-3 h-3 text-white/50 group-hover:text-white group-hover:translate-x-1 transition-all" />
                 </button>
               </div>
             </div>
@@ -479,8 +484,8 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
     } else if (activeIdx !== null) {
       const [px, py, pz] = getPosition(activeIdx);
       
-      // Move camera to the left to perfectly frame the video on the right and text on the left
-      const targetPos = new THREE.Vector3(px - 2.6, py, pz + 5.5);
+      // Keep the camera centered on the project for the Platform Layout
+      const targetPos = new THREE.Vector3(px, py, pz + 7.5);
       
       // Instantly pull focus to the project
       dofTarget.current.lerp(new THREE.Vector3(px, py, pz), 0.1);
