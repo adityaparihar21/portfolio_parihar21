@@ -125,12 +125,23 @@ function VideoMaterial({ url, isInside, isMuted, onUnmuteFailed, setNaturalAspec
     }
   });
 
-  return <meshBasicMaterial map={texture} toneMapped={false} />;
+  return (
+    <mesh>
+      <planeGeometry args={[w, h]} />
+      <meshBasicMaterial map={texture} toneMapped={false} />
+    </mesh>
+  );
 }
 
 function ImageMaterial({ url, setNaturalAspect, groupRef, w, h }: { url: string, setNaturalAspect: (a: number) => void, groupRef: React.RefObject<THREE.Group>, w: number, h: number }) {
   const [texture, setTexture] = useState<THREE.Texture | null>(null);
   const [aspect, setAspect] = useState(16 / 9);
+  
+  const bgMaterialRef = useRef<THREE.MeshBasicMaterial>(null);
+  const imgMaterialRef = useRef<THREE.MeshBasicMaterial>(null);
+  const opacityRef = useRef(0);
+  const colorA = new THREE.Color("#080808");
+  const colorB = new THREE.Color("#1a1a1a");
 
   useEffect(() => {
     const loader = new THREE.TextureLoader();
@@ -154,20 +165,48 @@ function ImageMaterial({ url, setNaturalAspect, groupRef, w, h }: { url: string,
     );
     
     return () => {
-      // Cleanup texture if unmounted
       if (texture) texture.dispose();
     };
   }, [url, setNaturalAspect]);
 
-  useFrame(() => {
+  useFrame((state) => {
+    // 1. Dynamic object-fit cover
     if (groupRef.current && texture) {
       const currentScaleX = groupRef.current.scale.x;
       const currentMeshAspect = (w * currentScaleX) / h;
       updateTextureFitCover(texture, aspect, currentMeshAspect);
     }
+    
+    // 2. Loading Pulse Animation (Skeleton)
+    if (!texture && bgMaterialRef.current) {
+      const pulse = (Math.sin(state.clock.elapsedTime * 4) + 1) / 2;
+      bgMaterialRef.current.color.lerpColors(colorA, colorB, pulse);
+    }
+    
+    // 3. Smooth Fade-In Animation
+    if (texture && imgMaterialRef.current) {
+      opacityRef.current = THREE.MathUtils.lerp(opacityRef.current, 1, 0.08);
+      imgMaterialRef.current.opacity = opacityRef.current;
+    }
   });
 
-  return <meshBasicMaterial map={texture || undefined} color={texture ? "#ffffff" : "#111111"} toneMapped={false} />;
+  return (
+    <group>
+      {/* Background Pulse Loader */}
+      <mesh position={[0, 0, -0.001]}>
+        <planeGeometry args={[w, h]} />
+        <meshBasicMaterial ref={bgMaterialRef} color="#080808" />
+      </mesh>
+      
+      {/* Foreground Image Fade */}
+      {texture && (
+        <mesh>
+          <planeGeometry args={[w, h]} />
+          <meshBasicMaterial ref={imgMaterialRef} map={texture} transparent={true} opacity={0} toneMapped={false} />
+        </mesh>
+      )}
+    </group>
+  );
 }
 
 function ProjectMedia({ url, isInside, isMuted, w, h, onUnmuteFailed, groupRef, naturalAspect, setNaturalAspect }: { url: string, isInside: boolean, isMuted: boolean, w: number, h: number, onUnmuteFailed: () => void, groupRef: any, naturalAspect: number, setNaturalAspect: (a: number) => void }) {
@@ -178,16 +217,15 @@ function ProjectMedia({ url, isInside, isMuted, w, h, onUnmuteFailed, groupRef, 
   const posterUrl = isVideo ? url.replace('.mp4', '_poster.jpg').replace('.webm', '_poster.jpg') : url;
 
   return (
-    <mesh position={[0, 0, 0.01]}>
-      <planeGeometry args={[w, h]} />
-      <Suspense fallback={<meshBasicMaterial color="#111111" />}>
+    <group position={[0, 0, 0.01]}>
+      <Suspense fallback={null}>
         {isVideo && isInside ? (
           <VideoMaterial url={url} isInside={isInside} isMuted={isMuted} onUnmuteFailed={onUnmuteFailed} setNaturalAspect={setNaturalAspect} groupRef={groupRef} w={w} h={h} />
         ) : (
           <ImageMaterial url={posterUrl} setNaturalAspect={setNaturalAspect} groupRef={groupRef} w={w} h={h} />
         )}
       </Suspense>
-    </mesh>
+    </group>
   );
 }
 
