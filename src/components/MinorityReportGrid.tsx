@@ -110,6 +110,9 @@ function VideoMaterial({ url, isInside, isMuted, onUnmuteFailed, setNaturalAspec
 
       return () => {
         video.removeEventListener("loadedmetadata", handleResize);
+        // Force the video to stop playing audio immediately when unmounting
+        video.pause();
+        video.muted = true;
       };
     }
   }, [texture, isInside, isMuted, onUnmuteFailed, setNaturalAspect]);
