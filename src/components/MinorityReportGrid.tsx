@@ -153,15 +153,19 @@ function ImageMaterial({ url, setNaturalAspect, groupRef, w, h }: { url: string,
 
 function ProjectMedia({ url, isInside, isMuted, w, h, onUnmuteFailed, groupRef, naturalAspect, setNaturalAspect }: { url: string, isInside: boolean, isMuted: boolean, w: number, h: number, onUnmuteFailed: () => void, groupRef: any, naturalAspect: number, setNaturalAspect: (a: number) => void }) {
   const isVideo = url.toLowerCase().endsWith('.mp4') || url.toLowerCase().endsWith('.webm');
+  
+  // Construct poster URL (e.g. /video.mp4 -> /video_poster.jpg)
+  // Ensure the user has uploaded these _poster.jpg files to public/
+  const posterUrl = isVideo ? url.replace('.mp4', '_poster.jpg').replace('.webm', '_poster.jpg') : url;
 
   return (
     <mesh position={[0, 0, 0.01]}>
       <planeGeometry args={[w, h]} />
       <Suspense fallback={<meshBasicMaterial color="#111111" />}>
-        {isVideo ? (
+        {isVideo && isInside ? (
           <VideoMaterial url={url} isInside={isInside} isMuted={isMuted} onUnmuteFailed={onUnmuteFailed} setNaturalAspect={setNaturalAspect} groupRef={groupRef} w={w} h={h} />
         ) : (
-          <ImageMaterial url={url} setNaturalAspect={setNaturalAspect} groupRef={groupRef} w={w} h={h} />
+          <ImageMaterial url={posterUrl} setNaturalAspect={setNaturalAspect} groupRef={groupRef} w={w} h={h} />
         )}
       </Suspense>
     </mesh>
@@ -200,6 +204,10 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
       groupRef.current.scale.x = THREE.MathUtils.lerp(groupRef.current.scale.x, targetScaleX, 0.05);
       groupRef.current.scale.y = scaleRef.current;
       groupRef.current.scale.z = scaleRef.current;
+      
+      // Move video to the left side when inside
+      const targetLocalX = isInside ? -1.8 : 0;
+      groupRef.current.position.x = THREE.MathUtils.lerp(groupRef.current.position.x, targetLocalX, 0.05);
 
       if (isInside || isEntering || isLocking || hovered) {
         // Face camera smoothly, no tilt
@@ -336,17 +344,17 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
             </button>
           </Html>
           
-          {/* Centered Minimal Platform HUD */}
+          {/* Centered Minimal Platform HUD -> Now moved to the Right */}
           <Html
-            position={[0, -1.8, 0.2]}
+            position={[1.8, 0, 0.2]}
             center
             transform
             scale={0.4}
-            className={`transition-all duration-1000 delay-300 w-max min-w-[300px] max-w-[500px] text-center ${
+            className={`transition-all duration-1000 delay-300 w-max min-w-[300px] max-w-[500px] text-left ${
               isEntering || isLocking ? "opacity-0 translate-y-10" : "opacity-100 translate-y-0"
             }`}
           >
-            <div className="flex flex-col items-center justify-center backdrop-blur-xl bg-black/50 px-8 py-5 rounded-3xl border border-white/10 shadow-2xl">
+            <div className="flex flex-col items-start justify-center backdrop-blur-xl bg-black/50 px-8 py-6 rounded-3xl border border-white/10 shadow-2xl">
               <div className="flex items-center gap-2 text-white/40 font-mono text-[10px] uppercase tracking-[0.3em] mb-2">
                 <span className="w-4 h-px bg-white/20"></span>
                 {project.category}
@@ -362,7 +370,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
                 dangerouslySetInnerHTML={{ __html: project.description }}
               />
 
-              <div className="flex items-center justify-center gap-4 w-full">
+              <div className="flex items-center justify-start gap-4 w-full">
                 {project.href && project.href !== "#" && (
                   <a 
                     href={project.href} 
