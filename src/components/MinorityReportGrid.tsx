@@ -226,7 +226,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
   const isClose = cameraDist < 30;
 
   return (
-    <group position={position} scale={[scaleRef.current, scaleRef.current, scaleRef.current]} ref={groupRef}>
+    <group position={position} scale={[scaleRef.current, scaleRef.current, scaleRef.current]}>
       
       <pointLight 
         color={lightColor} 
@@ -234,13 +234,14 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
         distance={isInside ? 30 : 20} 
       />
 
-      <mesh
-        onClick={(e) => {
-          e.stopPropagation();
-          if (!isClicked) {
-            onClick();
-          }
-        }}
+      <group ref={groupRef}>
+        <mesh
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!isClicked) {
+              onClick();
+            }
+          }}
         onPointerOver={() => {
           setHovered(true);
           if (!isClicked) document.body.style.cursor = "pointer";
@@ -272,6 +273,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
           </mesh>
         )}
       </mesh>
+      </group>
 
       {/* Sequence 1: Locking Animation */}
       {isLocking && (
@@ -336,27 +338,27 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
           
           {/* Centered Minimal Platform HUD */}
           <Html
-            position={[0, -1.6, 0.2]}
+            position={[0, -1.8, 0.2]}
             center
             transform
-            scale={0.25}
+            scale={0.4}
             className={`transition-all duration-1000 delay-300 w-max min-w-[300px] max-w-[500px] text-center ${
               isEntering || isLocking ? "opacity-0 translate-y-10" : "opacity-100 translate-y-0"
             }`}
           >
-            <div className="flex flex-col items-center justify-center backdrop-blur-xl bg-black/50 px-6 py-4 rounded-3xl border border-white/10 shadow-2xl">
+            <div className="flex flex-col items-center justify-center backdrop-blur-xl bg-black/50 px-8 py-5 rounded-3xl border border-white/10 shadow-2xl">
               <div className="flex items-center gap-2 text-white/40 font-mono text-[10px] uppercase tracking-[0.3em] mb-2">
                 <span className="w-4 h-px bg-white/20"></span>
                 {project.category}
                 <span className="w-4 h-px bg-white/20"></span>
               </div>
               
-              <h3 className="text-white text-2xl font-serif leading-tight tracking-tight drop-shadow-2xl mb-1">
+              <h3 className="text-white text-3xl font-serif leading-tight tracking-tight drop-shadow-2xl mb-2">
                 {project.title}
               </h3>
               
               <div 
-                className="text-white/70 text-xs font-light leading-relaxed mb-4"
+                className="text-white/70 text-xs font-light leading-relaxed mb-6"
                 dangerouslySetInnerHTML={{ __html: project.description }}
               />
 
