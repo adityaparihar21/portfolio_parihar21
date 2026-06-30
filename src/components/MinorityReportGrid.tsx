@@ -348,69 +348,64 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
       {isInside && (
         <>
           {/* Mute Button positioned on the video itself */}
-          <Html position={[w/2 + 0.2, h / 2, 0.2]} center transform scale={0.2}>
+          <Html position={[w/2 - 0.3, h / 2 - 0.3, 0.2]} center>
             <button 
               onClick={(e) => {
                 e.stopPropagation();
                 setIsMuted(!isMuted);
               }}
-              className="group relative p-3 rounded-full bg-black/40 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/30 transition-all duration-300"
+              className="group relative p-2 rounded-full bg-black/60 backdrop-blur-md border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all duration-300 shadow-xl"
             >
-              {isMuted ? <VolumeX className="w-6 h-6 text-white/50 group-hover:text-white" /> : <Volume2 className="w-6 h-6 text-white" />}
+              {isMuted ? <VolumeX className="w-5 h-5 text-white/50 group-hover:text-white" /> : <Volume2 className="w-5 h-5 text-white" />}
             </button>
           </Html>
           
-          {/* Centered Minimal Platform HUD -> Now moved to the Right */}
+          {/* Minimal 2D Flat HUD (No transform to prevent 3D tilt) */}
           <Html
             position={[1.8, 0, 0.2]}
             center
-            transform
-            scale={0.4}
-            className={`transition-all duration-1000 delay-300 w-max min-w-[300px] max-w-[500px] text-left ${
-              isEntering || isLocking ? "opacity-0 translate-y-10" : "opacity-100 translate-y-0"
+            className={`transition-all duration-1000 delay-300 w-[300px] text-left ${
+              isEntering || isLocking ? "opacity-0 translate-y-8" : "opacity-100 translate-y-0"
             }`}
           >
-            <div className="flex flex-col items-start justify-center backdrop-blur-xl bg-black/50 px-8 py-6 rounded-3xl border border-white/10 shadow-2xl">
+            <div className="flex flex-col items-start justify-center backdrop-blur-xl bg-black/60 px-6 py-5 rounded-2xl border border-white/10 shadow-2xl">
               <div className="flex items-center gap-2 text-white/40 font-mono text-[10px] uppercase tracking-[0.3em] mb-2">
                 <span className="w-4 h-px bg-white/20"></span>
                 {project.category}
                 <span className="w-4 h-px bg-white/20"></span>
               </div>
               
-              <h3 className="text-white text-3xl font-serif leading-tight tracking-tight drop-shadow-2xl mb-2">
+              <h3 className="text-white text-2xl font-serif leading-tight tracking-tight drop-shadow-2xl mb-2">
                 {project.title}
               </h3>
               
               <div 
-                className="text-white/70 text-xs font-light leading-relaxed mb-6"
+                className="text-white/70 text-xs font-light leading-relaxed mb-5"
                 dangerouslySetInnerHTML={{ __html: project.description }}
               />
 
-              <div className="flex items-center justify-start gap-4 w-full">
+              <div className="flex items-center justify-start gap-3 w-full">
                 {project.href && project.href !== "#" && (
                   <a 
                     href={project.href} 
                     target="_blank" 
                     rel="noreferrer"
-                    className="group relative px-6 py-3 rounded-full bg-white/10 border border-white/20 hover:bg-white hover:text-black transition-all flex items-center justify-center gap-2"
+                    className="group relative px-5 py-2.5 rounded-full bg-white/10 border border-white/20 hover:bg-white hover:text-black transition-all flex items-center justify-center gap-2 text-xs font-medium"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <span className="text-xs font-mono tracking-widest uppercase">View Project</span>
-                    <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100" />
+                    View Project
+                    <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                   </a>
                 )}
-
-                <button 
+                
+                <button
                   onClick={(e) => {
                     e.stopPropagation();
                     onExit();
                   }}
-                  className="group relative px-6 py-3 rounded-full border border-white/20 hover:border-white/50 transition-all flex items-center justify-center gap-2"
+                  className="group relative px-5 py-2.5 rounded-full bg-transparent border border-white/20 text-white/70 hover:text-white hover:bg-white/5 transition-all text-xs font-medium flex items-center justify-center gap-2"
                 >
-                  <span className="text-white/70 group-hover:text-white text-xs font-mono tracking-widest uppercase">
-                    Return to Journey
-                  </span>
-                  <ArrowRight className="w-3 h-3 text-white/50 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                  Return to Journey
                 </button>
               </div>
             </div>
