@@ -126,19 +126,35 @@ function VideoMaterial({ url, isInside, isMuted, onUnmuteFailed, setNaturalAspec
 }
 
 function ImageMaterial({ url, setNaturalAspect, groupRef, w, h }: { url: string, setNaturalAspect: (a: number) => void, groupRef: React.RefObject<THREE.Group>, w: number, h: number }) {
-  const texture = useTexture(encodeURI(url));
+  const [texture, setTexture] = useState<THREE.Texture | null>(null);
   const [aspect, setAspect] = useState(16 / 9);
 
   useEffect(() => {
-    if (texture && texture.image) {
-      const img = texture.image as HTMLImageElement;
-      const a = img.width / img.height;
-      if (!isNaN(a) && a > 0) {
-        setAspect(a);
-        setNaturalAspect(a);
+    const loader = new THREE.TextureLoader();
+    loader.load(
+      encodeURI(url),
+      (loadedTexture) => {
+        setTexture(loadedTexture);
+        if (loadedTexture.image) {
+          const img = loadedTexture.image as HTMLImageElement;
+          const a = img.width / img.height;
+          if (!isNaN(a) && a > 0) {
+            setAspect(a);
+            setNaturalAspect(a);
+          }
+        }
+      },
+      undefined,
+      (error) => {
+        console.warn(`[SafeImageMaterial] Could not load poster: ${url}`, error);
       }
-    }
-  }, [texture, setNaturalAspect]);
+    );
+    
+    return () => {
+      // Cleanup texture if unmounted
+      if (texture) texture.dispose();
+    };
+  }, [url, setNaturalAspect]);
 
   useFrame(() => {
     if (groupRef.current && texture) {
@@ -148,7 +164,7 @@ function ImageMaterial({ url, setNaturalAspect, groupRef, w, h }: { url: string,
     }
   });
 
-  return <meshBasicMaterial map={texture} toneMapped={false} />;
+  return <meshBasicMaterial map={texture || undefined} color={texture ? "#ffffff" : "#111111"} toneMapped={false} />;
 }
 
 function ProjectMedia({ url, isInside, isMuted, w, h, onUnmuteFailed, groupRef, naturalAspect, setNaturalAspect }: { url: string, isInside: boolean, isMuted: boolean, w: number, h: number, onUnmuteFailed: () => void, groupRef: any, naturalAspect: number, setNaturalAspect: (a: number) => void }) {
