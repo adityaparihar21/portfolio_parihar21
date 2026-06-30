@@ -113,31 +113,42 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Analytics } from "@vercel/analytics/react";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: 1.5, // Slower duration for more physical weight
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: "vertical",
       gestureOrientation: "vertical",
       smoothWheel: true,
-      wheelMultiplier: 1,
+      wheelMultiplier: 0.9, // Softer wheel steps
       touchMultiplier: 2,
     });
 
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
+    // Synchronize Lenis scrolling with GSAP ScrollTrigger
+    lenis.on('scroll', ScrollTrigger.update);
 
-    requestAnimationFrame(raf);
+    // Use GSAP's ticker to drive Lenis for perfect sync
+    gsap.ticker.add((time) => {
+      lenis.raf(time * 1000);
+    });
+    
+    // Prevent GSAP from causing hiccups by trying to smooth out lag
+    gsap.ticker.lagSmoothing(0);
 
     return () => {
       lenis.destroy();
+      gsap.ticker.remove((time) => lenis.raf(time * 1000));
     };
   }, []);
 
