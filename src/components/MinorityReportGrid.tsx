@@ -293,7 +293,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
       {isInside && (
         <>
           {/* Mute Button positioned on the video itself */}
-          <Html position={[w/2 + 0.5, h / 2, 0.2]} center transform scale={0.5}>
+          <Html position={[w/2 + 0.3, h / 2, 0.2]} center transform scale={0.3}>
             <button 
               onClick={(e) => {
                 e.stopPropagation();
@@ -307,27 +307,27 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
           
           {/* Centered Platform HUD */}
           <Html
-            position={[0, -2.4, 0.2]}
+            position={[0, -1.8, 0.2]}
             center
             transform
-            scale={0.7}
+            scale={0.35}
             className={`transition-all duration-1000 delay-300 w-[600px] text-center ${
               isEntering || isLocking ? "opacity-0 translate-y-10" : "opacity-100 translate-y-0"
             }`}
           >
-            <div className="flex flex-col items-center justify-center backdrop-blur-2xl bg-black/40 p-8 rounded-3xl border border-white/10 shadow-2xl">
-              <div className="flex items-center gap-2 text-white/40 font-mono text-[9px] uppercase tracking-[0.3em] mb-4">
+            <div className="flex flex-col items-center justify-center backdrop-blur-xl bg-black/60 p-6 rounded-3xl border border-white/10 shadow-2xl">
+              <div className="flex items-center gap-2 text-white/40 font-mono text-[8px] uppercase tracking-[0.3em] mb-3">
                 <span className="w-4 h-px bg-white/20"></span>
                 {project.category}
                 <span className="w-4 h-px bg-white/20"></span>
               </div>
               
-              <h3 className="text-white text-4xl font-serif leading-tight tracking-tight drop-shadow-2xl mb-4">
+              <h3 className="text-white text-3xl font-serif leading-tight tracking-tight drop-shadow-2xl mb-3">
                 {project.title}
               </h3>
               
               <div 
-                className="text-white/70 text-sm font-light leading-relaxed mb-8 max-w-[500px]"
+                className="text-white/60 text-xs font-light leading-relaxed mb-6 max-w-[500px]"
                 dangerouslySetInnerHTML={{ __html: project.description }}
               />
 
@@ -485,7 +485,8 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
       const [px, py, pz] = getPosition(activeIdx);
       
       // Keep the camera centered on the project for the Platform Layout
-      const targetPos = new THREE.Vector3(px, py, pz + 7.5);
+      // Closer distance (6.0) makes the video appear massive and cinematic
+      const targetPos = new THREE.Vector3(px, py, pz + 6.0);
       
       // Instantly pull focus to the project
       dofTarget.current.lerp(new THREE.Vector3(px, py, pz), 0.1);
