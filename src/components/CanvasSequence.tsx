@@ -33,29 +33,60 @@ export function CanvasSequence({
   const reqRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
-    // Preload all images
-    const loadedImages: HTMLImageElement[] = [];
-    let loadedCount = 0;
+    const loadedImages: HTMLImageElement[] = new Array(frameCount);
+    let isCancelled = false;
 
-    for (let i = 1; i <= frameCount; i++) {
-      const img = new Image();
-      const frameNum = i.toString().padStart(3, "0");
-      img.src = `${folderPath}/${prefix}${frameNum}.${extension}`;
-      img.onload = () => {
-        loadedCount++;
-        if (loadedCount === frameCount) {
-          setImages(loadedImages);
-          onReady?.();
+    // 1. Load the very first frame immediately so we can show something on screen!
+    const firstImg = new Image();
+    const firstFrameNum = (1).toString().padStart(3, "0");
+    firstImg.src = `${folderPath}/${prefix}${firstFrameNum}.${extension}`;
+    
+    firstImg.onload = () => {
+      if (isCancelled) return;
+      loadedImages[0] = firstImg;
+      setImages([...loadedImages]);
+      onReady?.(); // Unblock the UI instantly!
+
+      // 2. Load the remaining frames in small background chunks so we don't freeze the browser
+      let currentIndex = 2;
+      const chunkSize = 10;
+
+      const loadNextChunk = () => {
+        if (isCancelled || currentIndex > frameCount) return;
+
+        let chunkLoaded = 0;
+        const targetChunk = Math.min(chunkSize, frameCount - currentIndex + 1);
+
+        for (let j = 0; j < targetChunk; j++) {
+          const idx = currentIndex + j;
+          const img = new Image();
+          const frameNum = idx.toString().padStart(3, "0");
+          img.src = `${folderPath}/${prefix}${frameNum}.${extension}`;
+          
+          const handleComplete = () => {
+            if (isCancelled) return;
+            chunkLoaded++;
+            if (chunkLoaded === targetChunk) {
+              setImages([...loadedImages]);
+              currentIndex += chunkSize;
+              requestAnimationFrame(loadNextChunk); // Yield to browser rendering
+            }
+          };
+
+          img.onload = () => {
+            if (!isCancelled) loadedImages[idx - 1] = img;
+            handleComplete();
+          };
+          img.onerror = handleComplete; // graceful fallback
         }
       };
-      loadedImages.push(img);
-    }
 
-    // In case they load instantly from cache
-    if (loadedCount === frameCount) {
-      setImages(loadedImages);
-      onReady?.();
-    }
+      requestAnimationFrame(loadNextChunk);
+    };
+
+    return () => {
+      isCancelled = true;
+    };
   }, [folderPath, frameCount, prefix, extension, onReady]);
 
   useEffect(() => {
@@ -67,10 +98,24 @@ export function CanvasSequence({
 
     // Draw initial frame
     const drawFrame = (index: number) => {
-      if (!ctx || !images[index]) return;
+      if (!ctx) return;
+      
+      // If exact frame isn't loaded yet, try to find the nearest previous loaded frame to show
+      let imgToDraw = images[index];
+      if (!imgToDraw) {
+        for (let i = index - 1; i >= 0; i--) {
+          if (images[i]) {
+            imgToDraw = images[i];
+            break;
+          }
+        }
+      }
+      
+      if (!imgToDraw) return; // If nothing loaded yet, do nothing
+
       ctx.clearRect(0, 0, width, height);
       ctx.globalCompositeOperation = blendMode;
-      ctx.drawImage(images[index], 0, 0, width, height);
+      ctx.drawImage(imgToDraw, 0, 0, width, height);
     };
 
     drawFrame(0);
