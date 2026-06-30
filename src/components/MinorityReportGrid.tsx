@@ -52,57 +52,31 @@ function FloatingGeometry({ interactionState }: { interactionState: string }) {
 
 // Removed NebulaClouds for performance optimization
 
-const MediaShader = {
-  uniforms: {
-    map: { value: null },
-    meshAspect: { value: 16 / 9 },
-    mediaAspect: { value: 16 / 9 },
-  },
-  vertexShader: `
-    varying vec2 vUv;
-    void main() {
-      vUv = uv;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }
-  `,
-  fragmentShader: `
-    uniform sampler2D map;
-    uniform float meshAspect;
-    uniform float mediaAspect;
-    varying vec2 vUv;
+function updateTextureFitCover(texture: THREE.Texture, mediaAspect: number, meshAspect: number) {
+  if (!texture || !mediaAspect || !meshAspect) return;
+  
+  if (meshAspect > mediaAspect) {
+    // Mesh is wider than media. Cover by fitting width, crop height.
+    const scaleY = mediaAspect / meshAspect;
+    texture.repeat.set(1, scaleY);
+    texture.offset.set(0, (1 - scaleY) / 2);
+  } else {
+    // Mesh is narrower than media. Cover by fitting height, crop width.
+    const scaleX = meshAspect / mediaAspect;
+    texture.repeat.set(scaleX, 1);
+    texture.offset.set((1 - scaleX) / 2, 0);
+  }
+}
 
-    void main() {
-      vec2 uv = vUv - 0.5;
-      
-      float scaleX = 1.0;
-      float scaleY = 1.0;
-      
-      if (meshAspect > mediaAspect) {
-        scaleY = mediaAspect / meshAspect;
-      } else {
-        scaleX = meshAspect / mediaAspect;
-      }
-      
-      uv.x *= scaleX;
-      uv.y *= scaleY;
-      uv += 0.5;
-      
-      if(uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
-        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-      } else {
-        gl_FragColor = texture2D(map, uv);
-      }
-    }
-  `
-};
-
-function VideoMaterial({ url, isInside, isMuted, onUnmuteFailed, materialRef, setNaturalAspect }: { url: string, isInside: boolean, isMuted: boolean, onUnmuteFailed: () => void, materialRef: React.MutableRefObject<any>, setNaturalAspect: (a: number) => void }) {
+function VideoMaterial({ url, isInside, isMuted, onUnmuteFailed, setNaturalAspect, groupRef, w, h }: { url: string, isInside: boolean, isMuted: boolean, onUnmuteFailed: () => void, setNaturalAspect: (a: number) => void, groupRef: React.RefObject<THREE.Group>, w: number, h: number }) {
   const texture = useVideoTexture(encodeURI(url), {
     muted: true, // MUST default to muted for browser autoplay policy
     loop: true,
     start: false, // NO background autoplay!
     crossOrigin: "Anonymous"
   });
+
+  const [aspect, setAspect] = useState(16 / 9);
 
   useEffect(() => {
     if (texture && texture.image) {
@@ -123,7 +97,14 @@ function VideoMaterial({ url, isInside, isMuted, onUnmuteFailed, materialRef, se
         if (video.duration > 0.5 && video.currentTime === 0) video.currentTime = 0.5;
       }
 
-      const handleResize = () => setNaturalAspect(video.videoWidth / video.videoHeight);
+      const handleResize = () => {
+        const a = video.videoWidth / video.videoHeight;
+        if (!isNaN(a) && a > 0) {
+          setAspect(a);
+          setNaturalAspect(a);
+        }
+      };
+      
       video.addEventListener("loadedmetadata", handleResize);
       if (video.videoWidth) handleResize();
 
@@ -133,43 +114,54 @@ function VideoMaterial({ url, isInside, isMuted, onUnmuteFailed, materialRef, se
     }
   }, [texture, isInside, isMuted, onUnmuteFailed, setNaturalAspect]);
 
-  return <shaderMaterial ref={materialRef} args={[MediaShader]} uniforms-map-value={texture} />;
+  useFrame(() => {
+    if (groupRef.current && texture) {
+      const currentScaleX = groupRef.current.scale.x;
+      const currentMeshAspect = (w * currentScaleX) / h;
+      updateTextureFitCover(texture, aspect, currentMeshAspect);
+    }
+  });
+
+  return <meshBasicMaterial map={texture} toneMapped={false} />;
 }
 
-function ImageMaterial({ url, materialRef, setNaturalAspect }: { url: string, materialRef: React.MutableRefObject<any>, setNaturalAspect: (a: number) => void }) {
+function ImageMaterial({ url, setNaturalAspect, groupRef, w, h }: { url: string, setNaturalAspect: (a: number) => void, groupRef: React.RefObject<THREE.Group>, w: number, h: number }) {
   const texture = useTexture(encodeURI(url));
+  const [aspect, setAspect] = useState(16 / 9);
 
   useEffect(() => {
     if (texture && texture.image) {
       const img = texture.image as HTMLImageElement;
-      setNaturalAspect(img.width / img.height);
+      const a = img.width / img.height;
+      if (!isNaN(a) && a > 0) {
+        setAspect(a);
+        setNaturalAspect(a);
+      }
     }
   }, [texture, setNaturalAspect]);
 
-  return <shaderMaterial ref={materialRef} args={[MediaShader]} uniforms-map-value={texture} />;
+  useFrame(() => {
+    if (groupRef.current && texture) {
+      const currentScaleX = groupRef.current.scale.x;
+      const currentMeshAspect = (w * currentScaleX) / h;
+      updateTextureFitCover(texture, aspect, currentMeshAspect);
+    }
+  });
+
+  return <meshBasicMaterial map={texture} toneMapped={false} />;
 }
 
 function ProjectMedia({ url, isInside, isMuted, w, h, onUnmuteFailed, groupRef, naturalAspect, setNaturalAspect }: { url: string, isInside: boolean, isMuted: boolean, w: number, h: number, onUnmuteFailed: () => void, groupRef: any, naturalAspect: number, setNaturalAspect: (a: number) => void }) {
   const isVideo = url.toLowerCase().endsWith('.mp4') || url.toLowerCase().endsWith('.webm');
-  const materialRef = useRef<THREE.ShaderMaterial>(null);
-
-  useFrame(() => {
-    if (materialRef.current && groupRef.current) {
-      const currentScaleX = groupRef.current.scale.x;
-      const currentMeshAspect = (w * currentScaleX) / h;
-      materialRef.current.uniforms.meshAspect.value = currentMeshAspect;
-      materialRef.current.uniforms.mediaAspect.value = naturalAspect;
-    }
-  });
 
   return (
     <mesh position={[0, 0, 0.01]}>
       <planeGeometry args={[w, h]} />
       <Suspense fallback={<meshBasicMaterial color="#111111" />}>
         {isVideo ? (
-          <VideoMaterial url={url} isInside={isInside} isMuted={isMuted} onUnmuteFailed={onUnmuteFailed} materialRef={materialRef} setNaturalAspect={setNaturalAspect} />
+          <VideoMaterial url={url} isInside={isInside} isMuted={isMuted} onUnmuteFailed={onUnmuteFailed} setNaturalAspect={setNaturalAspect} groupRef={groupRef} w={w} h={h} />
         ) : (
-          <ImageMaterial url={url} materialRef={materialRef} setNaturalAspect={setNaturalAspect} />
+          <ImageMaterial url={url} setNaturalAspect={setNaturalAspect} groupRef={groupRef} w={w} h={h} />
         )}
       </Suspense>
     </mesh>
@@ -342,29 +334,29 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
             </button>
           </Html>
           
-          {/* Centered Platform HUD */}
+          {/* Centered Minimal Platform HUD */}
           <Html
-            position={[0, -1.8, 0.2]}
+            position={[0, -2.1, 0.2]}
             center
             transform
-            scale={0.35}
-            className={`transition-all duration-1000 delay-300 w-[500px] text-center ${
+            scale={0.5}
+            className={`transition-all duration-1000 delay-300 w-max min-w-[300px] max-w-[500px] text-center ${
               isEntering || isLocking ? "opacity-0 translate-y-10" : "opacity-100 translate-y-0"
             }`}
           >
-            <div className="flex flex-col items-center justify-center backdrop-blur-xl bg-black/50 px-8 py-5 rounded-2xl border border-white/10 shadow-2xl">
-              <div className="flex items-center gap-2 text-white/40 font-mono text-[8px] uppercase tracking-[0.3em] mb-2">
+            <div className="flex flex-col items-center justify-center backdrop-blur-xl bg-black/50 px-8 py-5 rounded-3xl border border-white/10 shadow-2xl">
+              <div className="flex items-center gap-2 text-white/40 font-mono text-[10px] uppercase tracking-[0.3em] mb-2">
                 <span className="w-4 h-px bg-white/20"></span>
                 {project.category}
                 <span className="w-4 h-px bg-white/20"></span>
               </div>
               
-              <h3 className="text-white text-2xl font-serif leading-tight tracking-tight drop-shadow-2xl mb-2">
+              <h3 className="text-white text-3xl font-serif leading-tight tracking-tight drop-shadow-2xl mb-2">
                 {project.title}
               </h3>
               
               <div 
-                className="text-white/60 text-[10px] font-light leading-relaxed mb-4 max-w-[400px]"
+                className="text-white/70 text-xs font-light leading-relaxed mb-6"
                 dangerouslySetInnerHTML={{ __html: project.description }}
               />
 
