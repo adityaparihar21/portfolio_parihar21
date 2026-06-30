@@ -322,41 +322,41 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
       {isInside && (
         <>
           {/* Mute Button positioned on the video itself */}
-          <Html position={[w/2 + 0.3, h / 2, 0.2]} center transform scale={0.3}>
+          <Html position={[w/2 + 0.2, h / 2, 0.2]} center transform scale={0.2}>
             <button 
               onClick={(e) => {
                 e.stopPropagation();
                 setIsMuted(!isMuted);
               }}
-              className="group relative p-4 rounded-full bg-black/40 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/30 transition-all duration-300"
+              className="group relative p-3 rounded-full bg-black/40 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/30 transition-all duration-300"
             >
-              {isMuted ? <VolumeX className="w-8 h-8 text-white/50 group-hover:text-white" /> : <Volume2 className="w-8 h-8 text-white" />}
+              {isMuted ? <VolumeX className="w-6 h-6 text-white/50 group-hover:text-white" /> : <Volume2 className="w-6 h-6 text-white" />}
             </button>
           </Html>
           
           {/* Centered Minimal Platform HUD */}
           <Html
-            position={[0, -2.1, 0.2]}
+            position={[0, -1.6, 0.2]}
             center
             transform
-            scale={0.5}
+            scale={0.25}
             className={`transition-all duration-1000 delay-300 w-max min-w-[300px] max-w-[500px] text-center ${
               isEntering || isLocking ? "opacity-0 translate-y-10" : "opacity-100 translate-y-0"
             }`}
           >
-            <div className="flex flex-col items-center justify-center backdrop-blur-xl bg-black/50 px-8 py-5 rounded-3xl border border-white/10 shadow-2xl">
+            <div className="flex flex-col items-center justify-center backdrop-blur-xl bg-black/50 px-6 py-4 rounded-3xl border border-white/10 shadow-2xl">
               <div className="flex items-center gap-2 text-white/40 font-mono text-[10px] uppercase tracking-[0.3em] mb-2">
                 <span className="w-4 h-px bg-white/20"></span>
                 {project.category}
                 <span className="w-4 h-px bg-white/20"></span>
               </div>
               
-              <h3 className="text-white text-3xl font-serif leading-tight tracking-tight drop-shadow-2xl mb-2">
+              <h3 className="text-white text-2xl font-serif leading-tight tracking-tight drop-shadow-2xl mb-1">
                 {project.title}
               </h3>
               
               <div 
-                className="text-white/70 text-xs font-light leading-relaxed mb-6"
+                className="text-white/70 text-xs font-light leading-relaxed mb-4"
                 dangerouslySetInnerHTML={{ __html: project.description }}
               />
 
