@@ -52,25 +52,51 @@ function FloatingGeometry({ interactionState }: { interactionState: string }) {
 
 // Removed NebulaClouds for performance optimization
 
-function applyObjectFitContain(texture: THREE.Texture, mediaWidth: number, mediaHeight: number, meshW: number = 4, meshH: number = 2.25) {
-  if (!mediaWidth || !mediaHeight) return;
-  const mediaAspect = mediaWidth / mediaHeight;
-  const meshAspect = meshW / meshH;
-  
-  if (mediaAspect < meshAspect) {
-    // Media is narrower (vertical) -> black bars / smear on left & right
-    const scaleX = meshAspect / mediaAspect;
-    texture.repeat.set(scaleX, 1);
-    texture.offset.set((1 - scaleX) / 2, 0);
-  } else {
-    // Media is wider -> black bars on top & bottom
-    const scaleY = mediaAspect / meshAspect;
-    texture.repeat.set(1, scaleY);
-    texture.offset.set(0, (1 - scaleY) / 2);
-  }
-}
+const MediaShader = {
+  uniforms: {
+    map: { value: null },
+    meshAspect: { value: 16 / 9 },
+    mediaAspect: { value: 16 / 9 },
+  },
+  vertexShader: `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    uniform sampler2D map;
+    uniform float meshAspect;
+    uniform float mediaAspect;
+    varying vec2 vUv;
 
-function VideoMaterial({ url, isInside, isMuted, onUnmuteFailed }: { url: string, isInside: boolean, isMuted: boolean, onUnmuteFailed: () => void }) {
+    void main() {
+      vec2 uv = vUv - 0.5;
+      
+      float scaleX = 1.0;
+      float scaleY = 1.0;
+      
+      if (meshAspect > mediaAspect) {
+        scaleY = mediaAspect / meshAspect;
+      } else {
+        scaleX = meshAspect / mediaAspect;
+      }
+      
+      uv.x *= scaleX;
+      uv.y *= scaleY;
+      uv += 0.5;
+      
+      if(uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
+        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+      } else {
+        gl_FragColor = texture2D(map, uv);
+      }
+    }
+  `
+};
+
+function VideoMaterial({ url, isInside, isMuted, onUnmuteFailed, materialRef, setNaturalAspect }: { url: string, isInside: boolean, isMuted: boolean, onUnmuteFailed: () => void, materialRef: React.MutableRefObject<any>, setNaturalAspect: (a: number) => void }) {
   const texture = useVideoTexture(encodeURI(url), {
     muted: true, // MUST default to muted for browser autoplay policy
     loop: true,
@@ -84,12 +110,8 @@ function VideoMaterial({ url, isInside, isMuted, onUnmuteFailed }: { url: string
       if (isInside) {
         video.muted = isMuted;
         if (video.paused) {
-          // Play from beginning if it was paused
-          if (video.currentTime > 0 && video.currentTime < 1) {
-            video.currentTime = 0;
-          }
+          if (video.currentTime > 0 && video.currentTime < 1) video.currentTime = 0;
           video.play().catch(() => {
-            // Browser blocked unmuted autoplay! Fallback to muted.
             video.muted = true;
             video.play().catch(() => {});
             onUnmuteFailed();
@@ -98,14 +120,10 @@ function VideoMaterial({ url, isInside, isMuted, onUnmuteFailed }: { url: string
       } else {
         video.muted = true;
         video.pause();
-        // Skip black frame to show a poster
-        if (video.duration > 0.5 && video.currentTime === 0) {
-          video.currentTime = 0.5;
-        }
+        if (video.duration > 0.5 && video.currentTime === 0) video.currentTime = 0.5;
       }
 
-      // Handle Aspect Ratio (Vertical Videos)
-      const handleResize = () => applyObjectFitContain(texture, video.videoWidth, video.videoHeight);
+      const handleResize = () => setNaturalAspect(video.videoWidth / video.videoHeight);
       video.addEventListener("loadedmetadata", handleResize);
       if (video.videoWidth) handleResize();
 
@@ -113,35 +131,45 @@ function VideoMaterial({ url, isInside, isMuted, onUnmuteFailed }: { url: string
         video.removeEventListener("loadedmetadata", handleResize);
       };
     }
-  }, [texture, isInside, isMuted, onUnmuteFailed]);
+  }, [texture, isInside, isMuted, onUnmuteFailed, setNaturalAspect]);
 
-  return <meshBasicMaterial map={texture} toneMapped={false} />;
+  return <shaderMaterial ref={materialRef} args={[MediaShader]} uniforms-map-value={texture} />;
 }
 
-function ImageMaterial({ url }: { url: string }) {
+function ImageMaterial({ url, materialRef, setNaturalAspect }: { url: string, materialRef: React.MutableRefObject<any>, setNaturalAspect: (a: number) => void }) {
   const texture = useTexture(encodeURI(url));
 
   useEffect(() => {
     if (texture && texture.image) {
       const img = texture.image as HTMLImageElement;
-      applyObjectFitContain(texture, img.width, img.height);
+      setNaturalAspect(img.width / img.height);
     }
-  }, [texture]);
+  }, [texture, setNaturalAspect]);
 
-  return <meshBasicMaterial map={texture} toneMapped={false} />;
+  return <shaderMaterial ref={materialRef} args={[MediaShader]} uniforms-map-value={texture} />;
 }
 
-function ProjectMedia({ url, isInside, isMuted, w, h, onUnmuteFailed }: { url: string, isInside: boolean, isMuted: boolean, w: number, h: number, onUnmuteFailed: () => void }) {
+function ProjectMedia({ url, isInside, isMuted, w, h, onUnmuteFailed, groupRef, naturalAspect, setNaturalAspect }: { url: string, isInside: boolean, isMuted: boolean, w: number, h: number, onUnmuteFailed: () => void, groupRef: any, naturalAspect: number, setNaturalAspect: (a: number) => void }) {
   const isVideo = url.toLowerCase().endsWith('.mp4') || url.toLowerCase().endsWith('.webm');
-  
+  const materialRef = useRef<THREE.ShaderMaterial>(null);
+
+  useFrame(() => {
+    if (materialRef.current && groupRef.current) {
+      const currentScaleX = groupRef.current.scale.x;
+      const currentMeshAspect = (w * currentScaleX) / h;
+      materialRef.current.uniforms.meshAspect.value = currentMeshAspect;
+      materialRef.current.uniforms.mediaAspect.value = naturalAspect;
+    }
+  });
+
   return (
     <mesh position={[0, 0, 0.01]}>
       <planeGeometry args={[w, h]} />
       <Suspense fallback={<meshBasicMaterial color="#111111" />}>
         {isVideo ? (
-          <VideoMaterial url={url} isInside={isInside} isMuted={isMuted} onUnmuteFailed={onUnmuteFailed} />
+          <VideoMaterial url={url} isInside={isInside} isMuted={isMuted} onUnmuteFailed={onUnmuteFailed} materialRef={materialRef} setNaturalAspect={setNaturalAspect} />
         ) : (
-          <ImageMaterial url={url} />
+          <ImageMaterial url={url} materialRef={materialRef} setNaturalAspect={setNaturalAspect} />
         )}
       </Suspense>
     </mesh>
@@ -160,8 +188,11 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
   const hideUI = activeIdx !== null && activeIdx !== idx;
 
   const [isMuted, setIsMuted] = useState(false); // Try unmuted by default
+  const [naturalAspect, setNaturalAspect] = useState(16 / 9); // Used for morphing
 
-  const targetScale = hideUI ? 0 : (isInside || isEntering) ? 1.15 : hovered ? 1.05 : 1;
+  const targetScaleY = hideUI ? 0 : (isInside || isEntering) ? 1.15 : hovered ? 1.05 : 1;
+  const targetAspect = isInside ? naturalAspect : 16 / 9;
+  
   const scaleRef = useRef(1);
   const groupRef = useRef<THREE.Group>(null);
   
@@ -169,9 +200,15 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
   const isVisible = isInside || cameraDist < 40;
 
   useFrame((state) => {
-    scaleRef.current = THREE.MathUtils.lerp(scaleRef.current, targetScale, 0.1);
+    scaleRef.current = THREE.MathUtils.lerp(scaleRef.current, targetScaleY, 0.1);
     
     if (groupRef.current) {
+      // Scale X separately to dynamically morph the aspect ratio of the 3D box!
+      const targetScaleX = targetScaleY * (targetAspect / (16 / 9));
+      groupRef.current.scale.x = THREE.MathUtils.lerp(groupRef.current.scale.x, targetScaleX, 0.05);
+      groupRef.current.scale.y = scaleRef.current;
+      groupRef.current.scale.z = scaleRef.current;
+
       if (isInside || isEntering || isLocking || hovered) {
         // Face camera smoothly, no tilt
         groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, 0, 0.05);
@@ -233,9 +270,9 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
           />
         </RoundedBox>
 
-        {/* Robust WebGL Media Component with Distance Culling */}
+        {/* Robust WebGL Media Component with Distance Culling & Dynamic Shaders */}
         {isVisible ? (
-          <ProjectMedia url={project.image} isInside={isInside} isMuted={isMuted} w={w} h={h} onUnmuteFailed={() => setIsMuted(true)} />
+          <ProjectMedia url={project.image} isInside={isInside} isMuted={isMuted} w={w} h={h} onUnmuteFailed={() => setIsMuted(true)} groupRef={groupRef} naturalAspect={naturalAspect} setNaturalAspect={setNaturalAspect} />
         ) : (
           <mesh position={[0, 0, 0.01]}>
             <planeGeometry args={[w, h]} />
@@ -311,23 +348,23 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
             center
             transform
             scale={0.35}
-            className={`transition-all duration-1000 delay-300 w-[600px] text-center ${
+            className={`transition-all duration-1000 delay-300 w-[500px] text-center ${
               isEntering || isLocking ? "opacity-0 translate-y-10" : "opacity-100 translate-y-0"
             }`}
           >
-            <div className="flex flex-col items-center justify-center backdrop-blur-xl bg-black/60 p-6 rounded-3xl border border-white/10 shadow-2xl">
-              <div className="flex items-center gap-2 text-white/40 font-mono text-[8px] uppercase tracking-[0.3em] mb-3">
+            <div className="flex flex-col items-center justify-center backdrop-blur-xl bg-black/50 px-8 py-5 rounded-2xl border border-white/10 shadow-2xl">
+              <div className="flex items-center gap-2 text-white/40 font-mono text-[8px] uppercase tracking-[0.3em] mb-2">
                 <span className="w-4 h-px bg-white/20"></span>
                 {project.category}
                 <span className="w-4 h-px bg-white/20"></span>
               </div>
               
-              <h3 className="text-white text-3xl font-serif leading-tight tracking-tight drop-shadow-2xl mb-3">
+              <h3 className="text-white text-2xl font-serif leading-tight tracking-tight drop-shadow-2xl mb-2">
                 {project.title}
               </h3>
               
               <div 
-                className="text-white/60 text-xs font-light leading-relaxed mb-6 max-w-[500px]"
+                className="text-white/60 text-[10px] font-light leading-relaxed mb-4 max-w-[400px]"
                 dangerouslySetInnerHTML={{ __html: project.description }}
               />
 
@@ -484,9 +521,9 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
     } else if (activeIdx !== null) {
       const [px, py, pz] = getPosition(activeIdx);
       
-      // Keep the camera centered on the project for the Platform Layout
+      // Keep the camera centered on the project, but offset Y so the video sits slightly upper of half!
       // Closer distance (6.0) makes the video appear massive and cinematic
-      const targetPos = new THREE.Vector3(px, py, pz + 6.0);
+      const targetPos = new THREE.Vector3(px, py - 0.5, pz + 6.0);
       
       // Instantly pull focus to the project
       dofTarget.current.lerp(new THREE.Vector3(px, py, pz), 0.1);
