@@ -13,35 +13,23 @@ function SwarmGeometry({ progress, isForming }: { progress: number; isForming: b
     const targets = new Float32Array(count * 3);
     const velocities = new Float32Array(count * 3);
 
-    const addLine = (x1: number, y1: number, x2: number, y2: number, pointCount: number, offset: number) => {
+    const addCoinDisc = (pointCount: number, offset: number) => {
+      const radius = 2.0; // Size of the coin
       for (let i = 0; i < pointCount; i++) {
-        const t = Math.random();
+        // Use square root of random for even distribution across the disc area
+        const r = radius * Math.sqrt(Math.random());
+        const theta = Math.random() * 2 * Math.PI;
+        
         const idx = (offset + i) * 3;
-        targets[idx] = THREE.MathUtils.lerp(x1, x2, t) + (Math.random() - 0.5) * 0.15;
-        targets[idx + 1] = THREE.MathUtils.lerp(y1, y2, t) + (Math.random() - 0.5) * 0.15;
+        targets[idx] = Math.cos(theta) * r;
+        targets[idx + 1] = Math.sin(theta) * r;
+        // Small thickness for the coin edge
         targets[idx + 2] = (Math.random() - 0.5) * 0.2;
       }
     };
 
-    const addCurve = (cx: number, cy: number, r: number, startAngle: number, endAngle: number, pointCount: number, offset: number) => {
-      for (let i = 0; i < pointCount; i++) {
-        const t = Math.random();
-        const angle = THREE.MathUtils.lerp(startAngle, endAngle, t);
-        const idx = (offset + i) * 3;
-        targets[idx] = cx + Math.cos(angle) * r + (Math.random() - 0.5) * 0.15;
-        targets[idx + 1] = cy + Math.sin(angle) * r + (Math.random() - 0.5) * 0.15;
-        targets[idx + 2] = (Math.random() - 0.5) * 0.2;
-      }
-    };
-
-    // A (1500 points)
-    addLine(-1.5, 1.5, -2.5, -1.5, 600, 0); // Left leg
-    addLine(-1.5, 1.5, -0.5, -1.5, 600, 600); // Right leg
-    addLine(-2.0, -0.2, -1.0, -0.2, 300, 1200); // Crossbar
-
-    // P (1500 points)
-    addLine(0.8, 1.5, 0.8, -1.5, 700, 1500); // Stem
-    addCurve(0.8, 0.4, 1.1, -Math.PI / 2, Math.PI / 2, 800, 2200); // Loop
+    // Form a single dense coin disc
+    addCoinDisc(count, 0);
 
     // Initialize random positions
     for (let i = 0; i < count; i++) {

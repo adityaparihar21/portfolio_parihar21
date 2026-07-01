@@ -1792,14 +1792,14 @@ export default function Index() {
   useEffect(() => {
     if (bootState !== "preloader") return;
 
-    // 2.5s: Background video awakens
-    const videoTimer = setTimeout(() => setVideoVisible(true), 2500);
+    // 1.0s: Background video awakens
+    const videoTimer = setTimeout(() => setVideoVisible(true), 1000);
 
-    // 4.5s: Sequential words begin
-    const wordsTimer = setTimeout(() => setWordsVisible(true), 4500);
+    // 2.5s: Sequential words begin
+    const wordsTimer = setTimeout(() => setWordsVisible(true), 2500);
 
-    // 6.0s: Enter Site button appears
-    const buttonTimer = setTimeout(() => setMinTimeElapsed(true), 6000);
+    // 4.0s: Enter Site button appears
+    const buttonTimer = setTimeout(() => setMinTimeElapsed(true), 4000);
 
     return () => {
       clearTimeout(videoTimer);
