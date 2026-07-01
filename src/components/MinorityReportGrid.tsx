@@ -218,7 +218,7 @@ function ProjectMedia({ url, isInside, isMuted, w, h, onUnmuteFailed, groupRef, 
 
   return (
     <group position={[0, 0, 0.01]}>
-      <Suspense fallback={null}>
+      <Suspense fallback={<ImageMaterial url={posterUrl} setNaturalAspect={setNaturalAspect} groupRef={groupRef} w={w} h={h} />}>
         {isVideo && isInside ? (
           <VideoMaterial url={url} isInside={isInside} isMuted={isMuted} onUnmuteFailed={onUnmuteFailed} setNaturalAspect={setNaturalAspect} groupRef={groupRef} w={w} h={h} />
         ) : (
@@ -316,8 +316,8 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
           document.body.style.cursor = "auto";
         }}
       >
-        {/* Soft Rounded Glass Backing */}
-        <RoundedBox key={`box-${aspect}`} args={[w + 0.15, h + 0.15, 0.05]} radius={0.08} position={[0, 0, -0.05]}>
+        {/* Soft Rounded Glass Backing (Flattened to remove perspective tilt illusion) */}
+        <RoundedBox key={`box-${aspect}`} args={[w + 0.15, h + 0.15, 0.001]} radius={0.08} position={[0, 0, -0.05]}>
           <meshPhysicalMaterial 
             color="#050505" 
             metalness={0.9} 
