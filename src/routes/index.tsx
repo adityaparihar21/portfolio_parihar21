@@ -19,6 +19,7 @@ import { CreativeHero } from "../components/CreativeHero";
 import MinorityReportGrid from "../components/MinorityReportGrid";
 import { DevDashboardHero } from "../components/DevDashboardHero";
 import { EngineeringPortfolio } from "../components/EngineeringPortfolio";
+import { ParticleSwarm } from "../components/ParticleSwarm";
 import { GithubSection } from "../components/GithubSection";
 import { RadialIntroSequence } from "../components/intro/RadialIntro";
 import { DebugErrorBoundary } from "../components/DebugErrorBoundary";
@@ -1685,9 +1686,10 @@ function WorkedWith({
   );
 }
 
-function Index() {
+export default function Index() {
   const data = useContent();
   const [activeAudioId, setActiveAudioId] = useState<string | null>(null);
+  const [bootState, setBootState] = useState<"particles" | "preloader">("particles");
   const [isLoading, setIsLoading] = useState(true);
   const [mediaReady, setMediaReady] = useState(false);
   const [minTimeElapsed, setMinTimeElapsed] = useState(false);
@@ -1788,6 +1790,8 @@ function Index() {
   }, [isLoading]);
 
   useEffect(() => {
+    if (bootState !== "preloader") return;
+
     // 2.5s: Background video awakens
     const videoTimer = setTimeout(() => setVideoVisible(true), 2500);
 
@@ -1802,7 +1806,7 @@ function Index() {
       clearTimeout(wordsTimer);
       clearTimeout(buttonTimer);
     };
-  }, []);
+  }, [bootState]);
 
   useEffect(() => {
     // Show enter button once min time has passed
@@ -1879,7 +1883,13 @@ function Index() {
     <DebugErrorBoundary>
       <div className="bg-black min-h-screen">
       <AnimatePresence>
-        {isPreloaderMounted && (
+        {bootState === "particles" && (
+          <ParticleSwarm onComplete={() => setBootState("preloader")} />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isPreloaderMounted && bootState === "preloader" && (
           <Preloader
             monogram={data.brand.monogram}
             triggerTransition={!isLoading}
