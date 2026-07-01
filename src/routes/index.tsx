@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { NameStage } from "../components/NameStage";
 import {
   motion,
@@ -23,6 +23,7 @@ import { EngineeringPortfolio } from "../components/EngineeringPortfolio";
 import { GithubSection } from "../components/GithubSection";
 import { RadialIntroSequence } from "../components/intro/RadialIntro";
 import { DebugErrorBoundary } from "../components/DebugErrorBoundary";
+import { useAssetPreloader } from "../hooks/useAssetPreloader";
 import {
   ChevronDown,
   Instagram,
@@ -1704,6 +1705,31 @@ function WorkedWith({
 
 export default function Index() {
   const data = useContent();
+
+  // Extract all posters and the first 4 videos for the memory chamber
+  const creativeAssets = useMemo(() => {
+    const assets: string[] = [];
+    data.creativeWork.projects.forEach((p, index) => {
+      if (p.image) {
+        const isVideo = p.image.toLowerCase().endsWith('.mp4') || p.image.toLowerCase().endsWith('.webm');
+        if (isVideo) {
+          // Always preload the poster image so the grid never flashes empty
+          const poster = p.image.replace('.mp4', '_poster.jpg').replace('.webm', '_poster.jpg');
+          assets.push(poster);
+          // Only preload the actual raw video files for the first 4 items to save massive bandwidth
+          if (index < 4) {
+            assets.push(p.image);
+          }
+        } else {
+          assets.push(p.image);
+        }
+      }
+    });
+    return assets;
+  }, [data]);
+
+  const assetsLoaded = useAssetPreloader(creativeAssets, 45000); // 45s safety timeout
+
   const [activeAudioId, setActiveAudioId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [mediaReady, setMediaReady] = useState(false);
@@ -1794,13 +1820,14 @@ export default function Index() {
     }
   }, []);
 
-  // Absolute maximum: if nothing happens in 15s, force entry with creative fallback
+  // Absolute maximum: if nothing happens in 45s, force entry with creative fallback
   useEffect(() => {
     if (!isLoading) return;
     
     const maxTimer = setTimeout(() => {
+      console.warn("Preloader forced entry after 45s fallback timeout.");
       handleChoice("creative");
-    }, 15000);
+    }, 45000);
     return () => clearTimeout(maxTimer);
   }, [isLoading]);
 
@@ -1822,11 +1849,11 @@ export default function Index() {
   }, []);
 
   useEffect(() => {
-    // Show enter button once min time has passed
-    if (minTimeElapsed && !showEnter) {
+    // Show enter button once min time has passed AND assets are loaded
+    if (minTimeElapsed && assetsLoaded && !showEnter) {
       setShowEnter(true);
     }
-  }, [minTimeElapsed, showEnter]);
+  }, [minTimeElapsed, assetsLoaded, showEnter]);
 
   // 10-second countdown once enter button appears
   useEffect(() => {
