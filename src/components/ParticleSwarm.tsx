@@ -13,23 +13,24 @@ function SwarmGeometry({ progress, isForming }: { progress: number; isForming: b
     const targets = new Float32Array(count * 3);
     const velocities = new Float32Array(count * 3);
 
-    const addCoinDisc = (pointCount: number, offset: number) => {
-      const radius = 2.0; // Size of the coin
+    const addSingularity = (pointCount: number, offset: number) => {
+      const radius = 0.1; // Tiny sphere for implosion
       for (let i = 0; i < pointCount; i++) {
-        // Use square root of random for even distribution across the disc area
-        const r = radius * Math.sqrt(Math.random());
-        const theta = Math.random() * 2 * Math.PI;
+        const u = Math.random();
+        const v = Math.random();
+        const theta = 2 * Math.PI * u;
+        const phi = Math.acos(2 * v - 1);
+        const r = radius * Math.cbrt(Math.random());
         
         const idx = (offset + i) * 3;
-        targets[idx] = Math.cos(theta) * r;
-        targets[idx + 1] = Math.sin(theta) * r;
-        // Small thickness for the coin edge
-        targets[idx + 2] = (Math.random() - 0.5) * 0.2;
+        targets[idx] = r * Math.sin(phi) * Math.cos(theta);
+        targets[idx + 1] = r * Math.sin(phi) * Math.sin(theta);
+        targets[idx + 2] = r * Math.cos(phi);
       }
     };
 
-    // Form a single dense coin disc
-    addCoinDisc(count, 0);
+    // Form a tiny dense singularity
+    addSingularity(count, 0);
 
     // Initialize random positions
     for (let i = 0; i < count; i++) {
@@ -126,7 +127,7 @@ function SwarmGeometry({ progress, isForming }: { progress: number; isForming: b
       </bufferGeometry>
       <pointsMaterial 
         size={0.06} 
-        color="#D2AF6E" 
+        color="#DDB94E" 
         transparent 
         opacity={0.8} 
         blending={THREE.AdditiveBlending}
