@@ -8,6 +8,7 @@ import {
   AnimatePresence,
   useMotionValue,
   useSpring,
+  useMotionTemplate,
 } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -19,7 +20,6 @@ import { CreativeHero } from "../components/CreativeHero";
 import MinorityReportGrid from "../components/MinorityReportGrid";
 import { DevDashboardHero } from "../components/DevDashboardHero";
 import { EngineeringPortfolio } from "../components/EngineeringPortfolio";
-import { ParticleSwarm } from "../components/ParticleSwarm";
 import { GithubSection } from "../components/GithubSection";
 import { RadialIntroSequence } from "../components/intro/RadialIntro";
 import { DebugErrorBoundary } from "../components/DebugErrorBoundary";
@@ -106,6 +106,18 @@ function Preloader({
   const mouseY = useMotionValue(typeof window !== "undefined" ? window.innerHeight / 2 : 0);
   const springX = useSpring(mouseX, { stiffness: 50, damping: 20 });
   const springY = useSpring(mouseY, { stiffness: 50, damping: 20 });
+
+  // Flashlight radius: starts at 150px (soft focus), expands to 3000px when ready
+  const radius = useSpring(150, { stiffness: 30, damping: 20 });
+  
+  useEffect(() => {
+    if (showEnter) {
+      radius.set(3000); // Massive expansion to reveal the whole screen
+    }
+  }, [showEnter, radius]);
+
+  // The cinematic soft-edge mask
+  const maskImage = useMotionTemplate`radial-gradient(circle ${radius}px at ${springX}px ${springY}px, black 40%, transparent 100%)`;
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -211,6 +223,10 @@ function Preloader({
         transition={{
           opacity: { duration: 2.0, ease: "easeOut" },
           scale: { duration: 25, ease: "linear", repeat: Infinity, repeatType: "reverse" },
+        }}
+        style={{
+          WebkitMaskImage: maskImage,
+          maskImage: maskImage,
         }}
         className="preloader-bg absolute inset-0 z-0 pointer-events-none origin-center"
       >
@@ -1689,7 +1705,6 @@ function WorkedWith({
 export default function Index() {
   const data = useContent();
   const [activeAudioId, setActiveAudioId] = useState<string | null>(null);
-  const [bootState, setBootState] = useState<"particles" | "preloader">("particles");
   const [isLoading, setIsLoading] = useState(true);
   const [mediaReady, setMediaReady] = useState(false);
   const [minTimeElapsed, setMinTimeElapsed] = useState(false);
@@ -1790,10 +1805,8 @@ export default function Index() {
   }, [isLoading]);
 
   useEffect(() => {
-    if (bootState !== "preloader") return;
-
-    // 1.0s: Background video awakens
-    const videoTimer = setTimeout(() => setVideoVisible(true), 1000);
+    // 0.5s: Background video awakens (using flashlight)
+    const videoTimer = setTimeout(() => setVideoVisible(true), 500);
 
     // 2.5s: Sequential words begin
     const wordsTimer = setTimeout(() => setWordsVisible(true), 2500);
@@ -1806,7 +1819,7 @@ export default function Index() {
       clearTimeout(wordsTimer);
       clearTimeout(buttonTimer);
     };
-  }, [bootState]);
+  }, []);
 
   useEffect(() => {
     // Show enter button once min time has passed
@@ -1883,13 +1896,7 @@ export default function Index() {
     <DebugErrorBoundary>
       <div className="bg-black min-h-screen">
       <AnimatePresence>
-        {bootState === "particles" && (
-          <ParticleSwarm onComplete={() => setBootState("preloader")} />
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {isPreloaderMounted && bootState === "preloader" && (
+        {isPreloaderMounted && (
           <Preloader
             monogram={data.brand.monogram}
             triggerTransition={!isLoading}
