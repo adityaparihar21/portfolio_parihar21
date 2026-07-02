@@ -966,6 +966,80 @@ function SelectedWork({
 }
 
 /* ---------------- Creative Work ---------------- */
+function CreativeCard({
+  p,
+  i,
+  total,
+  activeAudioId,
+  setActiveAudioId,
+}: {
+  p: any;
+  i: number;
+  total: number;
+  activeAudioId: string | null;
+  setActiveAudioId: (id: string | null) => void;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],
+  });
+
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
+  const brightness = useTransform(scrollYProgress, [0, 1], [1, 0.4]);
+  const filter = useTransform(brightness, (b) => `brightness(${b})`);
+
+  return (
+    <div ref={containerRef} className="h-[120vh] w-full relative flex justify-center">
+      <motion.a
+        href={p.href}
+        style={{ 
+          scale, 
+          filter,
+          transformOrigin: "top center",
+          top: `calc(8vh + ${i * 16}px)` 
+        }}
+        className="sticky w-[90%] max-w-5xl h-[65vh] flex flex-col md:flex-row items-center gap-6 md:gap-10 bg-zinc-900/90 dark:bg-zinc-900/90 backdrop-blur-3xl rounded-[32px] overflow-hidden border border-white/10 shadow-[0_-15px_40px_rgba(0,0,0,0.4)] p-6 md:p-10 group"
+      >
+        <div className={`w-full md:w-[60%] h-[40vh] md:h-full overflow-hidden rounded-2xl bg-black ${i % 2 === 1 ? "md:order-2" : ""}`}>
+          <div className="relative w-full h-full">
+            {p.image ? (
+              <ProjectMedia
+                src={p.image}
+                title={p.title}
+                id={p.id}
+                activeAudioId={activeAudioId}
+                setActiveAudioId={setActiveAudioId}
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center border border-border bg-card/60">
+                <span className="text-[10px] font-medium tracking-[0.3em] uppercase text-muted-foreground/60">
+                  Image coming soon
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="w-full md:w-[40%] flex flex-col gap-4">
+          <span className="text-[10px] font-medium tracking-[0.3em] uppercase text-primary">
+            {p.category}
+          </span>
+          <h3 className="font-serif text-3xl font-medium leading-tight tracking-tight md:text-4xl text-white">
+            {p.title}
+          </h3>
+          <p
+            className="text-sm font-light leading-relaxed text-zinc-400 md:text-base line-clamp-4"
+            dangerouslySetInnerHTML={{ __html: p.description }}
+          />
+          <span className="mt-4 inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.25em] uppercase text-primary transition-all group-hover:gap-3">
+            View Edit <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.5} />
+          </span>
+        </div>
+      </motion.a>
+    </div>
+  );
+}
+
 function CreativeWork({
   data,
   activeAudioId,
@@ -976,6 +1050,15 @@ function CreativeWork({
   setActiveAudioId: (id: string | null) => void;
 }) {
   const { eyebrow, title, projects } = data.creativeWork;
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile(); // Check on mount
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   return (
     <div id="creative">
       <section className="relative z-20 bg-[#050505] pt-32 md:pt-44 pb-12 border-t border-[#222]">
@@ -1001,7 +1084,22 @@ function CreativeWork({
         </div>
       </section>
 
-      <MinorityReportGrid projects={projects} />
+      {isMobile ? (
+        <div className="flex flex-col relative w-full bg-[#050505] pb-24">
+          {projects.map((p, i) => (
+            <CreativeCard
+              key={p.id}
+              p={p}
+              i={i}
+              total={projects.length}
+              activeAudioId={activeAudioId}
+              setActiveAudioId={setActiveAudioId}
+            />
+          ))}
+        </div>
+      ) : (
+        <MinorityReportGrid projects={projects} />
+      )}
     </div>
   );
 }
