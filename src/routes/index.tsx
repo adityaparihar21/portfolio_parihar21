@@ -1716,10 +1716,7 @@ export default function Index() {
           // Always preload the poster image so the grid never flashes empty
           const poster = p.image.replace('.mp4', '_poster.jpg').replace('.webm', '_poster.jpg');
           assets.push(poster);
-          // Only preload the actual raw video files for the first 4 items to save massive bandwidth
-          if (index < 4) {
-            assets.push(p.image);
-          }
+          assets.push(p.image);
         } else {
           assets.push(p.image);
         }

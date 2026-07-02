@@ -218,7 +218,19 @@ function ProjectMedia({ url, isInside, isMuted, w, h, onUnmuteFailed, groupRef, 
 
   return (
     <group position={[0, 0, 0.01]}>
-      <Suspense fallback={<ImageMaterial url={posterUrl} setNaturalAspect={setNaturalAspect} groupRef={groupRef} w={w} h={h} />}>
+      <Suspense fallback={
+        <group>
+          <ImageMaterial url={posterUrl} setNaturalAspect={setNaturalAspect} groupRef={groupRef} w={w} h={h} />
+          {isVideo && isInside && (
+            <Html center zIndexRange={[100, 0]} className="pointer-events-none">
+              <div className="flex flex-col items-center justify-center gap-2 drop-shadow-lg">
+                <div className="w-8 h-8 rounded-full border-[1.5px] border-white/20 border-t-[#d2af6e] animate-spin" />
+                <span className="text-white/90 text-[10px] tracking-[0.3em] uppercase font-serif italic">Buffering</span>
+              </div>
+            </Html>
+          )}
+        </group>
+      }>
         {isVideo && isInside ? (
           <VideoMaterial url={url} isInside={isInside} isMuted={isMuted} onUnmuteFailed={onUnmuteFailed} setNaturalAspect={setNaturalAspect} groupRef={groupRef} w={w} h={h} />
         ) : (
