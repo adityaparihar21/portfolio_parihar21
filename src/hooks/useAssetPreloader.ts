@@ -37,12 +37,15 @@ export function useAssetPreloader(urls: string[], timeoutMs: number = 35000) {
       }
     }, timeoutMs);
 
+    const createdVideos: HTMLVideoElement[] = [];
+
     urls.forEach((url) => {
       const isVideo = url.toLowerCase().endsWith('.mp4') || url.toLowerCase().endsWith('.webm');
       
       if (isVideo) {
         // Preload video until it can play through without buffering
         const video = document.createElement('video');
+        createdVideos.push(video);
         video.src = url;
         video.preload = 'auto';
         video.muted = true;
@@ -75,6 +78,12 @@ export function useAssetPreloader(urls: string[], timeoutMs: number = 35000) {
     return () => {
       clearTimeout(fallbackTimer);
       isFinished = true;
+      // OOM Fix: Force Safari to garbage collect videos
+      createdVideos.forEach(v => {
+        v.pause();
+        v.removeAttribute('src');
+        v.load();
+      });
     };
   }, [urls, timeoutMs]);
 

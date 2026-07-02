@@ -1716,7 +1716,7 @@ export default function Index() {
           // Always preload the poster image so the grid never flashes empty
           const poster = p.image.replace('.mp4', '_poster.jpg').replace('.webm', '_poster.jpg');
           assets.push(poster);
-          assets.push(p.image);
+          // OOM FIX: Do NOT preload raw .mp4 videos into memory during initial load.
         } else {
           assets.push(p.image);
         }

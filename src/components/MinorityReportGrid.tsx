@@ -144,10 +144,12 @@ function ImageMaterial({ url, setNaturalAspect, groupRef, w, h }: { url: string,
   const colorB = new THREE.Color("#1a1a1a");
 
   useEffect(() => {
+    let activeTexture: THREE.Texture | null = null;
     const loader = new THREE.TextureLoader();
     loader.load(
       encodeURI(url),
       (loadedTexture) => {
+        activeTexture = loadedTexture;
         setTexture(loadedTexture);
         if (loadedTexture.image) {
           const img = loadedTexture.image as HTMLImageElement;
@@ -165,7 +167,9 @@ function ImageMaterial({ url, setNaturalAspect, groupRef, w, h }: { url: string,
     );
     
     return () => {
-      if (texture) texture.dispose();
+      if (activeTexture) {
+        activeTexture.dispose();
+      }
     };
   }, [url, setNaturalAspect]);
 
