@@ -77,14 +77,28 @@ function VideoMaterial({ url, isInside, isMuted, onUnmuteFailed, setNaturalAspec
   });
 
   const [aspect, setAspect] = useState(16 / 9);
+  const [isBuffering, setIsBuffering] = useState(true);
 
   useEffect(() => {
     if (texture && texture.image) {
       const video = texture.image as HTMLVideoElement;
+      
+      const handleWaiting = () => setIsBuffering(true);
+      const handlePlaying = () => setIsBuffering(false);
+      
+      video.addEventListener('waiting', handleWaiting);
+      video.addEventListener('playing', handlePlaying);
+      video.addEventListener('canplay', handlePlaying);
+
+      if (video.readyState >= 3) {
+        setIsBuffering(false);
+      }
+
       if (isInside) {
         video.muted = isMuted;
         if (video.paused) {
           if (video.currentTime > 0 && video.currentTime < 1) video.currentTime = 0;
+          setIsBuffering(true); // show spinner while it attempts to play
           video.play().catch(() => {
             video.muted = true;
             video.play().catch(() => {});
@@ -110,6 +124,9 @@ function VideoMaterial({ url, isInside, isMuted, onUnmuteFailed, setNaturalAspec
 
       return () => {
         video.removeEventListener("loadedmetadata", handleResize);
+        video.removeEventListener('waiting', handleWaiting);
+        video.removeEventListener('playing', handlePlaying);
+        video.removeEventListener('canplay', handlePlaying);
         // Force the video to stop playing audio immediately when unmounting
         video.pause();
         video.muted = true;
@@ -126,10 +143,20 @@ function VideoMaterial({ url, isInside, isMuted, onUnmuteFailed, setNaturalAspec
   });
 
   return (
-    <mesh>
-      <planeGeometry args={[w, h]} />
-      <meshBasicMaterial map={texture} toneMapped={false} />
-    </mesh>
+    <group>
+      <mesh>
+        <planeGeometry args={[w, h]} />
+        <meshBasicMaterial map={texture} toneMapped={false} />
+      </mesh>
+      {isBuffering && isInside && (
+        <Html center zIndexRange={[100, 0]} className="pointer-events-none">
+          <div className="flex flex-col items-center justify-center gap-2 drop-shadow-lg">
+            <div className="w-8 h-8 rounded-full border-[1.5px] border-white/20 border-t-[#d2af6e] animate-spin" />
+            <span className="text-white/90 text-[10px] tracking-[0.3em] uppercase font-serif italic">Buffering</span>
+          </div>
+        </Html>
+      )}
+    </group>
   );
 }
 
