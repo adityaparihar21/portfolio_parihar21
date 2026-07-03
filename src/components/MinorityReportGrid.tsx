@@ -312,7 +312,7 @@ function ImageMaterial({ url, setNaturalAspect, groupRef, w, h }: { url: string,
   );
 }
 
-function ProjectMedia({ url, isInside, isMuted, w, h, onUnmuteFailed, groupRef, naturalAspect, setNaturalAspect }: { url: string, isInside: boolean, isMuted: boolean, w: number, h: number, onUnmuteFailed: () => void, groupRef: any, naturalAspect: number, setNaturalAspect: (a: number) => void }) {
+function ProjectMedia({ url, isInside, isMuted, w, h, onUnmuteFailed, groupRef, naturalAspect, setNaturalAspect, shouldLoadVideo }: { url: string, isInside: boolean, isMuted: boolean, w: number, h: number, onUnmuteFailed: () => void, groupRef: any, naturalAspect: number, setNaturalAspect: (a: number) => void, shouldLoadVideo: boolean }) {
   const isVideo = url.toLowerCase().endsWith('.mp4') || url.toLowerCase().endsWith('.webm');
   
   // Construct poster URL (e.g. /video.mp4 -> /video_poster.jpg)
@@ -334,7 +334,7 @@ function ProjectMedia({ url, isInside, isMuted, w, h, onUnmuteFailed, groupRef, 
           )}
         </group>
       }>
-        {isVideo ? (
+        {isVideo && shouldLoadVideo ? (
           <VideoMaterial url={url} isInside={isInside} isMuted={isMuted} onUnmuteFailed={onUnmuteFailed} setNaturalAspect={setNaturalAspect} groupRef={groupRef} w={w} h={h} />
         ) : (
           <ImageMaterial url={posterUrl} setNaturalAspect={setNaturalAspect} groupRef={groupRef} w={w} h={h} />
@@ -364,8 +364,8 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
   const scaleRef = useRef(1);
   const groupRef = useRef<THREE.Group>(null);
   
-  // Distance culling: only load and render the video if it's within 40 units
-  const isVisible = isInside || cameraDist < 40;
+  // Distance culling: prevent culling of the grid by setting a higher distance
+  const isVisible = isInside || cameraDist < 60;
 
   useFrame((state) => {
     scaleRef.current = THREE.MathUtils.lerp(scaleRef.current, targetScaleY, 0.1);
@@ -445,7 +445,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
 
         {/* Robust WebGL Media Component with Distance Culling & Dynamic Shaders */}
         {isVisible ? (
-          <ProjectMedia url={project.image} isInside={isInside} isMuted={isMuted} w={w} h={h} onUnmuteFailed={() => setIsMuted(true)} groupRef={groupRef} naturalAspect={naturalAspect} setNaturalAspect={setNaturalAspect} />
+          <ProjectMedia url={project.image} isInside={isInside} isMuted={isMuted} w={w} h={h} onUnmuteFailed={() => setIsMuted(true)} groupRef={groupRef} naturalAspect={naturalAspect} setNaturalAspect={setNaturalAspect} shouldLoadVideo={isInside || hovered} />
         ) : (
           <mesh position={[0, 0, 0.01]}>
             <planeGeometry args={[w, h]} />
