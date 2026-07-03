@@ -167,19 +167,18 @@ function VideoMaterial({ url, isInside, isMuted, onUnmuteFailed, setNaturalAspec
 
       if (isInside) {
         video.muted = isMuted;
-        if (video.paused) {
-          if (video.currentTime > 0 && video.currentTime < 1) video.currentTime = 0;
-          setIsBuffering(true); // show spinner while it attempts to play
-          video.play().catch(() => {
-            video.muted = true;
-            video.play().catch(() => {});
-            onUnmuteFailed();
-          });
-        }
       } else {
         video.muted = true;
-        video.pause();
-        if (video.duration > 0.5 && video.currentTime === 0) video.currentTime = 0.5;
+      }
+
+      if (video.paused) {
+        if (video.currentTime > 0 && video.currentTime < 1) video.currentTime = 0;
+        setIsBuffering(true); // show spinner while it attempts to play
+        video.play().catch(() => {
+          video.muted = true;
+          video.play().catch(() => {});
+          onUnmuteFailed();
+        });
       }
 
       const handleResize = () => {
@@ -208,7 +207,8 @@ function VideoMaterial({ url, isInside, isMuted, onUnmuteFailed, setNaturalAspec
   useFrame(() => {
     if (groupRef.current && texture) {
       const currentScaleX = groupRef.current.scale.x;
-      const currentMeshAspect = (w * currentScaleX) / h;
+      const currentScaleY = groupRef.current.scale.y;
+      const currentMeshAspect = (w * currentScaleX) / (h * currentScaleY);
       updateTextureFitCover(texture, aspect, currentMeshAspect);
     }
   });
@@ -276,7 +276,8 @@ function ImageMaterial({ url, setNaturalAspect, groupRef, w, h }: { url: string,
     // 1. Dynamic object-fit cover
     if (groupRef.current && texture) {
       const currentScaleX = groupRef.current.scale.x;
-      const currentMeshAspect = (w * currentScaleX) / h;
+      const currentScaleY = groupRef.current.scale.y;
+      const currentMeshAspect = (w * currentScaleX) / (h * currentScaleY);
       updateTextureFitCover(texture, aspect, currentMeshAspect);
     }
     
@@ -359,7 +360,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
   const [naturalAspect, setNaturalAspect] = useState(16 / 9); // Used for morphing
 
   const targetScaleY = hideUI ? 0 : (isInside || isEntering) ? 1.15 : hovered ? 1.05 : 1;
-  const targetAspect = isInside ? naturalAspect : 16 / 9;
+  const targetAspect = isClicked ? naturalAspect : 16 / 9;
   
   const scaleRef = useRef(1);
   const groupRef = useRef<THREE.Group>(null);
@@ -445,7 +446,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
 
         {/* Robust WebGL Media Component with Distance Culling & Dynamic Shaders */}
         {isVisible ? (
-          <ProjectMedia url={project.image} isInside={isInside} isMuted={isMuted} w={w} h={h} onUnmuteFailed={() => setIsMuted(true)} groupRef={groupRef} naturalAspect={naturalAspect} setNaturalAspect={setNaturalAspect} shouldLoadVideo={isClicked || hovered} />
+          <ProjectMedia url={project.image} isInside={isInside} isMuted={isMuted} w={w} h={h} onUnmuteFailed={() => setIsMuted(true)} groupRef={groupRef} naturalAspect={naturalAspect} setNaturalAspect={setNaturalAspect} shouldLoadVideo={isClicked} />
         ) : (
           <mesh position={[0, 0, 0.01]}>
             <planeGeometry args={[w, h]} />
