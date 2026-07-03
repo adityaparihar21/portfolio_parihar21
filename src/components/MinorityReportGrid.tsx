@@ -67,6 +67,77 @@ function updateTextureFitCover(texture: THREE.Texture, mediaAspect: number, mesh
     texture.offset.set((1 - scaleX) / 2, 0);
   }
 }
+function VideoProgressBar({ video, w, h, isInside }: { video: HTMLVideoElement | null, w: number, h: number, isInside: boolean }) {
+  const progressRef = useRef<THREE.Mesh>(null);
+  const bgRef = useRef<THREE.Mesh>(null);
+  const [hovered, setHovered] = useState(false);
+  
+  useFrame(() => {
+    const targetScaleY = hovered ? 3 : 1;
+    if (progressRef.current && bgRef.current) {
+      progressRef.current.scale.y = THREE.MathUtils.lerp(progressRef.current.scale.y, targetScaleY, 0.15);
+      bgRef.current.scale.y = THREE.MathUtils.lerp(bgRef.current.scale.y, targetScaleY, 0.15);
+    }
+
+    if (video && progressRef.current && video.duration > 0) {
+      const progress = video.currentTime / video.duration;
+      const safeProgress = Math.max(progress, 0.0001);
+      
+      progressRef.current.scale.x = safeProgress;
+      progressRef.current.position.x = -w / 2 + (w * safeProgress) / 2;
+    }
+  });
+
+  const handlePointerDown = (e: any) => {
+    e.stopPropagation();
+    if (!video || video.duration === 0) return;
+    const progress = Math.max(0, Math.min(1, e.uv.x));
+    video.currentTime = progress * video.duration;
+  };
+
+  const baseHeight = 0.03;
+
+  if (!isInside) return null;
+
+  return (
+    <group position={[0, -(h / 2) + baseHeight / 2, 0.02]}>
+      {/* Invisible larger hit area for easier scrubbing */}
+      <mesh 
+        position={[0, 0, 0.002]}
+        onPointerOver={() => {
+          setHovered(true);
+          document.body.style.cursor = "pointer";
+        }}
+        onPointerOut={() => {
+          setHovered(false);
+          document.body.style.cursor = "auto";
+        }}
+        onPointerDown={handlePointerDown}
+        onPointerMove={(e) => {
+          e.stopPropagation();
+          if (e.buttons === 1) { 
+            handlePointerDown(e);
+          }
+        }}
+      >
+         <planeGeometry args={[w, 0.4]} />
+         <meshBasicMaterial visible={false} />
+      </mesh>
+
+      {/* Background track */}
+      <mesh ref={bgRef} position={[0, 0, 0]}>
+        <planeGeometry args={[w, baseHeight]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.2} />
+      </mesh>
+      
+      {/* Progress track */}
+      <mesh ref={progressRef} position={[-w / 2, 0, 0.001]}>
+        <planeGeometry args={[w, baseHeight]} />
+        <meshBasicMaterial color="#d2af6e" toneMapped={false} />
+      </mesh>
+    </group>
+  );
+}
 
 function VideoMaterial({ url, isInside, isMuted, onUnmuteFailed, setNaturalAspect, groupRef, w, h }: { url: string, isInside: boolean, isMuted: boolean, onUnmuteFailed: () => void, setNaturalAspect: (a: number) => void, groupRef: React.RefObject<THREE.Group>, w: number, h: number }) {
   const texture = useVideoTexture(encodeURI(url), {
@@ -148,6 +219,7 @@ function VideoMaterial({ url, isInside, isMuted, onUnmuteFailed, setNaturalAspec
         <planeGeometry args={[w, h]} />
         <meshBasicMaterial map={texture} toneMapped={false} />
       </mesh>
+      <VideoProgressBar video={texture?.image as HTMLVideoElement} w={w} h={h} isInside={isInside} />
       {isBuffering && isInside && (
         <Html center zIndexRange={[100, 0]} className="pointer-events-none">
           <div className="flex flex-col items-center justify-center gap-2 drop-shadow-lg">
