@@ -262,7 +262,7 @@ function ProjectMedia({ url, isInside, isMuted, w, h, onUnmuteFailed, groupRef, 
           )}
         </group>
       }>
-        {isVideo && isInside ? (
+        {isVideo ? (
           <VideoMaterial url={url} isInside={isInside} isMuted={isMuted} onUnmuteFailed={onUnmuteFailed} setNaturalAspect={setNaturalAspect} groupRef={groupRef} w={w} h={h} />
         ) : (
           <ImageMaterial url={posterUrl} setNaturalAspect={setNaturalAspect} groupRef={groupRef} w={w} h={h} />
