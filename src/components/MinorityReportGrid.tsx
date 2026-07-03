@@ -100,7 +100,7 @@ function VideoProgressBar({ video, w, h, isInside }: { video: HTMLVideoElement |
   if (!isInside) return null;
 
   return (
-    <group position={[0, -(h / 2) + baseHeight / 2, 0.02]}>
+    <group position={[0, -(h / 2) - baseHeight / 2 - 0.02, 0.02]}>
       {/* Invisible larger hit area for easier scrubbing */}
       <mesh 
         position={[0, 0, 0.002]}
@@ -445,7 +445,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
 
         {/* Robust WebGL Media Component with Distance Culling & Dynamic Shaders */}
         {isVisible ? (
-          <ProjectMedia url={project.image} isInside={isInside} isMuted={isMuted} w={w} h={h} onUnmuteFailed={() => setIsMuted(true)} groupRef={groupRef} naturalAspect={naturalAspect} setNaturalAspect={setNaturalAspect} shouldLoadVideo={isInside || hovered} />
+          <ProjectMedia url={project.image} isInside={isInside} isMuted={isMuted} w={w} h={h} onUnmuteFailed={() => setIsMuted(true)} groupRef={groupRef} naturalAspect={naturalAspect} setNaturalAspect={setNaturalAspect} shouldLoadVideo={isClicked || hovered} />
         ) : (
           <mesh position={[0, 0, 0.01]}>
             <planeGeometry args={[w, h]} />
