@@ -346,7 +346,7 @@ function ProjectMedia({ url, isInside, isMuted, w, h, onUnmuteFailed, groupRef, 
 }
 
 
-function VideoPanel({ project, position, interactionState, activeIdx, idx, onClick, onExit, cameraDist }: any) {
+function VideoPanel({ project, position, interactionState, activeIdx, idx, onClick, onExit }: any) {
   const [hovered, setHovered] = useState(false);
   const aspect = 16 / 9; // Enforce 16:9 for all panels to prevent UI overlap
 
@@ -403,10 +403,10 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
     return colors[Math.floor(Math.random() * colors.length)];
   }, []);
 
-  const isClose = cameraDist < 30;
+  // cameraDist removed
 
   return (
-    <group position={position} scale={[scaleRef.current, scaleRef.current, scaleRef.current]}>
+    <group position={position}>
       
       <pointLight 
         color={lightColor} 
