@@ -365,8 +365,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
   const scaleRef = useRef(1);
   const groupRef = useRef<THREE.Group>(null);
   
-  // Distance culling: prevent culling of the grid by setting a higher distance
-  const isVisible = isInside || cameraDist < 60;
+  // Distance culling handled by Three.js frustum automatically
 
   useFrame((state) => {
     scaleRef.current = THREE.MathUtils.lerp(scaleRef.current, targetScaleY, 0.1);
@@ -445,14 +444,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
         </RoundedBox>
 
         {/* Robust WebGL Media Component with Distance Culling & Dynamic Shaders */}
-        {isVisible ? (
-          <ProjectMedia url={project.image} isInside={isInside} isMuted={isMuted} w={w} h={h} onUnmuteFailed={() => setIsMuted(true)} groupRef={groupRef} naturalAspect={naturalAspect} setNaturalAspect={setNaturalAspect} shouldLoadVideo={isClicked} />
-        ) : (
-          <mesh position={[0, 0, 0.01]}>
-            <planeGeometry args={[w, h]} />
-            <meshBasicMaterial color="#050505" />
-          </mesh>
-        )}
+        <ProjectMedia url={project.image} isInside={isInside} isMuted={isMuted} w={w} h={h} onUnmuteFailed={() => setIsMuted(true)} groupRef={groupRef} naturalAspect={naturalAspect} setNaturalAspect={setNaturalAspect} shouldLoadVideo={isClicked} />
       </mesh>
       </group>
 
@@ -576,7 +568,6 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
 function Scene({ projects, smoothScroll, interactionState, activeIdx, setInteractionState, setActiveIdx }: any) {
   const { camera } = useThree();
   const dummy = useMemo(() => new THREE.Vector3(), []);
-  const [dists, setDists] = useState<number[]>([]);
   
   const startCameraPos = useRef(new THREE.Vector3());
   const transitionProgress = useRef(0);
@@ -742,12 +733,6 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
         camera.lookAt(lookTarget);
       }
     }
-
-    const newDists = projects.map((_: any, i: number) => {
-      const [px, py, pz] = getPosition(i);
-      return camera.position.distanceTo(new THREE.Vector3(px, py, pz));
-    });
-    setDists(newDists);
   });
 
   return (
@@ -795,7 +780,6 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
             setTimeout(() => setInteractionState("ENTERING"), 300);
           }}
           onExit={() => setInteractionState("EXITING")}
-          cameraDist={dists[i] || 100}
         />
       ))}
 
