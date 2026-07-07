@@ -874,13 +874,12 @@
     }
 
     #hud{
-      grid-template-columns:1fr;
+      grid-template-columns: 1fr auto;
       grid-template-areas:
-        "center"
-        "left"
-        "right";
-      gap:8px;
-      padding:10px;
+        "left center"
+        "right right";
+      gap:6px;
+      padding:8px;
     }
 
     .hud-center,
@@ -935,10 +934,12 @@
 
     .screen-card{
       width:100%;
-      padding:20px 16px;
+      padding:16px 14px;
       border-radius:22px;
       margin-top:auto;
       margin-bottom:4px;
+      max-height: 60dvh;
+      overflow-y: auto;
     }
 
     .eyebrow{
