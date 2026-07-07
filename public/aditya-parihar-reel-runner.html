@@ -210,7 +210,9 @@
     z-index: 10;
   }
   
-  #math-game.active {
+  #math-game.active,
+  #memory-game.active,
+  #sudoku-game.active {
     display: flex;
   }
 
@@ -225,14 +227,17 @@
   
   /* Memory Game CSS */
   #memory-game {
-    margin-top: 80px;
-    padding-bottom: 30px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     pointer-events: auto;
   }
 
   /* Sudoku Game CSS */
   #sudoku-game {
-    margin-top: 60px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     pointer-events: auto;
   }
   
@@ -1244,13 +1249,13 @@
           <div id="math-options" style="display: flex; gap: 10px;"></div>
         </div>
         <div id="memory-game" class="game-view">
-          <h2 style="font-family: 'Courier New'; margin-bottom: 20px; text-align: center; margin-top: 40px; color: white;">MEMORY MATCH</h2>
-          <div id="memory-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; max-width: 500px; margin: 0 auto;"></div>
+          <h2 style="font-family: 'Courier New'; margin-bottom: 20px; text-align: center; color: white;">MEMORY MATCH</h2>
+          <div id="memory-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; max-width: 400px; width: 100%;"></div>
         </div>
         <div id="sudoku-game" class="game-view">
-          <h2 style="font-family: 'Courier New'; margin-bottom: 20px; text-align: center; margin-top: 40px; color: white;">THE VAULT CODE</h2>
-          <div id="sudoku-grid" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; padding: 2px; background: white; max-width: 400px; margin: 0 auto;"></div>
-          <div id="sudoku-numpad" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; max-width: 400px; margin: 20px auto;"></div>
+          <h2 style="font-family: 'Courier New'; margin-bottom: 20px; text-align: center; color: white;">THE VAULT CODE</h2>
+          <div id="sudoku-grid" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; padding: 2px; background: white; max-width: 360px; width: 100%;"></div>
+          <div id="sudoku-numpad" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; max-width: 360px; width: 100%; margin-top: 20px;"></div>
         </div>
         <div id="scanlines"></div>
         <div id="vignette"></div>
@@ -2630,6 +2635,23 @@
   resize();
   updateHud();
   requestAnimationFrame(loop);
+
+  // Auto-pause when scrolling out of view
+  const gameSection = document.getElementById("app-shell");
+  if (gameSection && window.IntersectionObserver) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) {
+          if (state === "playing") {
+            pauseGame();
+          } else {
+            Sound.stopMusic();
+          }
+        }
+      });
+    }, { threshold: 0.1 });
+    observer.observe(gameSection);
+  }
 
 })();
 </script>
