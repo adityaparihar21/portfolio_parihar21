@@ -19,6 +19,7 @@ import AP3DMonogram from "../components/AP3DMonogram";
 import { CreativeHero } from "../components/CreativeHero";
 import MinorityReportGrid from "../components/MinorityReportGrid";
 import { DevDashboardHero } from "../components/DevDashboardHero";
+import { LetterboxdSection } from "../components/LetterboxdSection";
 import { EngineeringPortfolio } from "../components/EngineeringPortfolio";
 import { GithubSection } from "../components/GithubSection";
 import { RadialIntroSequence } from "../components/intro/RadialIntro";
@@ -2104,6 +2105,9 @@ export default function Index() {
                 title="Reel Runner - About Me"
               />
             </section>
+
+            {/* --- LETTERBOXD SECTION --- */}
+            <LetterboxdSection />
           </>
         )}
 
