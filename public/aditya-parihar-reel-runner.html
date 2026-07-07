@@ -191,7 +191,6 @@
   #math-game,
   #memory-game,
   #sudoku-game {
-    display:block;
     width:100%;
     height:100%;
     position: absolute;
@@ -203,17 +202,20 @@
     background: linear-gradient(to bottom, #1a1a24 0%, #14141c 55%, #0b0b0f 100%);
   }
   
-  .game-view {
-    display: none;
-    z-index: 10;
+  .game-view:not(.active) {
+    display: none !important;
   }
   .game-view.active {
     display: block;
+    z-index: 10;
+  }
+  
+  #math-game.active {
+    display: flex;
   }
 
   /* Math Game CSS */
   #math-game {
-    background: var(--bg-1);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -223,12 +225,10 @@
   
   /* Memory Game CSS */
   #memory-game {
-    background: var(--bg-2);
   }
 
   /* Sudoku Game CSS */
   #sudoku-game {
-    background: var(--bg-3);
   }
 
   #scanlines{
@@ -1221,28 +1221,14 @@
 
         <!-- Start screen -->
         <div id="start-screen" class="screen">
-          <div class="screen-card">
+          <div class="screen-card" style="text-align: center;">
             <div class="eyebrow">Interactive Intro / Arcade Portfolio</div>
-            <h1 class="marquee-title">★ REEL RUNNER ★</h1>
-            <div class="marquee-sub">a personal introduction in five reels</div>
-            <div class="marquee-sub" style="margin-top:-6px;">starring Aditya Parihar</div>
+            <h1 class="marquee-title" style="margin-top: 10px;">Wanna know about me more?</h1>
+            <div class="marquee-sub" style="margin-top: 10px;">Unlock my story through a series of puzzles.</div>
 
-            <p class="hero-copy">
-              Jump through the reel, collect moments, and unlock five chapters about who I am —
-              from coding and cinema to football, chess, and CDS prep.
-            </p>
-
-            <div class="instruction-row">
-              <div class="pill">Desktop: Space / ↑ to jump</div>
-              <div class="pill">Mobile: Tap anywhere to jump</div>
-              <div class="pill">Collect film coins, avoid canisters</div>
+            <div class="btn-row" style="margin-top: 30px;">
+              <button class="btn btn-primary" id="start-btn">Let's Go</button>
             </div>
-
-            <div class="btn-row">
-              <button class="btn btn-primary" id="start-btn">Press Start</button>
-            </div>
-
-            <div class="marquee-sub blink" style="margin-top:4px;">one run · five reels · one ending</div>
           </div>
         </div>
 
