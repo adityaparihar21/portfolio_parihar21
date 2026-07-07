@@ -44,48 +44,22 @@ const playHoverSound = () => {
 const playWarpSound = () => {
   const ctx = getAudioContext();
   if (!ctx) return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
   
-  // 1. Sub Bass Sweep
-  const subOsc = ctx.createOscillator();
-  const subGain = ctx.createGain();
-  subOsc.type = 'sine';
-  subOsc.frequency.setValueAtTime(60, ctx.currentTime);
-  subOsc.frequency.exponentialRampToValueAtTime(10, ctx.currentTime + 1.2);
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(600, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.1);
   
-  subGain.gain.setValueAtTime(0, ctx.currentTime);
-  subGain.gain.linearRampToValueAtTime(0.7, ctx.currentTime + 0.1);
-  subGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.2);
+  gain.gain.setValueAtTime(0.0, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(0.05, ctx.currentTime + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
   
-  subOsc.connect(subGain);
-  subGain.connect(ctx.destination);
-  subOsc.start();
-  subOsc.stop(ctx.currentTime + 1.2);
-
-  // 2. High-Tech Noise Sweep
-  const bufferSize = ctx.sampleRate * 1.5;
-  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+  osc.connect(gain);
+  gain.connect(ctx.destination);
   
-  const noise = ctx.createBufferSource();
-  noise.buffer = buffer;
-  
-  const filter = ctx.createBiquadFilter();
-  filter.type = 'bandpass';
-  filter.frequency.setValueAtTime(3000, ctx.currentTime);
-  filter.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 1.2);
-  filter.Q.value = 1.0;
-
-  const noiseGain = ctx.createGain();
-  noiseGain.gain.setValueAtTime(0, ctx.currentTime);
-  noiseGain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.1);
-  noiseGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.2);
-  
-  noise.connect(filter);
-  filter.connect(noiseGain);
-  noiseGain.connect(ctx.destination);
-  
-  noise.start();
+  osc.start();
+  osc.stop(ctx.currentTime + 0.1);
 };
 
 const SPACING_Z = 15;
@@ -436,7 +410,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
   const isLocking = isClicked && interactionState === "LOCKING";
   const hideUI = activeIdx !== null && activeIdx !== idx;
 
-  const [isMuted, setIsMuted] = useState(false); // Try unmuted by default
+  const [isMuted, setIsMuted] = useState(true); // Start muted to ensure browser policies allow reliable unmute later
   const [naturalAspect, setNaturalAspect] = useState(16 / 9); // Used for morphing
 
   const targetScaleY = hideUI ? 0 : (isInside || isEntering) ? 1.15 : hovered ? 1.05 : 1;
