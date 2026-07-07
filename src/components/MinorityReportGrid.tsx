@@ -8,6 +8,30 @@ import { useScroll, useSpring, motion, useTransform } from "framer-motion";
 import * as THREE from "three";
 import { ArrowRight, Code2, ExternalLink, Github, Volume2, VolumeX } from "lucide-react";
 
+let hoverAudio: HTMLAudioElement | null = null;
+let warpAudio: HTMLAudioElement | null = null;
+
+if (typeof window !== "undefined") {
+  hoverAudio = new Audio('/coin_flip.mp3');
+  warpAudio = new Audio('/riser.mp3');
+}
+
+const playHoverSound = () => {
+  if (hoverAudio) {
+    hoverAudio.currentTime = 0;
+    hoverAudio.volume = 0.4;
+    hoverAudio.play().catch(() => {});
+  }
+};
+
+const playWarpSound = () => {
+  if (warpAudio) {
+    warpAudio.currentTime = 0;
+    warpAudio.volume = 0.6;
+    warpAudio.play().catch(() => {});
+  }
+};
+
 const SPACING_Z = 15;
 
 const positions = [
@@ -424,6 +448,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
             }
           }}
         onPointerOver={() => {
+          if (!hovered) playHoverSound();
           setHovered(true);
           if (!isClicked) document.body.style.cursor = "pointer";
         }}
@@ -777,6 +802,7 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
           onClick={() => {
             if (interactionState !== "IDLE") return;
             setActiveIdx(i);
+            playWarpSound();
             setInteractionState("LOCKING");
             setTimeout(() => setInteractionState("ENTERING"), 300);
           }}
