@@ -410,7 +410,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
       
       <pointLight 
         color={lightColor} 
-        intensity={isInside ? 5 : hovered ? 3 : 0.8} 
+        intensity={hideUI ? 0 : isInside ? 5 : hovered ? 3 : 0.8} 
         distance={isInside ? 30 : 20} 
       />
 
@@ -446,6 +446,19 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
         {/* Robust WebGL Media Component with Distance Culling & Dynamic Shaders */}
         <ProjectMedia url={project.image} isInside={isInside} isMuted={isMuted} w={w} h={h} onUnmuteFailed={() => setIsMuted(true)} groupRef={groupRef} naturalAspect={naturalAspect} setNaturalAspect={setNaturalAspect} shouldLoadVideo={isClicked} />
       </mesh>
+      {isInside && (
+        <Html position={[w/2 - 0.3 / targetScaleX, h/2 - 0.3 / targetScaleY, 0.2]} center>
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsMuted(!isMuted);
+            }}
+            className="group relative p-2 rounded-full bg-black/60 backdrop-blur-md border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all duration-300 shadow-xl"
+          >
+            {isMuted ? <VolumeX className="w-5 h-5 text-white/50 group-hover:text-white" /> : <Volume2 className="w-5 h-5 text-white" />}
+          </button>
+        </Html>
+      )}
       </group>
 
       {/* Sequence 1: Locking Animation */}
@@ -458,7 +471,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
       )}
 
       {/* Minimal Hover UI */}
-      {hovered && !isInside && !isEntering && !isLocking && (
+      {hovered && !isInside && !isEntering && !isLocking && !hideUI && (
         <Html
           position={[0, -(h / 2 + 0.5), 0.2]}
           center
@@ -475,7 +488,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
       )}
 
       {/* Idle Visible Poster Title */}
-      {!isClicked && !hovered && (
+      {!isClicked && !hovered && !hideUI && (
         <Html
           position={[0, -(h / 2 + 0.6), 0.2]}
           center
@@ -496,19 +509,6 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
       {/* Sequence 2: Inside the Memory (Centered Platform Layout) */}
       {isInside && (
         <>
-          {/* Mute Button positioned on the video itself */}
-          <Html position={[w/2 - 0.3, h / 2 - 0.3, 0.2]} center>
-            <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsMuted(!isMuted);
-              }}
-              className="group relative p-2 rounded-full bg-black/60 backdrop-blur-md border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all duration-300 shadow-xl"
-            >
-              {isMuted ? <VolumeX className="w-5 h-5 text-white/50 group-hover:text-white" /> : <Volume2 className="w-5 h-5 text-white" />}
-            </button>
-          </Html>
-          
           {/* Minimal 2D Flat HUD (No transform to prevent 3D tilt) */}
           <Html
             position={[1.8, 0, 0.2]}
