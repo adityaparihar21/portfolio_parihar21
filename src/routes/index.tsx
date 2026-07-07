@@ -2095,6 +2095,15 @@ export default function Index() {
                 <DomeGallery images={domeGalleryImages} />
               </div>
             </section>
+
+            {/* --- REEL RUNNER (ABOUT ME) SECTION --- */}
+            <section className="relative w-full h-[100vh] bg-[#050509] border-t border-white/10 overflow-hidden">
+              <iframe 
+                src="/aditya-parihar-reel-runner.html" 
+                className="w-full h-full border-none outline-none"
+                title="Reel Runner - About Me"
+              />
+            </section>
           </>
         )}
 
