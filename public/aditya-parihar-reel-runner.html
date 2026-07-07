@@ -1348,8 +1348,9 @@
   const Sound = (function(){
     let ctx = null;
     let enabled = true;
-    let musicTimer = null;
-    let musicStep = 0;
+    let bgmAudio = new Audio("/bgm.mp3");
+    bgmAudio.loop = true;
+    bgmAudio.volume = 0.5;
 
     function ensureCtx(){
       if(!ctx){
@@ -1398,24 +1399,13 @@
       tone(784, 0.16, "triangle", 0.10, 0.18);
     }
 
-    const bassPattern = [98, 98, 131, 98, 110, 110, 147, 110];
-
     function startMusic(){
-      stopMusic();
-      musicStep = 0;
-      musicTimer = setInterval(()=>{
-        if(!enabled) return;
-        const f = bassPattern[musicStep % bassPattern.length];
-        tone(f, 0.18, "triangle", 0.035);
-        musicStep++;
-      }, 260);
+      if(!enabled) return;
+      bgmAudio.play().catch(() => {}); // catch auto-play restrictions
     }
 
     function stopMusic(){
-      if(musicTimer){
-        clearInterval(musicTimer);
-        musicTimer = null;
-      }
+      bgmAudio.pause();
     }
 
     function toggle(){
