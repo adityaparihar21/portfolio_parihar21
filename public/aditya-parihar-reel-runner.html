@@ -1448,7 +1448,7 @@
   let particles = [];
   let spawnTimer = 0;
 
-  const MILESTONES = [100, 200, 300, 400, 450, 500];
+  const MILESTONES = [40, 80, 120, 160, 180, 200];
 
   /* =========================================================
      INPUT
@@ -1536,7 +1536,7 @@
   function maybeSpawn(){
     spawnTimer--;
     if(spawnTimer <= 0){
-      spawnTimer = 70 + Math.random() * 50;
+      spawnTimer = 40 + Math.random() * 30;
       const roll = Math.random();
 
       if(roll < 0.55){
@@ -1683,7 +1683,7 @@
 
     const reelIdx = shownMilestones.size >= 6
       ? 5
-      : Math.min(5, [...shownMilestones].filter(m => m !== 450).length);
+      : Math.min(5, [...shownMilestones].filter(m => m !== 180).length);
 
     document.getElementById("reel-val").textContent = reelIdx;
 
@@ -2000,17 +2000,17 @@
 
   function buildCard(m){
     const wrap = document.createElement("div");
-    wrap.className = "ticket-card" + (m === 450 ? " intermission" : "");
+    wrap.className = "ticket-card" + (m === 180 ? " intermission" : "");
 
     let data;
-    if(m === 100) data = CONFIG.bio;
-    else if(m === 200) data = CONFIG.hobbies;
-    else if(m === 300) data = CONFIG.films;
-    else if(m === 400) data = CONFIG.funfact;
-    else if(m === 450) data = CONFIG.intermission;
-    else if(m === 500) data = CONFIG.contact;
+    if(m === 40) data = CONFIG.bio;
+    else if(m === 80) data = CONFIG.hobbies;
+    else if(m === 120) data = CONFIG.films;
+    else if(m === 160) data = CONFIG.funfact;
+    else if(m === 180) data = CONFIG.intermission;
+    else if(m === 200) data = CONFIG.contact;
 
-    const reelNumberMap = {100:1, 200:2, 300:3, 400:4, 450:null, 500:5};
+    const reelNumberMap = {40:1, 80:2, 120:3, 160:4, 180:null, 200:5};
     const reelNo = reelNumberMap[m];
 
     const main = document.createElement("div");
@@ -2067,7 +2067,7 @@
       main.appendChild(p);
     }
 
-    if(m === 300){
+    if(m === 120){
       const grid = document.createElement("div");
       grid.className = "film-grid";
 
@@ -2100,7 +2100,7 @@
     const actions = document.createElement("div");
     actions.className = "card-actions";
 
-    if(m === 500){
+    if(m === 200){
       if(data.socials) {
         data.socials.forEach(s => {
           const btn = document.createElement("a");
