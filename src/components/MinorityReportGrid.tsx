@@ -8,28 +8,84 @@ import { useScroll, useSpring, motion, useTransform } from "framer-motion";
 import * as THREE from "three";
 import { ArrowRight, Code2, ExternalLink, Github, Volume2, VolumeX } from "lucide-react";
 
-let hoverAudio: HTMLAudioElement | null = null;
-let warpAudio: HTMLAudioElement | null = null;
-
-if (typeof window !== "undefined") {
-  hoverAudio = new Audio('/coin_flip.mp3');
-  warpAudio = new Audio('/riser.mp3');
-}
+const getAudioContext = (() => {
+  let ctx: AudioContext | null = null;
+  return () => {
+    if (typeof window === "undefined") return null;
+    if (!ctx) {
+      ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+    if (ctx.state === "suspended") ctx.resume();
+    return ctx;
+  };
+})();
 
 const playHoverSound = () => {
-  if (hoverAudio) {
-    hoverAudio.currentTime = 0;
-    hoverAudio.volume = 0.4;
-    hoverAudio.play().catch(() => {});
-  }
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(800, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.05);
+  
+  gain.gain.setValueAtTime(0.0, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+  
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  
+  osc.start();
+  osc.stop(ctx.currentTime + 0.05);
 };
 
 const playWarpSound = () => {
-  if (warpAudio) {
-    warpAudio.currentTime = 0;
-    warpAudio.volume = 0.6;
-    warpAudio.play().catch(() => {});
-  }
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  
+  // 1. Sub Bass Sweep
+  const subOsc = ctx.createOscillator();
+  const subGain = ctx.createGain();
+  subOsc.type = 'sine';
+  subOsc.frequency.setValueAtTime(60, ctx.currentTime);
+  subOsc.frequency.exponentialRampToValueAtTime(10, ctx.currentTime + 1.2);
+  
+  subGain.gain.setValueAtTime(0, ctx.currentTime);
+  subGain.gain.linearRampToValueAtTime(0.7, ctx.currentTime + 0.1);
+  subGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.2);
+  
+  subOsc.connect(subGain);
+  subGain.connect(ctx.destination);
+  subOsc.start();
+  subOsc.stop(ctx.currentTime + 1.2);
+
+  // 2. High-Tech Noise Sweep
+  const bufferSize = ctx.sampleRate * 1.5;
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+  
+  const noise = ctx.createBufferSource();
+  noise.buffer = buffer;
+  
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.setValueAtTime(3000, ctx.currentTime);
+  filter.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 1.2);
+  filter.Q.value = 1.0;
+
+  const noiseGain = ctx.createGain();
+  noiseGain.gain.setValueAtTime(0, ctx.currentTime);
+  noiseGain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.1);
+  noiseGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.2);
+  
+  noise.connect(filter);
+  filter.connect(noiseGain);
+  noiseGain.connect(ctx.destination);
+  
+  noise.start();
 };
 
 const SPACING_Z = 15;
