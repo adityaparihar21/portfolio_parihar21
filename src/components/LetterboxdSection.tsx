@@ -2,10 +2,10 @@ import { motion } from 'framer-motion';
 
 export function LetterboxdSection() {
   const films = [
-    { title: "Beautiful Boy", year: 2018, poster: "https://image.tmdb.org/t/p/w500/j5w82t5cO4b1o5V2D3V5h2c5b7K.jpg" },
-    { title: "The Perks of Being a Wallflower", year: 2012, poster: "https://image.tmdb.org/t/p/w500/a1cO4mAENiMAMWJ96i21X60bI5s.jpg" },
-    { title: "Good Will Hunting", year: 1997, poster: "https://image.tmdb.org/t/p/w500/bSqt9rhDZx1Q7UZ86dBPKdNomp2.jpg" },
-    { title: "Dil Bechara", year: 2020, poster: "https://image.tmdb.org/t/p/w500/pxzQIGiIfP8w4aF8P34N8PebXQ8.jpg" },
+    { title: "Beautiful Boy", year: 2018, poster: "https://a.ltrbxd.com/resized/film-poster/3/8/4/0/5/8/384058-beautiful-boy-0-230-0-345-crop.jpg?v=fb10cce0" },
+    { title: "The Perks of Being a Wallflower", year: 2012, poster: "https://a.ltrbxd.com/resized/film-poster/7/1/3/3/8/71338-the-perks-of-being-a-wallflower-0-230-0-345-crop.jpg?v=d2c4c804" },
+    { title: "Good Will Hunting", year: 1997, poster: "https://a.ltrbxd.com/resized/film-poster/5/1/6/2/1/51621-good-will-hunting-0-230-0-345-crop.jpg?v=f1139f66" },
+    { title: "Dil Bechara", year: 2020, poster: "https://a.ltrbxd.com/resized/film-poster/5/7/1/3/9/1/571391-dil-bechara-0-230-0-345-crop.jpg?v=bad1a4cb" },
   ];
 
   return (
