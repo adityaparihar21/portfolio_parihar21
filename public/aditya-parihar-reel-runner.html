@@ -225,10 +225,23 @@
   
   /* Memory Game CSS */
   #memory-game {
+    margin-top: 80px;
+    padding-bottom: 30px;
+    pointer-events: auto;
   }
 
   /* Sudoku Game CSS */
   #sudoku-game {
+    margin-top: 60px;
+    pointer-events: auto;
+  }
+  
+  .reveal-enter {
+    animation: slideUp3D 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+  @keyframes slideUp3D {
+    0% { transform: translateY(100px) rotateX(-20deg) scale(0.9); opacity: 0; }
+    100% { transform: translateY(0) rotateX(0deg) scale(1); opacity: 1; }
   }
 
   #scanlines{
@@ -1216,8 +1229,9 @@
             </div>
           </div>
 
-          <div class="hud-center">
+          <div class="hud-center" style="display: flex; gap: 10px; pointer-events: auto;">
             <button id="mute-btn" class="sound-btn" title="Toggle sound">SOUND: ON</button>
+            <button id="pause-btn" class="sound-btn" title="Pause Game">|| PAUSE</button>
           </div>
 
           <div class="hud-panel hud-right">
@@ -1235,6 +1249,19 @@
 
             <div class="btn-row" style="margin-top: 30px;">
               <button class="btn btn-primary" id="start-btn">Let's Go</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pause screen -->
+        <div id="pause-screen" class="screen hidden">
+          <div class="screen-card" style="text-align: center;">
+            <div class="eyebrow">Paused</div>
+            <h2 class="marquee-title" style="margin-top: 10px;">TAKE A BREATH</h2>
+            <div class="btn-row" style="margin-top: 30px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+              <button class="btn btn-primary" id="resume-btn" style="width: 200px;">Resume</button>
+              <button class="btn btn-primary" id="restart-level-btn" style="width: 200px;">Restart Level</button>
+              <button class="btn btn-primary" id="quit-btn" style="width: 200px;">Quit</button>
             </div>
           </div>
         </div>
@@ -1427,6 +1454,37 @@
     const on = Sound.toggle();
     document.getElementById("mute-btn").textContent = "SOUND: " + (on ? "ON" : "OFF");
   });
+  
+  function pauseGame() {
+    if (state !== "playing") return;
+    state = "paused";
+    document.getElementById("pause-screen").classList.remove("hidden");
+  }
+  function resumeGame() {
+    if (state !== "paused") return;
+    state = "playing";
+    document.getElementById("pause-screen").classList.add("hidden");
+  }
+  function restartLevel() {
+    if (state !== "paused" && state !== "fail") return;
+    startGame();
+  }
+  function quitGame() {
+    state = "start";
+    currentLevel = 1;
+    score = 0;
+    lives = 3;
+    Sound.stopMusic();
+    document.getElementById("pause-screen").classList.add("hidden");
+    document.getElementById("start-screen").classList.remove("hidden");
+    document.querySelectorAll(".game-view").forEach(el => el.classList.remove("active"));
+    updateHud();
+  }
+
+  document.getElementById("pause-btn").addEventListener("click", pauseGame);
+  document.getElementById("resume-btn").addEventListener("click", resumeGame);
+  document.getElementById("restart-level-btn").addEventListener("click", restartLevel);
+  document.getElementById("quit-btn").addEventListener("click", quitGame);
 
   /* =========================================================
      CANVAS + GAME SETUP
@@ -1587,7 +1645,9 @@
     document.getElementById("start-screen").classList.add("hidden");
     document.getElementById("fail-screen").classList.add("hidden");
     document.getElementById("reveal-overlay").classList.add("hidden");
+    document.getElementById("pause-screen").classList.add("hidden");
     updateHud();
+    Sound.startMusic();
   }
 
   /* =========================================================
@@ -2299,18 +2359,46 @@
   function openReveal(milestoneScore){
     state = "reveal";
     Sound.reveal();
-    Sound.stopMusic();
-
-    const overlay = document.getElementById("reveal-overlay");
-    overlay.innerHTML = "";
-    overlay.appendChild(buildCard(milestoneScore));
-    overlay.classList.remove("hidden");
+    
+    // Slight delay before reveal appears for a dramatic effect
+    setTimeout(() => {
+      const overlay = document.getElementById("reveal-overlay");
+      overlay.innerHTML = "";
+      const card = buildCard(milestoneScore);
+      card.classList.add("reveal-enter");
+      overlay.appendChild(card);
+      overlay.classList.remove("hidden");
+      
+      // Particle burst behind the ticket
+      for (let i = 0; i < 50; i++) {
+        const p = document.createElement("div");
+        p.style.position = "absolute";
+        p.style.width = "4px";
+        p.style.height = "4px";
+        p.style.background = "#e8b23d";
+        p.style.borderRadius = "50%";
+        p.style.left = "50%";
+        p.style.top = "50%";
+        p.style.zIndex = "-1";
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 50 + Math.random() * 200;
+        const tx = Math.cos(angle) * dist;
+        const ty = Math.sin(angle) * dist;
+        p.style.transition = "transform 1s cubic-bezier(0.1, 0.8, 0.3, 1), opacity 1s ease";
+        p.style.transform = `translate(0, 0)`;
+        card.appendChild(p);
+        
+        // Trigger reflow
+        void p.offsetWidth;
+        p.style.transform = `translate(${tx}px, ${ty}px) scale(0)`;
+        p.style.opacity = "0";
+      }
+    }, 500);
   }
 
   function closeReveal(){
     document.getElementById("reveal-overlay").classList.add("hidden");
     state = "playing";
-    Sound.startMusic();
   }
 
   function buildCard(m){
