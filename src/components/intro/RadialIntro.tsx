@@ -296,10 +296,6 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     );
   }
 
-  if (isMobile) {
-    return <>{children}</>;
-  }
-
   return (
     <div ref={scopeRef} className="relative w-full overflow-x-clip">
       <div ref={containerRef} className="relative w-full h-[100svh] overflow-hidden bg-[#080808]">

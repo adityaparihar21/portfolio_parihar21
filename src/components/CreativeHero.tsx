@@ -38,9 +38,9 @@ export function CreativeHero({
           OR we put it here and RadialIntro fades it in. Let's put it here and make it visible,
           but RadialIntro's timeline will control its opacity from 0 -> 0.6 -> 1. */}
 
-      <div className="absolute inset-0 creative-hero-bg z-0 will-change-[transform,opacity]">
+      <div className="absolute inset-0 creative-hero-bg z-0">
         <img
-          src="/intro bg.jpeg"
+          src="/intro%20bg.jpeg"
           alt="Cinematic background"
           className="absolute inset-0 h-full w-full object-cover object-[center_30%]"
           onLoad={onMediaReady}
