@@ -2126,7 +2126,19 @@
     const grid = document.getElementById("memory-grid");
     grid.innerHTML = '';
     
-    const images = CONFIG.films.list.map(f => f.poster).slice(0, 4);
+    const pool = [
+      "https://a.ltrbxd.com/resized/film-poster/3/8/4/0/5/8/384058-beautiful-boy-0-230-0-345-crop.jpg?v=fb10cce0",
+      "https://a.ltrbxd.com/resized/film-poster/7/1/3/3/8/71338-the-perks-of-being-a-wallflower-0-230-0-345-crop.jpg?v=d2c4c804",
+      "https://a.ltrbxd.com/resized/film-poster/5/1/6/2/1/51621-good-will-hunting-0-230-0-345-crop.jpg?v=f1139f66",
+      "https://a.ltrbxd.com/resized/film-poster/5/7/1/3/9/1/571391-dil-bechara-0-230-0-345-crop.jpg?v=bad1a4cb",
+      "https://a.ltrbxd.com/resized/film-poster/2/1/1/3/6/5/211365-interstellar-0-230-0-345-crop.jpg",
+      "https://a.ltrbxd.com/resized/film-poster/5/1/5/1/6/51516-the-dark-knight-0-230-0-345-crop.jpg",
+      "https://a.ltrbxd.com/resized/film-poster/1/3/9/3/8/13938-fight-club-0-230-0-345-crop.jpg",
+      "https://a.ltrbxd.com/resized/film-poster/4/5/7/5/5/45755-la-la-land-0-230-0-345-crop.jpg"
+    ];
+    pool.sort(() => Math.random() - 0.5);
+    const images = pool.slice(0, 4);
+    
     memoryCards = [...images, ...images].sort(() => Math.random() - 0.5);
 
     memoryCards.forEach((img, idx) => {
@@ -2182,7 +2194,7 @@
     flippedCards = [];
   }
   let sudokuGrid = [];
-  const sudokuSolution = [
+  let sudokuSolution = [
     [1, 2, 3, 4],
     [3, 4, 1, 2],
     [2, 1, 4, 3],
@@ -2191,12 +2203,35 @@
   let selectedCell = null;
 
   function startSudokuGame() {
-    sudokuGrid = [
-      [1, 0, 0, 4],
-      [0, 4, 1, 0],
-      [0, 1, 4, 0],
-      [4, 0, 0, 1]
+    // Generate random 4x4
+    let sol = [
+      [1, 2, 3, 4],
+      [3, 4, 1, 2],
+      [2, 1, 4, 3],
+      [4, 3, 2, 1]
     ];
+    
+    const nums = [1, 2, 3, 4].sort(() => Math.random() - 0.5);
+    sol = sol.map(row => row.map(val => nums[val - 1]));
+    
+    if (Math.random() > 0.5) { let t = sol[0]; sol[0] = sol[1]; sol[1] = t; }
+    if (Math.random() > 0.5) { let t = sol[2]; sol[2] = sol[3]; sol[3] = t; }
+    
+    if (Math.random() > 0.5) { sol.forEach(row => { let t = row[0]; row[0] = row[1]; row[1] = t; }); }
+    if (Math.random() > 0.5) { sol.forEach(row => { let t = row[2]; row[2] = row[3]; row[3] = t; }); }
+    
+    sudokuSolution = JSON.parse(JSON.stringify(sol));
+    sudokuGrid = JSON.parse(JSON.stringify(sol));
+
+    let removed = 0;
+    while(removed < 10) {
+      let r = Math.floor(Math.random() * 4);
+      let c = Math.floor(Math.random() * 4);
+      if (sudokuGrid[r][c] !== 0) {
+        sudokuGrid[r][c] = 0;
+        removed++;
+      }
+    }
     selectedCell = null;
     
     const gridEl = document.getElementById("sudoku-grid");
