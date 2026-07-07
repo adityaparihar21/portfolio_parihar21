@@ -471,14 +471,14 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
 
       <group ref={groupRef}>
         <mesh
-          onClick={(e) => {
-            e.stopPropagation();
-            if (!isClicked) {
-              onClick();
-            }
-          }}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (!isClicked) {
+            playHoverSound();
+            onClick();
+          }
+        }}
         onPointerOver={() => {
-          if (!hovered) playHoverSound();
           setHovered(true);
           if (!isClicked) document.body.style.cursor = "pointer";
         }}

@@ -1813,7 +1813,7 @@ export default function Index() {
         const isVideo = p.image.toLowerCase().endsWith('.mp4') || p.image.toLowerCase().endsWith('.webm');
         if (isVideo) {
           // Always preload the poster image so the grid never flashes empty
-          const poster = p.image.replace('.mp4', '_poster.jpg').replace('.webm', '_poster.jpg');
+          const poster = p.image.replace(/\.mp4$/i, '_poster.jpg').replace(/\.webm$/i, '_poster.jpg');
           assets.push(poster);
           // OOM FIX: Do NOT preload raw .mp4 videos into memory during initial load.
         } else {
