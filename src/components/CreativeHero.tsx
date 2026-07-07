@@ -27,7 +27,7 @@ export function CreativeHero({
       mediaUrl.includes("video") ||
       mediaUrl.includes("mixkit"));
   return (
-    <section className="relative h-[100svh] w-full overflow-hidden bg-[#080808]">
+    <section className="relative min-h-[100vh] h-screen w-full overflow-hidden bg-[#080808]">
       {/* Background Image is handled by RadialIntro.tsx which fades it in early. 
           But wait, the user says "Act 3: Crossfade to Hero layout content". 
           We can just have the background exist in RadialIntro.tsx and this Hero 

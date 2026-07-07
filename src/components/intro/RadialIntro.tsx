@@ -296,9 +296,14 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
     );
   }
 
+  // Disable cinematic intro on mobile to jump straight to the Hero section
+  if (isMobile) {
+    return <>{children}</>;
+  }
+
   return (
     <div ref={scopeRef} className="relative w-full overflow-x-clip">
-      <div ref={containerRef} className="relative w-full h-[100svh] overflow-hidden bg-[#080808]">
+      <section ref={containerRef} className="relative min-h-screen w-full overflow-hidden bg-[#080808]">
       
       {/* Film Grain Overlay */}
       <div 
