@@ -384,9 +384,16 @@
     background:
       radial-gradient(circle at center, rgba(18,18,28,0.88) 0%, rgba(8,8,12,0.95) 72%),
       rgba(0,0,0,0.4);
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
   }
 
-  .hidden{ display:none !important; }
+  .hidden { 
+    opacity: 0 !important; 
+    visibility: hidden !important; 
+    pointer-events: none !important;
+  }
 
   .screen-card{
     width:min(680px, 100%);
@@ -1625,6 +1632,7 @@
      UPDATE
      ========================================================= */
   function update(){
+    if (currentLevel !== 1) return;
     frame++;
     speed = 6 + Math.min(4, score / 150);
 
@@ -1761,6 +1769,7 @@
      DRAW
      ========================================================= */
   function draw(){
+    if (currentLevel !== 1) return;
     ctx.clearRect(0, 0, LOGICAL_W, LOGICAL_H);
 
     drawBackground();
