@@ -361,6 +361,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
 
   const targetScaleY = hideUI ? 0 : (isInside || isEntering) ? 1.15 : hovered ? 1.05 : 1;
   const targetAspect = isClicked ? naturalAspect : 16 / 9;
+  const renderTargetScaleX = targetScaleY * (targetAspect / (16 / 9));
   
   const scaleRef = useRef(1);
   const groupRef = useRef<THREE.Group>(null);
@@ -447,7 +448,7 @@ function VideoPanel({ project, position, interactionState, activeIdx, idx, onCli
         <ProjectMedia url={project.image} isInside={isInside} isMuted={isMuted} w={w} h={h} onUnmuteFailed={() => setIsMuted(true)} groupRef={groupRef} naturalAspect={naturalAspect} setNaturalAspect={setNaturalAspect} shouldLoadVideo={isClicked} />
       </mesh>
       {isInside && (
-        <Html position={[w/2 - 0.3 / targetScaleX, h/2 - 0.3 / targetScaleY, 0.2]} center>
+        <Html position={[w/2 - 0.3 / renderTargetScaleX, h/2 - 0.3 / targetScaleY, 0.2]} center>
           <button 
             onClick={(e) => {
               e.stopPropagation();
