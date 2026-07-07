@@ -737,9 +737,17 @@
 
   .film-grid{
     display:grid;
-    grid-template-columns:repeat(2, minmax(0,1fr));
-    gap:14px;
-    margin-top:16px;
+    grid-template-columns: repeat(4, 1fr);
+    gap:10px;
+    margin-top:20px;
+  }
+
+  .film-item{
+    width: 100%;
+    aspect-ratio: 2/3;
+    border-radius:8px;
+    overflow:hidden;
+    position:relative;
   }
 
   .film-poster{
@@ -1167,6 +1175,34 @@
     }
   }
 
+  /* Mobile specific overrides */
+  @media (max-width: 768px){
+    #start-btn {
+      display: none !important;
+    }
+    #mobile-warning {
+      display: block !important;
+      color: var(--gold);
+      font-family: "Courier New", monospace;
+      font-size: 13px;
+      margin-top: 20px;
+      line-height: 1.5;
+    }
+    
+    #stage{
+      aspect-ratio: 9 / 16;
+    }
+    .hud-panel{
+      padding:10px 12px;
+    }
+    .hud-big{ font-size:16px; }
+    
+    .film-grid{
+      grid-template-columns: repeat(2, 1fr);
+      gap:8px;
+    }
+  }
+
   /* Very small phones */
   @media (max-width: 390px){
     #stage{
@@ -1246,6 +1282,10 @@
             <div class="eyebrow">Interactive Intro / Arcade Portfolio</div>
             <h1 class="marquee-title" style="margin-top: 10px;">Wanna know about me more?</h1>
             <div class="marquee-sub" style="margin-top: 10px;">Unlock my story through a series of puzzles.</div>
+            
+            <p id="mobile-warning" style="display: none;">
+              This interactive portfolio is designed for larger screens. Please visit on a tablet or laptop to play.
+            </p>
 
             <div class="btn-row" style="margin-top: 30px;">
               <button class="btn btn-primary" id="start-btn">Let's Go</button>
@@ -1267,7 +1307,7 @@
         </div>
 
         <!-- Reveal overlay -->
-        <div id="reveal-overlay" class="screen hidden"></div>
+        <div id="reveal-overlay" class="screen hidden" style="perspective: 1000px;"></div>
 
         <!-- Game over -->
         <div id="fail-screen" class="screen hidden">
@@ -2283,6 +2323,9 @@
     const numpadEl = document.getElementById("sudoku-numpad");
     gridEl.innerHTML = '';
     numpadEl.innerHTML = '';
+    gridEl.style.background = "transparent";
+    gridEl.style.border = "2px solid rgba(232,178,61,0.3)";
+    gridEl.style.borderRadius = "8px";
 
     for (let r = 0; r < 4; r++) {
       for (let c = 0; c < 4; c++) {
@@ -2294,24 +2337,25 @@
         cell.style.justifyContent = "center";
         cell.style.fontSize = "24px";
         cell.style.fontWeight = "bold";
-        cell.style.color = "#14141c";
-        cell.style.border = "1px solid #ccc";
+        cell.style.color = "#e8b23d";
+        cell.style.border = "1px solid rgba(255,255,255,0.1)";
         cell.style.cursor = "pointer";
+        cell.style.transition = "background 0.2s";
         
-        if (c === 1) cell.style.borderRight = "2px solid #000";
-        if (r === 1) cell.style.borderBottom = "2px solid #000";
+        if (c === 1) cell.style.borderRight = "2px solid rgba(232,178,61,0.4)";
+        if (r === 1) cell.style.borderBottom = "2px solid rgba(232,178,61,0.4)";
 
         const val = sudokuGrid[r][c];
         if (val !== 0) {
           cell.textContent = val;
-          cell.style.backgroundColor = "#e0e0e0";
+          cell.style.backgroundColor = "rgba(255,255,255,0.05)";
         } else {
           cell.dataset.r = r;
           cell.dataset.c = c;
           cell.addEventListener("click", () => {
-            if (selectedCell) selectedCell.style.backgroundColor = "white";
+            if (selectedCell) selectedCell.style.backgroundColor = "transparent";
             selectedCell = cell;
-            cell.style.backgroundColor = "#e8b23d";
+            cell.style.backgroundColor = "rgba(232,178,61,0.2)";
           });
         }
         gridEl.appendChild(cell);
