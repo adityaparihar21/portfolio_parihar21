@@ -187,18 +187,54 @@
     border-radius:28px;
   }
 
-  canvas#game{
+  canvas#runner-game,
+  #math-game,
+  #memory-game,
+  #sudoku-game {
     display:block;
     width:100%;
     height:100%;
+    position: absolute;
+    inset: 0;
+  }
+  
+  canvas#runner-game {
     image-rendering:pixelated;
     background: linear-gradient(to bottom, #1a1a24 0%, #14141c 55%, #0b0b0f 100%);
+  }
+  
+  .game-view {
+    display: none;
+    z-index: 10;
+  }
+  .game-view.active {
+    display: block;
+  }
+
+  /* Math Game CSS */
+  #math-game {
+    background: var(--bg-1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+  }
+  
+  /* Memory Game CSS */
+  #memory-game {
+    background: var(--bg-2);
+  }
+
+  /* Sudoku Game CSS */
+  #sudoku-game {
+    background: var(--bg-3);
   }
 
   #scanlines{
     position:absolute;
     inset:0;
-    z-index:5;
+    z-index:15;
     pointer-events:none;
     background:
       repeating-linear-gradient(
@@ -1145,7 +1181,21 @@
   <div id="app">
     <div id="stage-shell">
       <div id="stage">
-        <canvas id="game"></canvas>
+        <canvas id="runner-game" class="game-view active"></canvas>
+        <div id="math-game" class="game-view">
+          <h2 style="font-family: 'Courier New'; margin-bottom: 20px;">MATHICS</h2>
+          <div id="math-equation" style="font-size: 32px; font-weight: bold; margin-bottom: 20px;"></div>
+          <div id="math-options" style="display: flex; gap: 10px;"></div>
+        </div>
+        <div id="memory-game" class="game-view">
+          <h2 style="font-family: 'Courier New'; margin-bottom: 20px; text-align: center; margin-top: 40px; color: white;">MEMORY MATCH</h2>
+          <div id="memory-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; max-width: 500px; margin: 0 auto;"></div>
+        </div>
+        <div id="sudoku-game" class="game-view">
+          <h2 style="font-family: 'Courier New'; margin-bottom: 20px; text-align: center; margin-top: 40px; color: white;">THE VAULT CODE</h2>
+          <div id="sudoku-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; padding: 2px; background: white; max-width: 300px; margin: 0 auto;"></div>
+          <div id="sudoku-numpad" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; max-width: 300px; margin: 20px auto;"></div>
+        </div>
         <div id="scanlines"></div>
         <div id="vignette"></div>
 
@@ -1398,7 +1448,7 @@
   /* =========================================================
      CANVAS + GAME SETUP
      ========================================================= */
-  const canvas = document.getElementById("game");
+  const canvas = document.getElementById("runner-game");
   const ctx = canvas.getContext("2d");
   const stage = document.getElementById("stage");
 
@@ -1423,6 +1473,7 @@
   const JUMP_V = -15.5;
 
   let state = "start"; // start | playing | reveal | fail
+  let currentLevel = 1;
   let score = 0;
   let lives = 3;
   let speed = 6;
@@ -1508,26 +1559,52 @@
     speed = 6;
     frame = 0;
     spawnTimer = 0;
-    shownMilestones = new Set();
     obstacles = [];
     coins = [];
     popups = [];
     particles = [];
 
-    player.y = GROUND_Y - player.h;
-    player.vy = 0;
-    player.onGround = true;
-    player.invuln = 0;
-    player.holdingJump = false;
-    player.squash = 1;
+    document.querySelectorAll(".game-view").forEach(el => el.classList.remove("active"));
+
+    if(currentLevel === 1) {
+      document.getElementById("runner-game").classList.add("active");
+      shownMilestones = new Set();
+      player.y = GROUND_Y - player.h;
+      player.vy = 0;
+      player.onGround = true;
+      player.invuln = 0;
+      player.holdingJump = false;
+      player.squash = 1;
+      state = "playing";
+      Sound.startMusic();
+    } else if (currentLevel === 2) {
+      document.getElementById("math-game").classList.add("active");
+      state = "playing";
+      startMathGame();
+    } else if (currentLevel === 3) {
+      document.getElementById("memory-game").classList.add("active");
+      state = "playing";
+      startMemoryGame();
+    } else if (currentLevel === 4) {
+      document.getElementById("sudoku-game").classList.add("active");
+      state = "playing";
+      startSudokuGame();
+    } else if (currentLevel === 5) {
+      // Intermission
+      shownMilestones.add(180);
+      openReveal(180);
+      return;
+    } else if (currentLevel === 6) {
+      // End
+      shownMilestones.add(200);
+      openReveal(200);
+      return;
+    }
 
     document.getElementById("start-screen").classList.add("hidden");
     document.getElementById("fail-screen").classList.add("hidden");
     document.getElementById("reveal-overlay").classList.add("hidden");
-
     updateHud();
-    state = "playing";
-    Sound.startMusic();
   }
 
   /* =========================================================
@@ -1669,12 +1746,9 @@
   }
 
   function checkMilestones(){
-    for(const m of MILESTONES){
-      if(score >= m && !shownMilestones.has(m)){
-        shownMilestones.add(m);
-        openReveal(m);
-        break;
-      }
+    if(currentLevel === 1 && score >= 40 && !shownMilestones.has(40)){
+      shownMilestones.add(40);
+      openReveal(40);
     }
   }
 
@@ -1978,6 +2052,227 @@
     document.getElementById("fail-screen").classList.remove("hidden");
   }
 
+  function completeLevel(milestone) {
+    shownMilestones.add(milestone);
+    openReveal(milestone);
+  }
+
+  let mathLevel = 0;
+
+  function startMathGame() {
+    mathLevel = 0;
+    generateMathProblem();
+  }
+
+  function generateMathProblem() {
+    const ops = ['+', '-', '*'];
+    const op = ops[Math.floor(Math.random() * (mathLevel < 2 ? 2 : 3))]; 
+    let a, b, answer;
+    if (op === '+') {
+      a = Math.floor(Math.random() * 50) + 10;
+      b = Math.floor(Math.random() * 50) + 10;
+      answer = a + b;
+    } else if (op === '-') {
+      a = Math.floor(Math.random() * 50) + 30;
+      b = Math.floor(Math.random() * (a - 10)) + 5;
+      answer = a - b;
+    } else {
+      a = Math.floor(Math.random() * 10) + 2;
+      b = Math.floor(Math.random() * 10) + 2;
+      answer = a * b;
+    }
+
+    document.getElementById("math-equation").textContent = `${a} ${op} ${b} = ?`;
+
+    const optionsContainer = document.getElementById("math-options");
+    optionsContainer.innerHTML = '';
+    
+    const options = [answer];
+    while(options.length < 4) {
+      const wrong = answer + (Math.floor(Math.random() * 20) - 10);
+      if (wrong !== answer && !options.includes(wrong) && wrong > 0) {
+        options.push(wrong);
+      }
+    }
+    options.sort(() => Math.random() - 0.5);
+
+    options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.className = "btn btn-primary";
+      btn.textContent = opt;
+      btn.addEventListener("click", () => {
+        if (opt === answer) {
+          Sound.coin();
+          mathLevel++;
+          if (mathLevel >= 3) {
+            completeLevel(80);
+          } else {
+            generateMathProblem();
+          }
+        } else {
+          Sound.hit();
+        }
+      });
+      optionsContainer.appendChild(btn);
+    });
+  }
+  let memoryCards = [];
+  let flippedCards = [];
+  let matchedPairs = 0;
+
+  function startMemoryGame() {
+    matchedPairs = 0;
+    flippedCards = [];
+    const grid = document.getElementById("memory-grid");
+    grid.innerHTML = '';
+    
+    const images = CONFIG.films.list.map(f => f.poster).slice(0, 4);
+    memoryCards = [...images, ...images].sort(() => Math.random() - 0.5);
+
+    memoryCards.forEach((img, idx) => {
+      const card = document.createElement("div");
+      card.style.width = "100%";
+      card.style.aspectRatio = "2/3";
+      card.style.backgroundColor = "#2d2d3b";
+      card.style.borderRadius = "8px";
+      card.style.cursor = "pointer";
+      card.style.backgroundSize = "cover";
+      card.style.backgroundPosition = "center";
+      card.style.border = "2px solid #e8b23d";
+      card.dataset.idx = idx;
+      card.dataset.img = img;
+      
+      card.addEventListener("click", () => flipCard(card));
+      grid.appendChild(card);
+    });
+  }
+
+  function flipCard(card) {
+    if (flippedCards.length >= 2 || card.dataset.flipped === "true" || card.dataset.matched === "true") return;
+    
+    Sound.step();
+    card.style.backgroundImage = `url('${card.dataset.img}')`;
+    card.dataset.flipped = "true";
+    flippedCards.push(card);
+
+    if (flippedCards.length === 2) {
+      setTimeout(checkMatch, 800);
+    }
+  }
+
+  function checkMatch() {
+    const [c1, c2] = flippedCards;
+    if (c1.dataset.img === c2.dataset.img) {
+      c1.dataset.matched = "true";
+      c2.dataset.matched = "true";
+      c1.style.opacity = "0.5";
+      c2.style.opacity = "0.5";
+      Sound.coin();
+      matchedPairs++;
+      if (matchedPairs === 4) {
+        completeLevel(120);
+      }
+    } else {
+      c1.style.backgroundImage = "none";
+      c2.style.backgroundImage = "none";
+      c1.dataset.flipped = "false";
+      c2.dataset.flipped = "false";
+      Sound.hit();
+    }
+    flippedCards = [];
+  }
+  let sudokuGrid = [];
+  const sudokuSolution = [
+    [1, 2, 3, 4],
+    [3, 4, 1, 2],
+    [2, 1, 4, 3],
+    [4, 3, 2, 1]
+  ];
+  let selectedCell = null;
+
+  function startSudokuGame() {
+    sudokuGrid = [
+      [1, 0, 0, 4],
+      [0, 4, 1, 0],
+      [0, 1, 4, 0],
+      [4, 0, 0, 1]
+    ];
+    selectedCell = null;
+    
+    const gridEl = document.getElementById("sudoku-grid");
+    const numpadEl = document.getElementById("sudoku-numpad");
+    gridEl.innerHTML = '';
+    numpadEl.innerHTML = '';
+
+    for (let r = 0; r < 4; r++) {
+      for (let c = 0; c < 4; c++) {
+        const cell = document.createElement("div");
+        cell.style.width = "100%";
+        cell.style.aspectRatio = "1/1";
+        cell.style.display = "flex";
+        cell.style.alignItems = "center";
+        cell.style.justifyContent = "center";
+        cell.style.fontSize = "24px";
+        cell.style.fontWeight = "bold";
+        cell.style.color = "#14141c";
+        cell.style.border = "1px solid #ccc";
+        cell.style.cursor = "pointer";
+        
+        if (c === 1) cell.style.borderRight = "2px solid #000";
+        if (r === 1) cell.style.borderBottom = "2px solid #000";
+
+        const val = sudokuGrid[r][c];
+        if (val !== 0) {
+          cell.textContent = val;
+          cell.style.backgroundColor = "#e0e0e0";
+        } else {
+          cell.dataset.r = r;
+          cell.dataset.c = c;
+          cell.addEventListener("click", () => {
+            if (selectedCell) selectedCell.style.backgroundColor = "white";
+            selectedCell = cell;
+            cell.style.backgroundColor = "#e8b23d";
+          });
+        }
+        gridEl.appendChild(cell);
+      }
+    }
+
+    for (let i = 1; i <= 4; i++) {
+      const btn = document.createElement("button");
+      btn.className = "btn btn-primary";
+      btn.textContent = i;
+      btn.addEventListener("click", () => {
+        if (selectedCell) {
+          selectedCell.textContent = i;
+          const r = parseInt(selectedCell.dataset.r);
+          const c = parseInt(selectedCell.dataset.c);
+          sudokuGrid[r][c] = i;
+          Sound.step();
+          checkSudoku();
+        }
+      });
+      numpadEl.appendChild(btn);
+    }
+  }
+
+  function checkSudoku() {
+    let complete = true;
+    let correct = true;
+    for (let r = 0; r < 4; r++) {
+      for (let c = 0; c < 4; c++) {
+        if (sudokuGrid[r][c] === 0) complete = false;
+        if (sudokuGrid[r][c] !== 0 && sudokuGrid[r][c] !== sudokuSolution[r][c]) correct = false;
+      }
+    }
+    if (complete && correct) {
+      Sound.reveal();
+      completeLevel(160);
+    } else if (complete && !correct) {
+      Sound.hit();
+    }
+  }
+
   /* =========================================================
      REVEAL CARDS
      ========================================================= */
@@ -2120,6 +2415,7 @@
       restartBtn.style.flex = "1 1 100%";
       restartBtn.textContent = "Play Again";
       restartBtn.addEventListener("click", ()=>{
+        currentLevel = 1;
         closeReveal();
         startGame();
       });
@@ -2129,7 +2425,11 @@
       const btn = document.createElement("button");
       btn.className = "btn btn-primary";
       btn.textContent = "Continue";
-      btn.addEventListener("click", closeReveal);
+      btn.addEventListener("click", () => {
+        currentLevel++;
+        closeReveal();
+        if(currentLevel <= 6) startGame();
+      });
       actions.appendChild(btn);
     }
 
