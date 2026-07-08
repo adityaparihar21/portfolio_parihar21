@@ -1234,6 +1234,21 @@
       gap:8px;
     }
   }
+
+  /* Desktop and Mobile display helpers */
+  @media (min-width: 769px) {
+    .mobile-only {
+      display: none !important;
+    }
+  }
+  @media (max-width: 768px) {
+    .desktop-only {
+      display: none !important;
+    }
+    .mobile-only {
+      display: block !important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -1284,16 +1299,20 @@
         <!-- Start screen -->
         <div id="start-screen" class="screen">
           <div class="screen-card" style="text-align: center;">
-            <div class="eyebrow">Interactive Intro / Arcade Portfolio</div>
-            <h1 class="marquee-title" style="margin-top: 10px;">Wanna know about me more?</h1>
-            <div class="marquee-sub" style="margin-top: 10px;">Unlock my story through a series of puzzles.</div>
-            
-            <p id="mobile-warning" style="display: none;">
-              This interactive portfolio is designed for larger screens. Please visit on a tablet or laptop to play.
-            </p>
+            <div class="desktop-only">
+              <div class="eyebrow">Interactive Intro / Arcade Portfolio</div>
+              <h1 class="marquee-title" style="margin-top: 10px;">Wanna know about me more?</h1>
+              <div class="marquee-sub" style="margin-top: 10px;">Unlock my story through a series of puzzles.</div>
+              <div class="btn-row" style="margin-top: 30px;">
+                <button class="btn btn-primary" id="start-btn">Let's Go</button>
+              </div>
+            </div>
 
-            <div class="btn-row" style="margin-top: 30px;">
-              <button class="btn btn-primary" id="start-btn">Let's Go</button>
+            <div class="mobile-only" style="display: none;">
+              <h1 class="marquee-title" style="font-size: clamp(24px, 6vw, 32px); margin-bottom: 12px; line-height: 1.1;">Introduction Game</h1>
+              <p style="font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 1px; color: var(--gold-soft); opacity: 0.8; line-height: 1.6; text-transform: uppercase;">
+                (Only for big screens or laptops.<br>Not designed for the current device<br>on which you are watching the site)
+              </p>
             </div>
           </div>
         </div>
