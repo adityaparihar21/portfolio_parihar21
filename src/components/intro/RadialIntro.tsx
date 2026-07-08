@@ -454,7 +454,7 @@ export function RadialIntroSequence({ children }: { children: React.ReactNode })
         </div>
       </div>
       )}
-    </div>
+    </section>
     </div>
   );
 }
