@@ -2080,12 +2080,7 @@ export default function Index() {
                 onMediaReady={() => setMediaReady(true)}
               />
             </RadialIntroSequence>
-            <SelectedWork 
-              data={data} 
-              activeAudioId={activeAudioId}
-              setActiveAudioId={setActiveAudioId}
-              onOpenProject={setSelectedProject} 
-            />
+
             <CreativeWork
               data={data}
               activeAudioId={activeAudioId}
