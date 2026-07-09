@@ -2241,7 +2241,7 @@
       "https://a.ltrbxd.com/resized/film-poster/3/8/4/0/5/8/384058-beautiful-boy-0-230-0-345-crop.jpg?v=fb10cce0",
       "https://a.ltrbxd.com/resized/film-poster/7/1/3/3/8/71338-the-perks-of-being-a-wallflower-0-230-0-345-crop.jpg?v=d2c4c804",
       "https://a.ltrbxd.com/resized/film-poster/5/1/6/2/1/51621-good-will-hunting-0-230-0-345-crop.jpg?v=f1139f66",
-      "https://a.ltrbxd.com/resized/film-poster/5/7/1/3/9/1/571391-dil-bechara-0-230-0-345-crop.jpg?v=bad1a4cb",
+      "https://a.ltrbxd.com/resized/film-poster/5/7/1/3/9/1/571391-dil-bechara-0-230-0-345-crop.jpg",
       "https://a.ltrbxd.com/resized/film-poster/2/1/1/3/6/5/211365-interstellar-0-230-0-345-crop.jpg",
       "https://a.ltrbxd.com/resized/film-poster/5/1/5/1/6/51516-the-dark-knight-0-230-0-345-crop.jpg",
       "https://a.ltrbxd.com/resized/film-poster/1/3/9/3/8/13938-fight-club-0-230-0-345-crop.jpg",
@@ -2384,9 +2384,23 @@
           cell.dataset.r = r;
           cell.dataset.c = c;
           cell.addEventListener("click", () => {
-            if (selectedCell) selectedCell.style.backgroundColor = "transparent";
+            if (selectedCell) {
+              const pr = parseInt(selectedCell.dataset.r);
+              const pc = parseInt(selectedCell.dataset.c);
+              const pval = sudokuGrid[pr][pc];
+              if (pval === 0) {
+                selectedCell.style.backgroundColor = "transparent";
+                selectedCell.style.color = "#e8b23d";
+              } else if (pval === sudokuSolution[pr][pc]) {
+                selectedCell.style.backgroundColor = "rgba(42, 157, 143, 0.4)";
+                selectedCell.style.color = "#fff";
+              } else {
+                selectedCell.style.backgroundColor = "rgba(179, 18, 46, 0.5)";
+                selectedCell.style.color = "#fff";
+              }
+            }
             selectedCell = cell;
-            cell.style.backgroundColor = "rgba(232,178,61,0.2)";
+            cell.style.backgroundColor = "rgba(232,178,61,0.4)";
           });
         }
         gridEl.appendChild(cell);
@@ -2403,6 +2417,16 @@
           const r = parseInt(selectedCell.dataset.r);
           const c = parseInt(selectedCell.dataset.c);
           sudokuGrid[r][c] = i;
+          
+          if (i === sudokuSolution[r][c]) {
+            selectedCell.style.backgroundColor = "rgba(42, 157, 143, 0.4)";
+            selectedCell.style.color = "#fff";
+          } else {
+            selectedCell.style.backgroundColor = "rgba(179, 18, 46, 0.5)";
+            selectedCell.style.color = "#fff";
+          }
+          
+          selectedCell = null;
           Sound.step();
           checkSudoku();
         }
