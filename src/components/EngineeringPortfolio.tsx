@@ -99,7 +99,7 @@ const getExtendedProject = (
   };
 };
 
-export function EngineeringPortfolio({ data, onSwitchToCreative }: { data: ReturnType<typeof useContent>, onSwitchToCreative?: () => void }) {
+export function EngineeringPortfolio({ data, onSwitchToCreative, onOpenProject }: { data: ReturnType<typeof useContent>, onSwitchToCreative?: () => void, onOpenProject?: (p: any) => void }) {
   const [activeFilter, setActiveFilter] = useState("ALL");
   const [typedText, setTypedText] = useState("");
   const [showCursor, setShowCursor] = useState(true);
@@ -287,9 +287,19 @@ export function EngineeringPortfolio({ data, onSwitchToCreative }: { data: Retur
       <section id="work" className="w-full px-6 md:px-12 pb-[clamp(4rem,10vw,8rem)]">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-l border-t border-[rgba(100,150,210,0.08)]">
           {filteredProjects.map((p, idx) => (
-            <div
-              key={p.id}
-              onClick={() => setSelectedProject(p)}
+            <button
+                  key={p.id}
+                  onClick={(e) => {
+                    if (onOpenProject && (p.role || (p as any).problem)) {
+                      e.preventDefault();
+                      onOpenProject(p);
+                    } else if (onOpenProject) {
+                      e.preventDefault();
+                      window.open(p.href, "_blank");
+                    } else {
+                      setSelectedProject(p);
+                    }
+                  }}
               className="group relative p-6 border-r border-b border-[rgba(100,150,210,0.08)] bg-[#070b12] cursor-crosshair transition-all duration-200 hover:bg-[rgba(55,100,180,0.06)] hover:border-[rgba(100,150,210,0.3)] flex flex-col justify-between min-h-[400px] overflow-hidden"
             >
               {/* Background Image Overlay */}
@@ -353,7 +363,7 @@ export function EngineeringPortfolio({ data, onSwitchToCreative }: { data: Retur
                   {p.status}
                 </span>
               </div>
-            </div>
+            </button>
           ))}
         </div>
 

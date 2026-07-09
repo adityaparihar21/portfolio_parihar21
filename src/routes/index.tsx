@@ -43,6 +43,7 @@ import {
 
 import { siteData } from "@/lib/site-data";
 import { useContent } from "@/lib/use-content";
+import { ProjectDrawer, type DrawerProject } from "@/components/ProjectDrawer";
 import { domeGalleryImages } from "@/lib/domeGalleryImages";
 
 export const Route = createFileRoute("/")({
@@ -866,9 +867,9 @@ function SelectedWork({
   activeAudioId,
   setActiveAudioId,
 }: {
-  data: ReturnType<typeof useContent>;
   activeAudioId: string | null;
   setActiveAudioId: (id: string | null) => void;
+  onOpenProject: (p: any) => void;
 }) {
   const { eyebrow, title, projects, viewAll } = data.selectedWork;
   return (
@@ -893,14 +894,19 @@ function SelectedWork({
 
         <div className="flex flex-col gap-20 md:gap-28">
           {projects.map((p, i) => (
-            <motion.a
+            <motion.button
               key={p.id}
-              href={p.href}
+              onClick={(e) => {
+                if (p.role || p.problem) {
+                  e.preventDefault();
+                  onOpenProject(p);
+                }
+              }}
               initial={{ opacity: 0, y: 80 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-120px" }}
               transition={{ duration: 1.1, ease: EASE_OUT_EXPO }}
-              className={`group grid items-center gap-8 md:grid-cols-12 md:gap-12 ${
+              className={`group grid w-full text-left items-center gap-8 md:grid-cols-12 md:gap-12 ${
                 i % 2 === 1 ? "md:[&>div:first-child]:order-2" : ""
               }`}
             >
@@ -943,7 +949,7 @@ function SelectedWork({
                   View Project <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.5} />
                 </span>
               </motion.div>
-            </motion.a>
+            </motion.button>
           ))}
         </div>
 
@@ -973,12 +979,14 @@ function CreativeCard({
   total,
   activeAudioId,
   setActiveAudioId,
+  onOpenProject,
 }: {
   p: any;
   i: number;
   total: number;
   activeAudioId: string | null;
   setActiveAudioId: (id: string | null) => void;
+  onOpenProject: (p: any) => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -992,15 +1000,23 @@ function CreativeCard({
 
   return (
     <div ref={containerRef} className="h-[120vh] w-full relative flex justify-center">
-      <motion.a
-        href={p.href}
+      <motion.button
+        onClick={(e) => {
+          if (p.role || p.problem) {
+            e.preventDefault();
+            onOpenProject(p);
+          } else {
+            window.open(p.href, "_blank");
+          }
+        }}
         style={{ 
           scale, 
           filter,
           transformOrigin: "top center",
-          top: `calc(8vh + ${i * 16}px)` 
+          top: `calc(8vh + ${i * 16}px)`,
+          willChange: "transform, filter"
         }}
-        className="sticky w-[90%] max-w-5xl h-[65vh] flex flex-col md:flex-row items-center gap-6 md:gap-10 bg-zinc-900/90 dark:bg-zinc-900/90 backdrop-blur-3xl rounded-[32px] overflow-hidden border border-white/10 shadow-[0_-15px_40px_rgba(0,0,0,0.4)] p-6 md:p-10 group"
+        className="sticky w-[90%] max-w-5xl h-[65vh] flex flex-col md:flex-row items-center gap-6 md:gap-10 bg-zinc-900 dark:bg-zinc-900 rounded-[32px] overflow-hidden border border-white/10 shadow-2xl p-6 md:p-10 group text-left cursor-pointer"
       >
         <div className={`w-full md:w-[60%] h-[40vh] md:h-full overflow-hidden rounded-2xl bg-black ${i % 2 === 1 ? "md:order-2" : ""}`}>
           <div className="relative w-full h-full">
@@ -1036,7 +1052,7 @@ function CreativeCard({
             View Edit <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.5} />
           </span>
         </div>
-      </motion.a>
+      </motion.button>
     </div>
   );
 }
@@ -1045,10 +1061,12 @@ function CreativeWork({
   data,
   activeAudioId,
   setActiveAudioId,
+  onOpenProject,
 }: {
   data: ReturnType<typeof useContent>;
   activeAudioId: string | null;
   setActiveAudioId: (id: string | null) => void;
+  onOpenProject: (p: any) => void;
 }) {
   const { eyebrow, title, projects } = data.creativeWork;
   const [isMobile, setIsMobile] = useState(false);
@@ -1095,11 +1113,12 @@ function CreativeWork({
               total={projects.length}
               activeAudioId={activeAudioId}
               setActiveAudioId={setActiveAudioId}
+              onOpenProject={onOpenProject}
             />
           ))}
         </div>
       ) : (
-        <MinorityReportGrid projects={projects} />
+        <MinorityReportGrid projects={projects} onOpenProject={onOpenProject} />
       )}
     </div>
   );
@@ -1110,10 +1129,12 @@ function UPESWork({
   data,
   activeAudioId,
   setActiveAudioId,
+  onOpenProject,
 }: {
   data: ReturnType<typeof useContent>;
   activeAudioId: string | null;
   setActiveAudioId: (id: string | null) => void;
+  onOpenProject: (p: any) => void;
 }) {
   const { eyebrow, title, projects } = data.upesWork;
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -1194,16 +1215,14 @@ function UPESWork({
                 .map((p) => {
                   const isReel = p.href.includes("reel");
                   return (
-                    <motion.a
+                    <motion.button
                       key={p.id}
-                      href={p.href}
-                      target="_blank"
-                      rel="noreferrer"
+                      onClick={() => onOpenProject(p)}
                       initial={{ opacity: 0, y: 35 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, margin: "-120px" }}
                       transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
-                      className="group flex flex-col justify-between gap-3 bg-card/25 border border-border/40 p-4 rounded-xl hover:border-primary/40 transition-all duration-300 flex-1 min-h-0"
+                      className="group flex flex-col justify-between text-left gap-3 bg-card/25 border border-border/40 p-4 rounded-xl hover:border-primary/40 transition-all duration-300 flex-1 min-h-0"
                     >
                       <div className="overflow-hidden bg-black rounded-lg w-full relative aspect-[16/10]">
                         <ProjectMedia
@@ -1229,7 +1248,7 @@ function UPESWork({
                           <ArrowRight className="h-3 w-3" strokeWidth={1.5} />
                         </span>
                       </div>
-                    </motion.a>
+                    </motion.button>
                   );
                 })}
             </div>
@@ -1241,16 +1260,14 @@ function UPESWork({
             .map((p) => {
               const isReel = p.href.includes("reel");
               return (
-                <motion.a
+                <motion.button
                   key={p.id}
-                  href={p.href}
-                  target="_blank"
-                  rel="noreferrer"
+                  onClick={() => onOpenProject(p)}
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-120px" }}
                   transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
-                  className="group flex flex-col gap-4 bg-card/25 border border-border/40 p-4 rounded-xl hover:border-primary/40 transition-all duration-300 shrink-0 snap-start w-[85vw] sm:w-[55vw] md:w-[40vw] lg:w-[28vw]"
+                  className="group flex flex-col text-left gap-4 bg-card/25 border border-border/40 p-4 rounded-xl hover:border-primary/40 transition-all duration-300 shrink-0 snap-start w-[85vw] sm:w-[55vw] md:w-[40vw] lg:w-[28vw]"
                 >
                   <div className="overflow-hidden bg-black rounded-lg w-full relative aspect-[9/16]">
                     <ProjectMedia
@@ -1276,7 +1293,7 @@ function UPESWork({
                       <ArrowRight className="h-3 w-3" strokeWidth={1.5} />
                     </span>
                   </div>
-                </motion.a>
+                </motion.button>
               );
             })}
         </div>
@@ -1492,6 +1509,16 @@ function Testimonial({ data }: { data: ReturnType<typeof useContent> }) {
         >
           — {author}
         </motion.p>
+        
+        {/* Global UI Overlays */}
+        <CustomCursor isMobile={isMobile} />
+        
+        {/* Project Drawer Overlay */}
+        <ProjectDrawer 
+          project={selectedProject} 
+          isOpen={!!selectedProject} 
+          onClose={() => setSelectedProject(null)} 
+        />
       </motion.div>
     </section>
   );
@@ -1840,6 +1867,7 @@ export default function Index() {
 
   const [themeMode, setThemeMode] = useState<"select" | "creative" | "engineering">("select");
   const [hoverMode, setHoverMode] = useState<"none" | "creative" | "engineering">("none");
+  const [selectedProject, setSelectedProject] = useState<DrawerProject | null>(null);
 
   // Hydration-safe localStorage check
   useEffect(() => {
@@ -2040,7 +2068,7 @@ export default function Index() {
         animate={{
           opacity: isLoading ? 0 : 1,
           scale: isLoading ? 0.92 : 1,
-          filter: isLoading ? "blur(8px)" : "blur(0px)",
+          filter: isLoading ? "blur(8px)" : "none",
         }}
         transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
       >
@@ -2050,8 +2078,6 @@ export default function Index() {
           themeMode={themeMode}
           setThemeMode={setThemeMode}
         />
-
-        {/* NEW: Vision Intro Sequence */}
 
         {/* CONDITIONAL RENDER: CREATIVE PATH */}
         {themeMode === "creative" && (
@@ -2064,15 +2090,23 @@ export default function Index() {
                 onMediaReady={() => setMediaReady(true)}
               />
             </RadialIntroSequence>
+            <SelectedWork 
+              data={data} 
+              activeAudioId={activeAudioId}
+              setActiveAudioId={setActiveAudioId}
+              onOpenProject={setSelectedProject} 
+            />
             <CreativeWork
               data={data}
               activeAudioId={activeAudioId}
               setActiveAudioId={setActiveAudioId}
+              onOpenProject={setSelectedProject}
             />
             <UPESWork
               data={data}
               activeAudioId={activeAudioId}
               setActiveAudioId={setActiveAudioId}
+              onOpenProject={setSelectedProject}
             />
             <WorkedWith
               data={data}
@@ -2114,7 +2148,7 @@ export default function Index() {
         {/* CONDITIONAL RENDER: SYSTEMS ENGINEER PATH */}
         {themeMode === "engineering" && (
           <div className="relative z-10 w-full bg-[#050810] transition-opacity duration-1000">
-            <EngineeringPortfolio data={data} onSwitchToCreative={() => handleChoice("creative")} />
+            <EngineeringPortfolio data={data} onSwitchToCreative={() => setThemeMode("creative")} onOpenProject={setSelectedProject} />
           </div>
         )}
 

@@ -55,7 +55,16 @@
         "description": "AI language for faster insights and zero chaos.",
         "image": "/lingo.png",
         "href": "https://lingooo-one.vercel.app",
-        "repo": "https://github.com/adityaparihar21/day3-advanced-css"
+        "repo": "https://github.com/adityaparihar21/day3-advanced-css",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       },
       {
         "id": "portfolio",
@@ -64,7 +73,16 @@
         "description": "A premium web experience built entirely from scratch — not a template in sight.",
         "image": "/intro bg.jpeg",
         "href": "https://portfolioparihar21.vercel.app/",
-        "repo": "https://github.com/adityaparihar21/portfolio_parihar21"
+        "repo": "https://github.com/adityaparihar21/portfolio_parihar21",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       },
       {
         "id": "ctj",
@@ -73,7 +91,16 @@
         "description": "A digital journaling space inspired by vintage typewriters, analog poetry, and shared silence.",
         "image": "/ctj21.jpg",
         "href": "https://ctj21.vercel.app",
-        "repo": "https://github.com/adityaparihar21/ctj21"
+        "repo": "https://github.com/adityaparihar21/ctj21",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       },
       {
         "id": "ascii-engine",
@@ -82,7 +109,16 @@
         "description": "Live webcam feed converted to ASCII art in real-time — 30fps, pure Java.",
         "image": "/asciii.jpg",
         "href": "#",
-        "repo": "https://github.com/adityaparihar21/ascii-webcam"
+        "repo": "https://github.com/adityaparihar21/ascii-webcam",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       },
       {
         "id": "trip-co",
@@ -91,7 +127,16 @@
         "description": "Input your travel preferences. Get a full itinerary in ~2 seconds.",
         "image": "/tripco.png",
         "href": "https://tripco-puce.vercel.app",
-        "repo": "https://github.com/adityaparihar21/tripco"
+        "repo": "https://github.com/adityaparihar21/tripco",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       },
       {
         "id": "weather-hut",
@@ -100,7 +145,16 @@
         "description": "Weather, but actually beautiful to look at.",
         "image": "/weather-hut.png",
         "href": "https://weatherhut-zeta.vercel.app",
-        "repo": "https://github.com/adityaparihar21/weatherhut"
+        "repo": "https://github.com/adityaparihar21/weatherhut",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       }
     ]
   },
@@ -114,7 +168,16 @@
         "title": "Blackedout",
         "description": "A dynamic and creative visual edit.",
         "image": "/blackedout.mp4",
-        "href": "#"
+        "href": "#",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       },
       {
         "id": "ezdeekid",
@@ -122,7 +185,16 @@
         "title": "Ezdeekid",
         "description": "A high-energy creative video project.",
         "image": "/ezdeekid.mp4",
-        "href": "#"
+        "href": "#",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       },
       {
         "id": "himym-intro",
@@ -130,7 +202,16 @@
         "title": "HIMYM Intro",
         "description": "A creative edit inspired by the How I Met Your Mother intro.",
         "image": "/himymintro.mp4",
-        "href": "#"
+        "href": "#",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       },
       {
         "id": "ig-reel-collab-new",
@@ -138,7 +219,16 @@
         "title": "Artist Reveal Collab",
         "description": "A creative video edit recently featured on Instagram.",
         "image": "/artist revealdate.mp4",
-        "href": "https://www.instagram.com/p/DHbL85JSo2i/"
+        "href": "https://www.instagram.com/p/DHbL85JSo2i/",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       },
       {
         "id": "upes-branding",
@@ -146,7 +236,16 @@
         "title": "UPES fresher video2025",
         "description": "A dynamic  student experience edit showcasing the lifestyle and fun at UPES.",
         "image": "/fresherupes.mp4",
-        "href": "#"
+        "href": "#",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       },
       {
         "id": "dark-cinematic",
@@ -154,7 +253,16 @@
         "title": "Dark Cinematic",
         "description": "An atmospheric visual narrative with a focus on rhythm, vintage aesthetics, and meticulous color grading.",
         "image": "/DARK.mp4",
-        "href": "#"
+        "href": "#",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       },
       {
         "id": "birthday-video",
@@ -162,7 +270,16 @@
         "title": "for myself",
         "description": "A creative personal birthday video edit.",
         "image": "/birthday.mp4",
-        "href": "#"
+        "href": "#",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       },
       {
         "id": "year-2025",
@@ -170,7 +287,16 @@
         "title": "Year 2025",
         "description": "A nostalgic video compilation of memories from the year 2025.",
         "image": "/year2025.mp4",
-        "href": "#"
+        "href": "#",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       },
       {
         "id": "life-at-upes-collab",
@@ -178,7 +304,16 @@
         "title": "@life_at_upes Collab",
         "description": "My first-year collaboration video with the official UPES Instagram page (@life_at_upes), which helped me connect with many talented people at my college.",
         "image": "/life_at_upes.MP4",
-        "href": "https://www.instagram.com/life_at_upes/"
+        "href": "https://www.instagram.com/life_at_upes/",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       },
       {
         "id": "saharsh-style",
@@ -186,7 +321,16 @@
         "title": "Saharsh Style Edit",
         "description": "A cinematic video edit set to audio by Saharsh (a well-known cinematographer), who appreciated, shared, and commented on the work on his socials.",
         "image": "/saharshstyle.mp4",
-        "href": "#"
+        "href": "#",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       },
       {
         "id": "chakrata-day-trip",
@@ -194,7 +338,16 @@
         "title": "Chakrata Day Trip",
         "description": "Creative vlog of the trip - CHAKRATA DAY TRIP <span class=\"font-serif italic\">'with da boys'</span>",
         "image": "/chakrata.mp4",
-        "href": "https://www.instagram.com/reel/DZR8lnFvI5t/"
+        "href": "https://www.instagram.com/reel/DZR8lnFvI5t/",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       },
       {
         "id": "para-in-doon",
@@ -202,7 +355,16 @@
         "title": "PARA IN DOON",
         "description": "A high-energy, cinematic reel covering Paradox's electrifying performance live at the Mall of Dehradun.",
         "image": "/mall_of_dehradun_paradox.mp4",
-        "href": "#"
+        "href": "#",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       }
     ]
   },
@@ -216,7 +378,16 @@
         "title": "Artist Reveal Collab",
         "description": "A creative video edit recently featured on Instagram.",
         "image": "/artist revealdate.mp4",
-        "href": "https://www.instagram.com/p/DHbL85JSo2i/"
+        "href": "https://www.instagram.com/p/DHbL85JSo2i/",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       },
       {
         "id": "upes-branding-2",
@@ -224,7 +395,16 @@
         "title": "UPES fresher video2025",
         "description": "A dynamic student experience edit showcasing the lifestyle and fun at UPES.",
         "image": "/fresherupes.mp4",
-        "href": "#"
+        "href": "#",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       },
       {
         "id": "upes-reel-1",
@@ -232,7 +412,16 @@
         "title": "Javed Ali Reveal",
         "description": "The voice that melts hearts..... The legend himself, Javed Ali is coming to set the stage on fire at UURJA’25! Realme Music Studio brings the magic, powered by Realme P3 Ultra 5G.",
         "image": "/upes_reel1.mp4",
-        "href": "https://www.instagram.com/reel/DIbvZw6yMhg/"
+        "href": "https://www.instagram.com/reel/DIbvZw6yMhg/",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       },
       {
         "id": "upes-reel-2",
@@ -240,7 +429,16 @@
         "title": "DJ Aerro Reveal",
         "description": "The bass is about to hit, and the energy is about to explode! DJ Aerro is here to set UURJA on fire—get ready for a night of unstoppable madness!",
         "image": "/upes_reel2.mp4",
-        "href": "https://www.instagram.com/reel/DH6L9RayHGo/"
+        "href": "https://www.instagram.com/reel/DH6L9RayHGo/",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       },
       {
         "id": "upes-reel-3",
@@ -248,7 +446,16 @@
         "title": "Mame Khan Reveal",
         "description": "Do you get lost in Coke Studio sessions, dreaming of witnessing your favorite artist live? Well, UURJA brings Mame Khan! Get ready to be mesmerized by Rajasthan’s folk music.",
         "image": "/upes_reel3.mp4",
-        "href": "https://www.instagram.com/reel/DIEYAJ3SUbp/"
+        "href": "https://www.instagram.com/reel/DIEYAJ3SUbp/",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       },
       {
         "id": "upes-reel-4",
@@ -256,7 +463,16 @@
         "title": "Behind the Scenes Workflow",
         "description": "Behind every cinematic edit is hours of grading, cutting, and syncing. A glimpse of the editing workflow behind the @life_at_upes collaboration reels.",
         "image": "/upes_reel4.mp4",
-        "href": "https://www.instagram.com/reel/DFlCkSsyC8w/"
+        "href": "https://www.instagram.com/reel/DFlCkSsyC8w/",
+        "role": "Lead Developer & Creative Director",
+        "techStack": [
+          "React",
+          "TypeScript",
+          "GSAP",
+          "TailwindCSS"
+        ],
+        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
+        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
       }
     ]
   },

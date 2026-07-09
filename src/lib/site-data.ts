@@ -33,6 +33,10 @@ export type SiteData = {
       image: string;
       href: string;
       repo?: string;
+      role?: string;
+      techStack?: string[];
+      problem?: string;
+      solution?: string;
     }[];
   };
   creativeWork: {
@@ -45,6 +49,10 @@ export type SiteData = {
       description: string;
       image: string;
       href: string;
+      role?: string;
+      techStack?: string[];
+      problem?: string;
+      solution?: string;
     }[];
   };
   upesWork: {
@@ -57,6 +65,10 @@ export type SiteData = {
       description: string;
       image: string;
       href: string;
+      role?: string;
+      techStack?: string[];
+      problem?: string;
+      solution?: string;
     }[];
   };
   workedWith: {
