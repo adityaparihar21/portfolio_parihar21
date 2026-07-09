@@ -2120,19 +2120,19 @@ export default function Index() {
             {/* --- REEL RUNNER (ABOUT ME) SECTION --- */}
             <section className="relative w-full bg-[#050509] border-t border-white/10 overflow-hidden">
               {/* Desktop/Tablet Banner */}
-              <div className="hidden md:flex flex-col items-center justify-center w-full h-[60vh] text-center px-6">
-                <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-6">
-                  <span className="text-3xl">👾</span>
+              <div className="hidden md:flex flex-col items-center justify-center w-full h-[60vh] text-center px-6 relative z-10">
+                <div className="flex flex-col items-center gap-2 mb-8">
+                  <span className="text-[#e8b23d] font-mono text-xs tracking-[0.3em] uppercase">Secret Level Unlocked</span>
+                  <h2 className="text-5xl md:text-6xl font-serif font-medium text-white tracking-tight">The Memory Vault</h2>
                 </div>
-                <h2 className="text-4xl font-serif font-medium text-white mb-4 tracking-tight">Interactive Arcade</h2>
-                <p className="text-white/50 max-w-lg mb-8 leading-relaxed font-light">
-                  Take a break. Step into my custom-built interactive arcade featuring Sudoku, Memory Match, and hidden easter eggs.
+                <p className="text-white/60 max-w-xl mb-10 leading-relaxed font-light text-lg">
+                  You've made it this far. Why not step inside the vault? Test your memory, crack the code, and discover hidden fragments of my creative journey.
                 </p>
                 <button 
                   onClick={() => setShowArcade(true)}
-                  className="px-8 py-4 rounded-full bg-[#e8b23d] text-black font-semibold tracking-wide hover:scale-105 active:scale-95 transition-transform"
+                  className="px-10 py-4 rounded-full bg-white text-black font-semibold tracking-widest text-sm uppercase hover:scale-105 hover:bg-[#e8b23d] active:scale-95 transition-all duration-300"
                 >
-                  Enter Arcade
+                  Unlock Vault
                 </button>
               </div>
               
