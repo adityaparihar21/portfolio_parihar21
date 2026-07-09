@@ -2117,12 +2117,28 @@ export default function Index() {
             </section>
 
             {/* --- REEL RUNNER (ABOUT ME) SECTION --- */}
-            <section className="relative w-full h-[100vh] bg-[#050509] border-t border-white/10 overflow-hidden">
-              <iframe 
-                src="/aditya-parihar-reel-runner.html" 
-                className="w-full h-full border-none outline-none"
-                title="Reel Runner - About Me"
-              />
+            <section className="relative w-full bg-[#050509] border-t border-white/10 overflow-hidden">
+              {/* Desktop/Tablet View */}
+              <div className="hidden md:block w-full h-[100vh]">
+                <iframe 
+                  src="/aditya-parihar-reel-runner.html" 
+                  className="w-full h-full border-none outline-none"
+                  title="Reel Runner - About Me"
+                />
+              </div>
+              
+              {/* Mobile Fallback */}
+              <div className="flex md:hidden w-full h-[30vh] items-center justify-center p-6 text-center">
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-2">
+                    <span className="text-xl">👾</span>
+                  </div>
+                  <h3 className="text-white/80 font-mono text-sm tracking-widest uppercase">Interactive Arcade</h3>
+                  <p className="text-white/40 text-[10px] max-w-[220px] uppercase tracking-wider leading-relaxed">
+                    This experience requires a larger screen. Please visit on a desktop to play.
+                  </p>
+                </div>
+              </div>
             </section>
 
             {/* --- LETTERBOXD SECTION --- */}
