@@ -67,6 +67,7 @@ export function ProjectDrawer({
             exit={{ x: "100%" }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }} // smooth ease out expo
             className="relative w-full max-w-2xl h-full bg-[#0a0a0a] border-l border-white/10 shadow-2xl overflow-y-auto"
+            data-lenis-prevent="true"
           >
             {/* Close Button */}
             <button
