@@ -1858,6 +1858,7 @@ export default function Index() {
   const [themeMode, setThemeMode] = useState<"select" | "creative" | "engineering">("select");
   const [hoverMode, setHoverMode] = useState<"none" | "creative" | "engineering">("none");
   const [selectedProject, setSelectedProject] = useState<DrawerProject | null>(null);
+  const [showArcade, setShowArcade] = useState(false);
 
   // Hydration-safe localStorage check
   useEffect(() => {
@@ -2118,13 +2119,21 @@ export default function Index() {
 
             {/* --- REEL RUNNER (ABOUT ME) SECTION --- */}
             <section className="relative w-full bg-[#050509] border-t border-white/10 overflow-hidden">
-              {/* Desktop/Tablet View */}
-              <div className="hidden md:block w-full h-[100vh]">
-                <iframe 
-                  src="/aditya-parihar-reel-runner.html" 
-                  className="w-full h-full border-none outline-none"
-                  title="Reel Runner - About Me"
-                />
+              {/* Desktop/Tablet Banner */}
+              <div className="hidden md:flex flex-col items-center justify-center w-full h-[60vh] text-center px-6">
+                <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-6">
+                  <span className="text-3xl">👾</span>
+                </div>
+                <h2 className="text-4xl font-serif font-medium text-white mb-4 tracking-tight">Interactive Arcade</h2>
+                <p className="text-white/50 max-w-lg mb-8 leading-relaxed font-light">
+                  Take a break. Step into my custom-built interactive arcade featuring Sudoku, Memory Match, and hidden easter eggs.
+                </p>
+                <button 
+                  onClick={() => setShowArcade(true)}
+                  className="px-8 py-4 rounded-full bg-[#e8b23d] text-black font-semibold tracking-wide hover:scale-105 active:scale-95 transition-transform"
+                >
+                  Enter Arcade
+                </button>
               </div>
               
               {/* Mobile Fallback */}
@@ -2191,6 +2200,33 @@ export default function Index() {
         isOpen={!!selectedProject} 
         onClose={() => setSelectedProject(null)} 
       />
+
+      {/* Fullscreen Arcade Overlay */}
+      <AnimatePresence>
+        {showArcade && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed inset-0 z-[9999] bg-[#050509] flex flex-col"
+          >
+            <div className="w-full h-16 bg-[#0a0a0f] border-b border-white/10 flex items-center justify-between px-6 shrink-0">
+              <span className="text-white/80 font-mono text-sm tracking-widest uppercase">Interactive Arcade</span>
+              <button 
+                onClick={() => setShowArcade(false)}
+                className="text-white/60 hover:text-white flex items-center gap-2 font-mono text-xs tracking-wider uppercase transition-colors"
+              >
+                Exit Arcade <X className="h-4 w-4" />
+              </button>
+            </div>
+            <iframe 
+              src="/aditya-parihar-reel-runner.html" 
+              className="w-full h-full flex-1 border-none outline-none bg-[#050509]"
+              title="Reel Runner - About Me"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
     </DebugErrorBoundary>
   );
