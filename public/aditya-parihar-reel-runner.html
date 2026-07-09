@@ -1249,6 +1249,28 @@
       display: block !important;
     }
   }
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--bg-2);
+    border: 1px solid var(--red-soft);
+    color: var(--cream);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 9999;
+    pointer-events: none;
+    box-shadow: var(--shadow-1);
+    font-family: monospace;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
 </style>
 </head>
 <body>
@@ -2238,14 +2260,14 @@
     grid.innerHTML = '';
     
     const pool = [
-      "https://a.ltrbxd.com/resized/film-poster/3/8/4/0/5/8/384058-beautiful-boy-0-230-0-345-crop.jpg?v=fb10cce0",
-      "https://a.ltrbxd.com/resized/film-poster/7/1/3/3/8/71338-the-perks-of-being-a-wallflower-0-230-0-345-crop.jpg?v=d2c4c804",
-      "https://a.ltrbxd.com/resized/film-poster/5/1/6/2/1/51621-good-will-hunting-0-230-0-345-crop.jpg?v=f1139f66",
-      "https://a.ltrbxd.com/resized/film-poster/5/7/1/3/9/1/571391-dil-bechara-0-230-0-345-crop.jpg",
-      "https://a.ltrbxd.com/resized/film-poster/2/1/1/3/6/5/211365-interstellar-0-230-0-345-crop.jpg",
-      "https://a.ltrbxd.com/resized/film-poster/5/1/5/1/6/51516-the-dark-knight-0-230-0-345-crop.jpg",
-      "https://a.ltrbxd.com/resized/film-poster/1/3/9/3/8/13938-fight-club-0-230-0-345-crop.jpg",
-      "https://a.ltrbxd.com/resized/film-poster/4/5/7/5/5/45755-la-la-land-0-230-0-345-crop.jpg"
+      "/blackedout_poster.jpg",
+      "/himymintro_poster.jpg",
+      "/loadingpagebg_poster.jpg",
+      "/mall_of_dehradun_paradox_poster.jpg",
+      "/saharshstyle_poster.jpg",
+      "/upes_reel1_poster.jpg",
+      "/fresherupes_poster.jpg",
+      "/year2025_poster.jpg"
     ];
     pool.sort(() => Math.random() - 0.5);
     const images = pool.slice(0, 4);
@@ -2424,6 +2446,7 @@
           } else {
             selectedCell.style.backgroundColor = "rgba(179, 18, 46, 0.5)";
             selectedCell.style.color = "#fff";
+            showToast("Oops, try again! It's not that hard.");
           }
           
           selectedCell = null;
@@ -2696,7 +2719,18 @@
     observer.observe(gameSection);
   }
 
+  function showToast(message) {
+    const toast = document.getElementById("toast");
+    if(!toast) return;
+    toast.textContent = message;
+    toast.classList.add("show");
+    setTimeout(() => {
+      toast.classList.remove("show");
+    }, 2500);
+  }
+
 })();
 </script>
+<div id="toast" class="toast"></div>
 </body>
 </html>
