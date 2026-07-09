@@ -1509,16 +1509,6 @@ function Testimonial({ data }: { data: ReturnType<typeof useContent> }) {
         >
           — {author}
         </motion.p>
-        
-        {/* Global UI Overlays */}
-        <CustomCursor isMobile={isMobile} />
-        
-        {/* Project Drawer Overlay */}
-        <ProjectDrawer 
-          project={selectedProject} 
-          isOpen={!!selectedProject} 
-          onClose={() => setSelectedProject(null)} 
-        />
       </motion.div>
     </section>
   );
@@ -2183,6 +2173,13 @@ export default function Index() {
           />
         </motion.div>
       )}
+      
+      {/* Project Drawer Overlay */}
+      <ProjectDrawer 
+        project={selectedProject} 
+        isOpen={!!selectedProject} 
+        onClose={() => setSelectedProject(null)} 
+      />
     </div>
     </DebugErrorBoundary>
   );
