@@ -127,6 +127,20 @@ export default function DomeGallery({
   const loopRAF = useRef(null);
   const hoverActiveRef = useRef(false);
   const mousePosRef = useRef({ x: 0, y: 0 });
+  const isVisibleRef = useRef(true);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting;
+      },
+      { threshold: 0 }
+    );
+    if (rootRef.current) {
+      observer.observe(rootRef.current);
+    }
+    return () => observer.disconnect();
+  }, []);
   const velocityRef = useRef({ x: 0, y: 0 });
   const baseRotationRef = useRef({ x: 0, y: 0 });
   const driftYRef = useRef(0);
@@ -274,6 +288,13 @@ export default function DomeGallery({
 
       // Don't update rotation if modal is open
       if (focusedElRef.current || rootRef.current?.getAttribute("data-enlarging") === "true") {
+        loopRAF.current = requestAnimationFrame(step);
+        return;
+      }
+
+      // If not in viewport, pause calculations to prevent scroll lag
+      if (!isVisibleRef.current) {
+        lastTime = time;
         loopRAF.current = requestAnimationFrame(step);
         return;
       }

@@ -2259,12 +2259,7 @@
     const grid = document.getElementById("memory-grid");
     grid.innerHTML = '';
     
-    const pool = [
-      "/beautifulboy.jpg",
-      "/dil.jpg",
-      "/goodwillhunting.jpg",
-      "/perks.jpg"
-    ];
+    const pool = CONFIG.films.list.map(f => f.poster);
     pool.sort(() => Math.random() - 0.5);
     const images = pool.slice(0, 4);
     
@@ -2275,6 +2270,7 @@
       card.style.width = "100%";
       card.style.aspectRatio = "2/3";
       card.style.backgroundColor = "#2d2d3b";
+      card.style.backgroundImage = "repeating-linear-gradient(45deg, #1c1c24 0, #1c1c24 10px, #2d2d3b 10px, #2d2d3b 20px)";
       card.style.borderRadius = "8px";
       card.style.cursor = "pointer";
       card.style.backgroundSize = "cover";
@@ -2314,8 +2310,8 @@
         completeLevel(120);
       }
     } else {
-      c1.style.backgroundImage = "none";
-      c2.style.backgroundImage = "none";
+      c1.style.backgroundImage = "repeating-linear-gradient(45deg, #1c1c24 0, #1c1c24 10px, #2d2d3b 10px, #2d2d3b 20px)";
+      c2.style.backgroundImage = "repeating-linear-gradient(45deg, #1c1c24 0, #1c1c24 10px, #2d2d3b 10px, #2d2d3b 20px)";
       c1.dataset.flipped = "false";
       c2.dataset.flipped = "false";
       Sound.hit();
@@ -2714,6 +2710,20 @@
     }, { threshold: 0.1 });
     observer.observe(gameSection);
   }
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      if (state === "playing") {
+        pauseGame();
+      } else {
+        Sound.stopMusic();
+      }
+    }
+  });
+
+  window.addEventListener("unload", () => {
+    Sound.stopMusic();
+  });
 
   function showToast(message) {
     const toast = document.getElementById("toast");
