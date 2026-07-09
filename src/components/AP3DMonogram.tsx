@@ -505,7 +505,7 @@ export default function AP3DMonogram({
           <CinematicLights isMini={isMini} hoverMode={hoverMode} />
 
           {/* Studio HDRI for strong, clean gold reflections */}
-          <Environment preset="studio" />
+          <Environment files="/studio_small_03_1k.hdr" />
 
           {/* Visually center the 3D focal point (counteracting layout shift in full-screen) */}
           <group position={isMini || themeMode === "select" ? [0, 0, 0] : [0.28, 0, 0]}>
