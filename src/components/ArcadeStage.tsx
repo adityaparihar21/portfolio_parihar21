@@ -718,7 +718,8 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         return {
           tag: "Ticket 5 — The Writer", title: "Silent Background",
           desc: "While I work silently in the background, I also write about things I find interesting and random facts about my life.",
-          link: { url: "https://adityaparihar.substack.com/", text: "Read my Substack" }
+          link: { url: "https://substack.com/@adityaparihar21", text: "Read my Substack" },
+          image: "/about.jpg"
         };
       case 6:
         return {
@@ -814,7 +815,14 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                   </div>
                   <div className="p-10 flex-1 flex flex-col justify-between">
                     <div>
-                      <div className="text-black/50 font-mono text-xs tracking-[0.3em] uppercase mb-4">{content.tag}</div>
+                      <div className="flex items-center gap-4 mb-4">
+                        {/* @ts-ignore */}
+                        {content.image && (
+                          /* @ts-ignore */
+                          <img src={content.image} alt="Profile" className="w-10 h-10 rounded-full object-cover border border-black/20 grayscale" />
+                        )}
+                        <div className="text-black/50 font-mono text-xs tracking-[0.3em] uppercase">{content.tag}</div>
+                      </div>
                       <h2 className="text-[#241a1e] font-serif italic text-3xl lg:text-4xl mb-4 leading-tight">{content.title}</h2>
                       <p className="text-black/70 font-sans text-base leading-relaxed mb-4">{content.desc}</p>
                       {/* @ts-ignore */}
