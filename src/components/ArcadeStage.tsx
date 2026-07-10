@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useMemo } from "react";
-import { X, Volume2, VolumeX } from "lucide-react";
+import { X, Volume2, VolumeX, HelpCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const FILMS = [
@@ -44,34 +44,44 @@ const useSound = (enabled: boolean) => {
   }, [enabled]);
 };
 
+// -----------------------------------------------------
+// CHESS PIECE SVGS
+// -----------------------------------------------------
+const SVGPieces = {
+  wQ: () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" width="100%" height="100%"><g fill="#fff" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 12a2 2 0 1 1-4 0 2 2 0 1 1 4 0zM24.5 7.5a2 2 0 1 1-4 0 2 2 0 1 1 4 0zM41 12a2 2 0 1 1-4 0 2 2 0 1 1 4 0zM16 8.5a2 2 0 1 1-4 0 2 2 0 1 1 4 0zM33 8.5a2 2 0 1 1-4 0 2 2 0 1 1 4 0z"/><path d="M9 26c8.5-1.5 21-1.5 27 0l2-12-7 11V11l-5.5 13.5-3-15-3 15-5.5-14V25L7 14l2 12zM9 26c0 2 1.5 2 2.5 4 1 1.5 1 1 .5 3.5-1.5 1-1.5 2.5-1.5 2.5-1.5 1.5.5 2.5.5 2.5 6.5 1 16.5 1 23 0 0 0 1.5-1 0-2.5 0 0 .5-1.5-1-2.5-.5-2.5-.5-2 .5-3.5 1-2 2.5-2 2.5-4-8.5-1.5-18.5-1.5-27 0z"/><path d="M11.5 30c3.5-1 18.5-1 22 0M12 33.5c6-1 15-1 21 0" fill="none"/></g></svg>,
+  wB: () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" width="100%" height="100%"><g fill="#fff" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><g strokeLinecap="butt"><path d="M9 36c3.39-.97 10.11.43 13.5-2 3.39 2.43 10.11 1.03 13.5 2 0 0 1.65.54 3 2-.68.97-1.65.99-3 .5-3.39-.97-10.11.46-13.5-1-3.39 1.46-10.11.03-13.5 1-1.354.49-2.323.47-3-.5 1.354-1.94 3-2 3-2zM15 32c2.5 2.5 12.5 2.5 15 0 .5-1.5 0-2 0-2 0-2.5-2.5-4-2.5-4 5.5-1.5 6-11.5-5-15.5-11 4-10.5 14-5 15.5 0 0-2.5 1.5-2.5 4 0 0-.5.5 0 2zM25 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 1 1 5 0z"/></g><path d="M17.5 26h10M15 30h15m-7.5-14.5v5M20 18h5" fill="none" strokeLinejoin="miter"/></g></svg>,
+  bK: () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" width="100%" height="100%"><g fill="#000" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22.5 11.63V6M20 8h5"/><path d="M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5"/><path d="M11.5 37c5.5 3.5 15.5 3.5 21 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-3.5-7.5-13-10.5-16-4-3 6 5 10.5 5 10.5v7z"/><path d="M11.5 30c5.5-3 15.5-3 21 0M12.5 33.5c5.5-3 15.5-3 21 0M11.5 37c5.5-3 15.5-3 21 0" stroke="#fff"/></g></svg>,
+  bP: () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" width="100%" height="100%"><g fill="#000" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z"/></g></svg>
+};
 
 // -----------------------------------------------------
 // CHESS PUZZLE (Reel 2)
 // -----------------------------------------------------
 function ChessPuzzleGame({ onComplete, sfx }: { onComplete: () => void, sfx: any }) {
   const initialBoard = Array(64).fill("");
-  initialBoard[4] = "♚"; 
-  initialBoard[13] = "♟"; 
-  initialBoard[14] = "♟"; 
-  initialBoard[15] = "♟"; 
-  initialBoard[26] = "♗"; 
-  initialBoard[35] = "♕"; 
+  initialBoard[4] = "bK";  // e8
+  initialBoard[13] = "bP"; // f7
+  initialBoard[14] = "bP"; // g7
+  initialBoard[15] = "bP"; // h7
+  initialBoard[26] = "wB"; // c4
+  initialBoard[35] = "wQ"; // d5
 
   const [board, setBoard] = useState(initialBoard);
   const [selected, setSelected] = useState<number | null>(null);
   const [win, setWin] = useState(false);
+  const [hintActive, setHintActive] = useState(false);
 
   const handleSquareClick = (idx: number) => {
     if (win) return;
     if (selected === null) {
-      if (board[idx] === "♕" || board[idx] === "♗") {
+      if (board[idx] === "wQ" || board[idx] === "wB") {
         setSelected(idx);
         sfx.click();
       }
     } else {
       if (selected === 35 && idx === 13) {
         const newBoard = [...board];
-        newBoard[13] = "♕";
+        newBoard[13] = "wQ";
         newBoard[35] = "";
         setBoard(newBoard);
         setSelected(null);
@@ -86,24 +96,49 @@ function ChessPuzzleGame({ onComplete, sfx }: { onComplete: () => void, sfx: any
   };
 
   return (
-    <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-8 bg-[#0b0b0f]">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-serif text-white mb-2">{win ? "Checkmate!" : "Find the Mate in 1"}</h2>
-        <p className="text-white/50 text-xs font-mono">White to play and win.</p>
+    <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-4 bg-[#232323]">
+      <div className="text-center mb-4">
+        <h2 className="text-xl md:text-3xl font-serif text-white mb-2">{win ? "Checkmate!" : "Find the Mate in 1"}</h2>
+        <p className="text-white/60 text-xs md:text-sm font-sans tracking-wide">White to play and win.</p>
       </div>
-      <div className="w-full max-w-[320px] aspect-square grid grid-cols-8 border-4 border-[#241a1e] rounded shadow-2xl">
+      <div className="w-full max-w-[360px] md:max-w-[480px] aspect-square grid grid-cols-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-sm overflow-hidden select-none touch-none">
         {board.map((piece, i) => {
           const row = Math.floor(i / 8);
           const col = i % 8;
           const isDark = (row + col) % 2 === 1;
           const isSelected = selected === i;
+          const isHintSquare = hintActive && (i === 35 || i === 13);
+          
           return (
-            <div key={i} onClick={() => handleSquareClick(i)} className={`flex items-center justify-center text-3xl cursor-pointer select-none ${isDark ? 'bg-[#71828F]' : 'bg-[#C7D0D8]'} ${isSelected ? 'ring-inset ring-4 ring-[#e8b23d] bg-[#e8b23d]/50' : ''}`}>
-              <span className={piece === "♕" || piece === "♗" ? "text-white drop-shadow-md" : "text-black drop-shadow-sm"}>{piece}</span>
+            <div 
+              key={i} 
+              onClick={() => handleSquareClick(i)} 
+              className={`relative flex items-center justify-center cursor-pointer 
+                ${isDark ? 'bg-[#739552]' : 'bg-[#ebecd0]'}
+              `}
+            >
+              {isSelected && <div className="absolute inset-0 bg-[#f6f669]/60" />}
+              {isHintSquare && !win && <div className="absolute inset-0 border-4 border-dashed border-[#ff4d4d]/70 animate-pulse pointer-events-none" />}
+              {piece && (
+                <div className="w-[80%] h-[80%] relative z-10 drop-shadow-md">
+                  {piece === "wQ" && <SVGPieces.wQ />}
+                  {piece === "wB" && <SVGPieces.wB />}
+                  {piece === "bK" && <SVGPieces.bK />}
+                  {piece === "bP" && <SVGPieces.bP />}
+                </div>
+              )}
             </div>
           );
         })}
       </div>
+      {!win && (
+        <button 
+          onClick={() => setHintActive(!hintActive)}
+          className="mt-6 flex items-center gap-2 px-6 py-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition text-sm font-sans"
+        >
+          <HelpCircle className="w-4 h-4" /> {hintActive ? "Hide Hint" : "Get Hint"}
+        </button>
+      )}
     </div>
   );
 }
@@ -194,6 +229,86 @@ function MemoryMatchGame({ onComplete, sfx }: { onComplete: () => void, sfx: any
   );
 }
 
+// -----------------------------------------------------
+// SUDOKU GAME (Reel 4)
+// -----------------------------------------------------
+function SudokuGame({ onComplete, sfx }: { onComplete: () => void, sfx: any }) {
+  // A simple 4x4 Sudoku
+  // 1 2 3 4
+  // 3 4 1 2
+  // 2 1 4 3
+  // 4 3 2 1
+  const initial = [
+    [1, 0, 3, 4],
+    [3, 4, 1, 0],
+    [0, 1, 4, 3],
+    [4, 3, 0, 1]
+  ];
+  const solution = [
+    [1, 2, 3, 4],
+    [3, 4, 1, 2],
+    [2, 1, 4, 3],
+    [4, 3, 2, 1]
+  ];
+
+  const [grid, setGrid] = useState(initial);
+  const [win, setWin] = useState(false);
+
+  const handleCellClick = (r: number, c: number) => {
+    if (win || initial[r][c] !== 0) return;
+    
+    sfx.click();
+    const newGrid = [...grid.map(row => [...row])];
+    let val = newGrid[r][c];
+    val = val === 0 ? 1 : val + 1;
+    if (val > 4) val = 1;
+    newGrid[r][c] = val;
+    setGrid(newGrid);
+
+    // Check win
+    let isWin = true;
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 4; j++) {
+        if (newGrid[i][j] !== solution[i][j]) {
+          isWin = false;
+        }
+      }
+    }
+    if (isWin) {
+      setWin(true);
+      sfx.win();
+      setTimeout(onComplete, 1500);
+    }
+  };
+
+  return (
+    <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-8 bg-[#0b0b0f]">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-serif text-white mb-2">{win ? "Solved!" : "Logic Puzzle"}</h2>
+        <p className="text-white/50 text-xs font-mono">Fill missing numbers (1-4). Click to cycle.</p>
+      </div>
+      <div className="grid grid-cols-4 grid-rows-4 w-64 h-64 border-4 border-white/20 bg-black shadow-[0_0_30px_rgba(255,255,255,0.05)]">
+        {grid.map((row, r) => row.map((val, c) => {
+          const isFixed = initial[r][c] !== 0;
+          return (
+            <div 
+              key={`${r}-${c}`} 
+              onClick={() => handleCellClick(r, c)}
+              className={`flex items-center justify-center border border-white/10 text-2xl font-mono
+                ${isFixed ? 'text-white/50 bg-white/5' : 'text-[#e8b23d] cursor-pointer hover:bg-white/10'}
+                ${r === 1 ? 'border-b-2 border-b-white/30' : ''}
+                ${c === 1 ? 'border-r-2 border-r-white/30' : ''}
+              `}
+            >
+              {val !== 0 ? val : ""}
+            </div>
+          )
+        }))}
+      </div>
+    </div>
+  );
+}
+
 
 // -----------------------------------------------------
 // MAIN COMPONENT
@@ -202,7 +317,6 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const bgmAudio = useRef<HTMLAudioElement | null>(null);
 
-  // START IN "playing" STATE FOR GAME -> STORY FLOW
   const [currentReel, setCurrentReel] = useState(1);
   const [reelState, setReelState] = useState<"playing" | "story" | "fail">("playing");
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -240,7 +354,6 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Load generated sprite sheet & apply chroma key
     const spriteSheet = new Image();
     spriteSheet.src = "/runner_sprite.png";
     const processedCanvas = document.createElement("canvas");
@@ -255,7 +368,6 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         const imgData = pCtx.getImageData(0, 0, processedCanvas.width, processedCanvas.height);
         const data = imgData.data;
         for (let i = 0; i < data.length; i += 4) {
-          // Remove white background (R, G, B > 230)
           if (data[i] > 230 && data[i+1] > 230 && data[i+2] > 230) {
             data[i+3] = 0; 
           }
@@ -267,16 +379,16 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
 
     const LOGICAL_W = 960;
     const LOGICAL_H = 480;
-    const GROUND_Y = 360;
+    const GROUND_Y = 380;
     const GRAVITY = 0.85;
     const JUMP_V = -15.5;
 
     let frame = 0;
-    let speed = 6;
+    let speed = 6.5;
     let spawnTimer = 0;
     let animationId: number;
 
-    const player = { x: 110, y: GROUND_Y - 80, w: 60, h: 80, vy: 0, onGround: true, invuln: 0, squash: 1, isCrouching: false, crouchTimer: 0 };
+    const player = { x: 110, y: GROUND_Y - 80, w: 60, h: 80, vy: 0, onGround: true, invuln: 0, isCrouching: false, crouchTimer: 0 };
     let obstacles: any[] = [];
     let coins: any[] = [];
     let particles: any[] = [];
@@ -299,7 +411,6 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       if (player.onGround && !player.isCrouching) {
         player.vy = JUMP_V;
         player.onGround = false;
-        player.squash = 1.3;
         spawnParticles(player.x + player.w/2, player.y + player.h, 15, "#fff");
         sfx.jump();
       }
@@ -307,8 +418,9 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
 
     const crouch = () => {
       if (player.onGround && !player.isCrouching) {
-        player.crouchTimer = 35; // Crouch for ~0.5s
-        sfx.step(); // Quick slide sound
+        player.crouchTimer = 35; 
+        spawnParticles(player.x, player.y + player.h, 10, "#aaa");
+        sfx.step();
       }
     };
 
@@ -317,7 +429,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       if (e.code === "ArrowDown" || e.code === "KeyS") { e.preventDefault(); crouch(); }
     };
     window.addEventListener("keydown", handleKeyDown);
-    canvas.addEventListener("pointerdown", jump, { passive: true }); // Click to jump
+    canvas.addEventListener("pointerdown", jump, { passive: true }); 
 
     function spawnParticles(x: number, y: number, count: number, color: string) {
       for (let i = 0; i < count; i++) {
@@ -325,17 +437,16 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       }
     }
 
-    function drawHillLayer(baseY: number, speedMul: number, color: string, amp: number) {
-      const scrollX = (frame * speed * speedMul) % LOGICAL_W;
+    // Modern Parallax Background Logic
+    function drawCityLayer(baseY: number, speedMul: number, color: string, w: number, spacing: number, arr: number[]) {
+      const scrollX = (frame * speed * speedMul) % (w * arr.length + spacing * arr.length);
       ctx!.fillStyle = color;
-      ctx!.beginPath();
-      ctx!.moveTo(-scrollX, GROUND_Y + 2);
-      const step = 80;
-      for(let x = -scrollX; x < LOGICAL_W + step; x += step){
-        ctx!.lineTo(x, baseY - Math.sin(x * 0.008) * amp * 0.5 - amp * 0.3);
+      let x = -scrollX;
+      for (let i = 0; i < arr.length * 3; i++) {
+        const h = arr[i % arr.length];
+        ctx!.fillRect(x, baseY - h, w, h);
+        x += w + spacing;
       }
-      ctx!.lineTo(LOGICAL_W + step, GROUND_Y + 2);
-      ctx!.fill();
     }
 
     function drawObstacle(o: any) {
@@ -343,26 +454,28 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       ctx!.translate(o.x, o.y);
       if (o.type === 'c-stand') {
         ctx!.fillStyle = "#222";
-        ctx!.fillRect(12, -20, 6, o.h + 20); // main pole
-        ctx!.fillRect(0, o.h - 6, 30, 6); // base
-        ctx!.fillRect(12, -15, 20, 4); // arm
+        ctx!.fillRect(12, -20, 6, o.h + 20); 
+        ctx!.fillRect(0, o.h - 6, 30, 6); 
+        ctx!.fillRect(12, -15, 20, 4); 
       } else if (o.type === 'pelican') {
         ctx!.fillStyle = "#111";
         ctx!.beginPath(); ctx!.roundRect(0, 8, o.w + 10, o.h - 8, 4); ctx!.fill();
-        ctx!.fillStyle = "#e8b23d"; // yellow accent
+        ctx!.fillStyle = "#e8b23d"; 
         ctx!.fillRect(4, 14, o.w + 2, 4);
       } else if (o.type === 'boom-mic') {
         ctx!.fillStyle = "#333";
-        ctx!.fillRect(o.w/2 - 2, -120, 4, 120); // pole coming from top
+        ctx!.fillRect(o.w/2 - 2, -300, 4, 300); 
         ctx!.fillStyle = "#1a1a1a";
-        ctx!.beginPath(); ctx!.roundRect(0, 0, o.w, o.h, 10); ctx!.fill(); // fuzzy mic
-        // Small grey details
+        ctx!.beginPath(); ctx!.roundRect(0, 0, o.w, o.h, 10); ctx!.fill(); 
         ctx!.fillStyle = "#555";
         ctx!.fillRect(4, 4, o.w-8, 2);
         ctx!.fillRect(4, 12, o.w-8, 2);
       }
       ctx!.restore();
     }
+
+    const cityBack = [150, 100, 180, 120, 160, 200];
+    const cityFront = [60, 80, 50, 90, 70, 110, 60, 120];
 
     function loop() {
       const now = performance.now();
@@ -377,9 +490,8 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       }
 
       frame++;
-      speed = 7 + Math.min(5, scoreRef.current / 80);
+      speed = 6.5 + Math.min(5, scoreRef.current / 80);
 
-      // Crouch Logic
       if (player.crouchTimer > 0) {
         player.crouchTimer--;
         player.isCrouching = true;
@@ -387,25 +499,21 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         player.isCrouching = false;
       }
 
-      // Physics
       player.vy += GRAVITY;
       player.y += player.vy;
       if (player.y >= GROUND_Y - player.h) {
         player.y = GROUND_Y - player.h;
-        if (player.vy > 0 && !player.onGround) player.squash = 0.72;
         player.vy = 0;
         player.onGround = true;
       }
       if (player.invuln > 0) player.invuln--;
-      player.squash += (1 - player.squash) * 0.25;
 
       if (player.onGround && !player.isCrouching && frame % 12 === 0) sfx.step();
 
-      // Spawning
       spawnTimer--;
       if (spawnTimer <= 0) {
-        spawnTimer = 50 + Math.random() * 30;
-        if (Math.random() < 0.50) {
+        spawnTimer = 55 + Math.random() * 30;
+        if (Math.random() < 0.45) {
           coins.push({ x: LOGICAL_W + 20, y: GROUND_Y - 90 - Math.random() * 60, r: 16, wobble: Math.random() * 10 });
         } else {
           const types = ['c-stand', 'pelican', 'boom-mic'];
@@ -416,16 +524,16 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         }
       }
 
-      // Dynamic Hitbox for Crouch
-      const hitboxTop = player.y + (player.isCrouching ? player.h * 0.5 : 0);
-      const hitboxHeight = player.isCrouching ? player.h * 0.5 : player.h;
+      // Dynamic Hitbox
+      // When sliding, we use a much smaller, lower hitbox
+      const hitboxTop = player.y + (player.isCrouching ? player.h * 0.6 : 0);
+      const hitboxHeight = player.isCrouching ? player.h * 0.4 : player.h;
 
-      // Update obstacles
       for (let i = obstacles.length - 1; i >= 0; i--) {
         const o = obstacles[i];
         o.x -= speed;
         if (o.x + o.w < -20) { obstacles.splice(i, 1); continue; }
-        // Hitbox collision
+        
         if (player.invuln === 0 && 
             player.x + 10 < o.x + o.w && 
             player.x + player.w - 10 > o.x && 
@@ -435,7 +543,6 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
           livesRef.current--;
           setUiLives(livesRef.current);
           player.invuln = 90;
-          player.squash = 1.25;
           sfx.hit();
           if (livesRef.current <= 0) {
             setReelState("fail");
@@ -444,7 +551,6 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         }
       }
 
-      // Update AP Monogram Coins
       for (let i = coins.length - 1; i >= 0; i--) {
         const c = coins[i];
         c.x -= speed;
@@ -456,7 +562,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
           setUiScore(scoreRef.current);
           if (scoreRef.current >= 40) { 
             sfx.win();
-            setReelState("story"); // Go to story when won
+            setReelState("story"); 
             return;
           }
           coins.splice(i, 1);
@@ -471,33 +577,33 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         if (p.life <= 0) particles.splice(i, 1);
       }
 
-      // Draw Background - Sunset
+      // Draw Parallax Background
       ctx!.clearRect(0, 0, LOGICAL_W, LOGICAL_H);
       const sky = ctx!.createLinearGradient(0, 0, 0, GROUND_Y);
-      sky.addColorStop(0, "#ff7b54"); sky.addColorStop(1, "#ffd56b");
+      sky.addColorStop(0, "#191724"); sky.addColorStop(1, "#3c385c");
       ctx!.fillStyle = sky; ctx!.fillRect(0, 0, LOGICAL_W, GROUND_Y);
-      ctx!.fillStyle = "#fff4d4";
-      ctx!.beginPath(); ctx!.arc(LOGICAL_W * 0.7, GROUND_Y * 0.6, 60, 0, Math.PI*2); ctx!.fill();
+      
+      ctx!.fillStyle = "#f6f6f6";
+      ctx!.beginPath(); ctx!.arc(LOGICAL_W * 0.8, GROUND_Y * 0.4, 50, 0, Math.PI*2); ctx!.fill();
 
-      drawHillLayer(GROUND_Y - 60, 0.15, "#e36e5c", 80);
-      drawHillLayer(GROUND_Y - 20, 0.3, "#a34a58", 50);
+      // City Layers
+      drawCityLayer(GROUND_Y, 0.1, "#28253b", 80, 20, cityBack);
+      drawCityLayer(GROUND_Y, 0.3, "#191724", 60, 40, cityFront);
 
-      ctx!.fillStyle = "#1a1a24"; ctx!.fillRect(0, GROUND_Y, LOGICAL_W, LOGICAL_H - GROUND_Y);
+      ctx!.fillStyle = "#11111a"; ctx!.fillRect(0, GROUND_Y, LOGICAL_W, LOGICAL_H - GROUND_Y);
       ctx!.fillStyle = "#e8b23d"; ctx!.fillRect(0, GROUND_Y, LOGICAL_W, 4);
 
-      // Draw Coins (AP Monogram)
+      // Draw AP Monogram Coins
       coins.forEach(c => {
         ctx!.save(); ctx!.translate(c.x, c.y + Math.sin(frame * 0.1 + c.wobble) * 8);
         ctx!.fillStyle = "#e8b23d";
-        ctx!.shadowColor = "#e8b23d"; ctx!.shadowBlur = 10;
-        ctx!.beginPath(); ctx!.arc(0, 0, c.r, 0, Math.PI * 2); ctx!.fill();
+        ctx!.shadowColor = "#e8b23d"; ctx!.shadowBlur = 15;
+        // pixel coin shape
+        ctx!.fillRect(-c.r, -c.r*0.6, c.r*2, c.r*1.2);
+        ctx!.fillRect(-c.r*0.6, -c.r, c.r*1.2, c.r*2);
         ctx!.shadowBlur = 0;
-        ctx!.fillStyle = "#111";
-        ctx!.beginPath(); ctx!.arc(0, 0, c.r * 0.8, 0, Math.PI * 2); ctx!.fill();
-        
-        // AP Text
-        ctx!.fillStyle = "#e8b23d";
-        ctx!.font = "bold 14px monospace";
+        ctx!.fillStyle = "#fff";
+        ctx!.font = "bold 12px monospace";
         ctx!.textAlign = "center";
         ctx!.textBaseline = "middle";
         ctx!.fillText("AP", 0, 1);
@@ -506,17 +612,21 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
 
       obstacles.forEach(drawObstacle);
 
-      // Draw Player (Transparent Sprite Sheet + Crouch Logic)
+      // Draw Player
       ctx!.save();
       if (player.invuln > 0 && frame % 10 < 5) ctx!.globalAlpha = 0.4;
       const cx = player.x + player.w/2;
-      ctx!.translate(cx, GROUND_Y); 
+      const cy = player.y + player.h/2;
       
-      // If crouching, squash on Y heavily to simulate slide
-      const renderSquash = player.isCrouching ? player.squash * 0.5 : player.squash;
-      ctx!.scale(1 / Math.sqrt(renderSquash), renderSquash); 
+      ctx!.translate(cx, cy); 
       
-      ctx!.translate(-cx, -GROUND_Y);
+      // Action Slide animation (rotate character backwards)
+      if (player.isCrouching) {
+        ctx!.rotate(-Math.PI / 2);
+        ctx!.translate(-player.h/2 + 20, -player.w/2); 
+      }
+      
+      ctx!.translate(-cx, -cy);
       
       if (isSpriteReady && processedCanvas.width > 0) {
         const cols = 2;
@@ -525,12 +635,10 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         const frameH = processedCanvas.height / rows;
         let currentSpriteFrame = 0;
         
-        if (player.isCrouching) {
-          currentSpriteFrame = 1; // Use jump frame as a proxy for sliding
-        } else if (player.onGround) {
-          currentSpriteFrame = Math.floor((frame / 6) % 4);
+        if (player.isCrouching || !player.onGround) {
+          currentSpriteFrame = 1; // Use jump frame for jumping/sliding
         } else {
-          currentSpriteFrame = 1; // Jumping frame
+          currentSpriteFrame = Math.floor((frame / 6) % 4);
         }
         
         const col = currentSpriteFrame % cols;
@@ -542,9 +650,8 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
           player.x - 20, player.y - 20, player.w + 40, player.h + 20
         );
       } else {
-        // Fallback Box
         ctx!.fillStyle = "#3b5b82";
-        ctx!.fillRect(player.x, player.y + (player.isCrouching ? player.h/2 : 0), player.w, player.isCrouching ? player.h/2 : player.h);
+        ctx!.fillRect(player.x, player.y, player.w, player.h);
       }
       ctx!.restore();
 
@@ -576,8 +683,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
     livesRef.current = 3; setUiLives(3);
     const nextReel = currentReel + 1;
     setCurrentReel(nextReel);
-    // If it's reel 4 (Outtakes) there is no game, just story.
-    setReelState(nextReel >= 4 ? "story" : "playing"); 
+    setReelState(nextReel >= 5 ? "story" : "playing"); 
   };
 
   const retryReel = () => {
@@ -605,8 +711,13 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         };
       case 4:
         return {
-          tag: "Ticket 4 — Outtake", title: "The Blooper Reel",
-          desc: "Fun fact: I sometimes stumble over certain sounds when I talk — words starting with things like 'wh-' can trip me up. It's just part of my story — not something I hide."
+          tag: "Ticket 4 — The Logic", title: "Method to the Madness",
+          desc: "Whether I'm writing a defense exam or debugging a React component, breaking a massive problem down into simple logic gates is how I get things done."
+        };
+      case 5:
+        return {
+          tag: "Ticket 5 — Outtake", title: "The Blooper Reel",
+          desc: "Fun fact: I sometimes stumble over certain sounds when I talk — words starting with things like 'wh-' can trip me up. It's just part of my story — not something I hide. Thanks for watching the whole reel."
         };
       default: return null;
     }
@@ -625,6 +736,27 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         .preserve-3d { transform-style: preserve-3d; }
         .perspective-1000 { perspective: 1000px; }
         .backface-hidden { backface-visibility: hidden; }
+        
+        .cinema-ticket {
+          background: #f4ead8;
+          border-radius: 12px;
+          position: relative;
+          color: #241a1e;
+        }
+        .cinema-ticket::before, .cinema-ticket::after {
+          content: ""; position: absolute; top: 50%; width: 40px; height: 40px;
+          background: #000; border-radius: 50%; transform: translateY(-50%);
+        }
+        .cinema-ticket::before { left: -20px; }
+        .cinema-ticket::after { right: -20px; }
+        .ticket-dashed-line {
+          position: absolute; left: 80px; top: 20px; bottom: 20px;
+          border-left: 2px dashed rgba(0,0,0,0.15);
+        }
+        .ticket-barcode {
+          background: repeating-linear-gradient(to right, #241a1e 0px, #241a1e 3px, transparent 3px, transparent 6px, #241a1e 6px, #241a1e 7px, transparent 7px, transparent 10px);
+          width: 100%; height: 40px;
+        }
       `}} />
 
       <div className="w-full h-16 bg-[#0a0a0f] border-b border-white/10 flex items-center justify-between px-6 shrink-0 z-50">
@@ -651,44 +783,54 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                 ))}
               </div>
             </div>
-            {/* Controls hint */}
             <div className="absolute bottom-[-40px] left-0 text-white/40 text-xs tracking-wider">SPACE = JUMP | DOWN = CROUCH</div>
           </div>
         )}
 
-        {/* Game Stage Container */}
         <div className="relative w-full max-w-5xl aspect-[16/8.8] rounded-3xl overflow-hidden border border-white/10 shadow-[0_30px_80px_rgba(0,0,0,0.5)] bg-[#0b0b0f]">
           <div className="arcade-scanlines absolute inset-0 z-40 opacity-50" />
           <div className="arcade-vignette absolute inset-0 z-30 shadow-[inset_0_0_100px_rgba(0,0,0,0.8)] pointer-events-none" />
 
           <AnimatePresence mode="wait">
-            {/* Story Overlay (Reward for winning the game) */}
+            {/* Story Overlay - Now looks like a Cinema Ticket */}
             {reelState === "story" && content && (
               <motion.div 
                 key="story"
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
-                className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/90 backdrop-blur-md p-8 text-center"
+                className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/95 backdrop-blur-md p-8"
               >
-                <div className="border border-white/20 p-10 rounded-xl bg-gradient-to-b from-white/5 to-transparent max-w-2xl backdrop-blur-sm relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#e8b23d] to-transparent opacity-50"></div>
-                  <div className="text-[#e8b23d] font-mono text-xs tracking-[0.3em] uppercase mb-6">{content.tag}</div>
-                  <h2 className="text-white font-serif italic text-4xl lg:text-5xl mb-6 leading-tight">{content.title}</h2>
-                  <p className="text-white/70 font-mono text-base leading-relaxed mb-10">{content.desc}</p>
-                  
-                  {currentReel < 4 ? (
-                    <button onClick={startNextReel} className="bg-white text-black px-10 py-4 rounded-full font-mono uppercase tracking-widest text-sm hover:scale-105 hover:bg-[#e8b23d] transition-all">
-                      Play Next Scene
-                    </button>
-                  ) : (
-                    <button onClick={onClose} className="border border-white/20 text-white px-10 py-4 rounded-full font-mono uppercase tracking-widest text-sm hover:bg-white/10 transition-colors">
-                      Return to Portfolio
-                    </button>
-                  )}
+                <div className="cinema-ticket w-full max-w-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex">
+                  <div className="w-[100px] flex-shrink-0 flex items-center justify-center border-r border-dashed border-black/10 relative">
+                    <div className="ticket-dashed-line"></div>
+                    <div className="text-black/30 font-mono text-xs uppercase tracking-[0.4em] rotate-180" style={{ writingMode: 'vertical-rl' }}>
+                      Admit One
+                    </div>
+                  </div>
+                  <div className="p-10 flex-1 flex flex-col justify-between">
+                    <div>
+                      <div className="text-black/50 font-mono text-xs tracking-[0.3em] uppercase mb-4">{content.tag}</div>
+                      <h2 className="text-[#241a1e] font-serif italic text-3xl lg:text-4xl mb-4 leading-tight">{content.title}</h2>
+                      <p className="text-black/70 font-sans text-base leading-relaxed mb-8">{content.desc}</p>
+                    </div>
+                    <div className="flex flex-col gap-6">
+                      <div className="ticket-barcode"></div>
+                      <div className="flex justify-end">
+                        {currentReel < 5 ? (
+                          <button onClick={startNextReel} className="bg-[#241a1e] text-[#f4ead8] px-8 py-3 rounded-full font-mono uppercase tracking-widest text-xs hover:scale-105 hover:bg-black transition-all">
+                            Play Next Scene
+                          </button>
+                        ) : (
+                          <button onClick={onClose} className="border border-black/20 text-black px-8 py-3 rounded-full font-mono uppercase tracking-widest text-xs hover:bg-black/5 transition-colors">
+                            Return to Portfolio
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             )}
 
-            {/* Fail Overlay */}
             {reelState === "fail" && (
               <motion.div 
                 key="fail" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
@@ -702,17 +844,13 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
             )}
           </AnimatePresence>
 
-          {/* Reel 1: Runner Canvas */}
           {currentReel === 1 && (reelState === "playing" || reelState === "fail") && 
             <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-cover z-0" style={{ imageRendering: 'pixelated' }} />
           }
-
-          {/* Reel 2: Chess Puzzle */}
           {currentReel === 2 && reelState === "playing" && <ChessPuzzleGame onComplete={() => setReelState("story")} sfx={sfx} />}
-
-          {/* Reel 3: Memory Match */}
           {currentReel === 3 && reelState === "playing" && <MemoryMatchGame onComplete={() => setReelState("story")} sfx={sfx} />}
-
+          {currentReel === 4 && reelState === "playing" && <SudokuGame onComplete={() => setReelState("story")} sfx={sfx} />}
+          
         </div>
 
         <button 
