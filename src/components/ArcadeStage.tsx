@@ -455,8 +455,9 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         pCtx.drawImage(spriteSheet, 0, 0);
         const imgData = pCtx.getImageData(0, 0, processedCanvas.width, processedCanvas.height);
         const data = imgData.data;
+        const bgR = data[0], bgG = data[1], bgB = data[2];
         for (let i = 0; i < data.length; i += 4) {
-          if (data[i] > 230 && data[i+1] > 230 && data[i+2] > 230) {
+          if (Math.abs(data[i] - bgR) < 30 && Math.abs(data[i+1] - bgG) < 30 && Math.abs(data[i+2] - bgB) < 30) {
             data[i+3] = 0; 
           }
         }
@@ -499,7 +500,6 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       if (player.onGround && !player.isCrouching) {
         player.vy = JUMP_V;
         player.onGround = false;
-        spawnParticles(player.x + player.w/2, player.y + player.h, 15, "#fff");
         sfx.jump();
       }
     };
@@ -507,7 +507,6 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
     const crouch = () => {
       if (player.onGround && !player.isCrouching) {
         player.crouchTimer = 35; 
-        spawnParticles(player.x, player.y + player.h, 10, "#aaa");
         sfx.step();
       }
     };
@@ -583,7 +582,6 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       if (player.crouchTimer > 0) {
         player.crouchTimer--;
         player.isCrouching = true;
-        if (frame % 3 === 0) spawnParticles(player.x, player.y + player.h, 4, "#aaa");
       } else {
         player.isCrouching = false;
       }
@@ -675,24 +673,29 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       ctx!.fillStyle = "#f6f6f6";
       ctx!.beginPath(); ctx!.arc(LOGICAL_W * 0.8, GROUND_Y * 0.4, 50, 0, Math.PI*2); ctx!.fill();
 
-      // City Layers
-      drawCityLayer(GROUND_Y, 0.1, "#28253b", 80, 20, cityBack);
-      drawCityLayer(GROUND_Y, 0.3, "#191724", 60, 40, cityFront);
+      // City Layers - Lightened to contrast with dark obstacles
+      drawCityLayer(GROUND_Y, 0.1, "#3b3754", 80, 20, cityBack);
+      drawCityLayer(GROUND_Y, 0.3, "#2a273b", 60, 40, cityFront);
 
       ctx!.fillStyle = "#11111a"; ctx!.fillRect(0, GROUND_Y, LOGICAL_W, LOGICAL_H - GROUND_Y);
       ctx!.fillStyle = "#e8b23d"; ctx!.fillRect(0, GROUND_Y, LOGICAL_W, 4);
 
-      // Draw AP Monogram Coins
+      // Draw Coins
       coins.forEach(c => {
         ctx!.save(); ctx!.translate(c.x, c.y + Math.sin(frame * 0.1 + c.wobble) * 8);
+        ctx!.beginPath();
+        // Spinning effect using scale
+        const scaleX = Math.abs(Math.cos(frame * 0.08));
+        ctx!.scale(scaleX, 1);
+        ctx!.arc(0, 0, c.r, 0, Math.PI * 2);
         ctx!.fillStyle = "#e8b23d";
-        ctx!.shadowColor = "#e8b23d"; ctx!.shadowBlur = 15;
-        // pixel coin shape
-        ctx!.fillRect(-c.r, -c.r*0.6, c.r*2, c.r*1.2);
-        ctx!.fillRect(-c.r*0.6, -c.r, c.r*1.2, c.r*2);
-        ctx!.shadowBlur = 0;
+        ctx!.fill();
+        ctx!.lineWidth = 2;
+        ctx!.strokeStyle = "#d69a21";
+        ctx!.stroke();
+        
         ctx!.fillStyle = "#fff";
-        ctx!.font = "bold 12px monospace";
+        ctx!.font = "bold 14px sans-serif";
         ctx!.textAlign = "center";
         ctx!.textBaseline = "middle";
         ctx!.fillText("AP", 0, 1);
@@ -710,10 +713,10 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       
       ctx!.translate(cx, cy); 
       
-      // Action Slide animation (squash vertically, stretch horizontally, skew slightly)
+      // Action Slide animation
       if (player.isCrouching) {
-        ctx!.scale(1.15, 0.7);
-        ctx!.transform(1, 0, 0.2, 1, 0, 0); // lean forward
+        ctx!.scale(1.05, 0.85);
+        ctx!.transform(1, 0, 0.15, 1, 0, 0); // lean forward slightly
       }
       
       ctx!.translate(-cx, -cy);
