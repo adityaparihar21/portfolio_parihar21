@@ -736,15 +736,11 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         
         const col = currentSpriteFrame % cols;
         const row = Math.floor(currentSpriteFrame / cols);
-        
         ctx!.drawImage(
           processedCanvas,
           col * frameW, row * frameH, frameW, frameH,
           player.x - 20, player.y - 20, player.w + 40, player.h + 20
         );
-      } else {
-        ctx!.fillStyle = "#3b5b82";
-        ctx!.fillRect(player.x, player.y, player.w, player.h);
       }
       ctx!.restore();
 
