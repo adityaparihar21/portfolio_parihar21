@@ -64,24 +64,53 @@ const SVGPieces = {
 const PUZZLES = [
   {
     initial: { 4: "bK", 13: "bP", 14: "bP", 15: "bP", 26: "wB", 35: "wQ" },
-    pieceToMove: 35,
-    target: 13,
-    pieceType: "wQ",
+    pieceToMove: 35, target: 13, pieceType: "wQ",
     validMoves: [3, 11, 19, 27, 43, 51, 59, 32, 33, 34, 36, 37, 38, 39, 8, 17, 26, 44, 53, 62, 56, 49, 42, 28, 21, 14, 13]
   },
   {
     initial: { 6: "bK", 13: "bP", 14: "bP", 15: "bP", 59: "wR", 55: "wK" },
-    pieceToMove: 59,
-    target: 3,
-    pieceType: "wR",
+    pieceToMove: 59, target: 3, pieceType: "wR",
     validMoves: [3, 11, 19, 27, 35, 43, 51, 56, 57, 58, 60, 61, 62, 63]
   },
   {
     initial: { 7: "bK", 6: "bR", 14: "bP", 15: "bP", 20: "wN", 62: "wK" },
-    pieceToMove: 20,
-    target: 13,
-    pieceType: "wN",
+    pieceToMove: 20, target: 13, pieceType: "wN",
     validMoves: [11, 13, 18, 22, 35, 37, 43, 45] 
+  },
+  {
+    initial: { 6: "bK", 15: "bP", 21: "wN", 38: "wQ", 62: "wK" },
+    pieceToMove: 38, target: 14, pieceType: "wQ",
+    validMoves: [6, 14, 22, 30, 46, 54, 62, 32, 33, 34, 35, 36, 37, 39, 11, 20, 29, 47, 56, 24, 31, 45, 52, 59]
+  },
+  {
+    initial: { 2: "bK", 8: "bP", 9: "bP", 10: "bP", 58: "wR", 54: "wK" },
+    pieceToMove: 58, target: 2, pieceType: "wR",
+    validMoves: [2, 10, 18, 26, 34, 42, 50, 56, 57, 59, 60, 61, 62, 63]
+  },
+  {
+    initial: { 0: "bK", 1: "bR", 8: "bP", 9: "bP", 35: "wN", 62: "wK" },
+    pieceToMove: 35, target: 10, pieceType: "wN",
+    validMoves: [10, 18, 20, 25, 41, 45, 50, 52] 
+  },
+  {
+    initial: { 7: "bK", 14: "bP", 21: "wN", 39: "wR", 62: "wK" },
+    pieceToMove: 39, target: 15, pieceType: "wR",
+    validMoves: [7, 15, 23, 31, 47, 55, 63, 32, 33, 34, 35, 36, 37, 38]
+  },
+  {
+    initial: { 6: "bK", 13: "bP", 14: "bP", 15: "bP", 34: "wB", 31: "wQ" },
+    pieceToMove: 31, target: 13, pieceType: "wQ",
+    validMoves: [7, 15, 23, 39, 47, 55, 63, 24, 25, 26, 27, 28, 29, 30, 6, 13, 22, 38, 45, 52, 59]
+  },
+  {
+    initial: { 7: "bK", 15: "bP", 22: "wB", 56: "wR" },
+    pieceToMove: 56, target: 0, pieceType: "wR",
+    validMoves: [0, 8, 16, 24, 32, 40, 48, 57, 58, 59, 60, 61, 62, 63]
+  },
+  {
+    initial: { 6: "bK", 5: "bR", 15: "bP", 21: "wN", 39: "wR" },
+    pieceToMove: 39, target: 7, pieceType: "wR",
+    validMoves: [7, 15, 23, 31, 47, 55, 63, 32, 33, 34, 35, 36, 37, 38]
   }
 ];
 
@@ -109,20 +138,25 @@ function ChessPuzzleGame({ onComplete, sfx }: { onComplete: () => void, sfx: any
     
     // If we have a selected piece and click a valid move dot
     if (selected === puzzle.pieceToMove && puzzle.validMoves.includes(idx)) {
+      const newBoard = [...board];
+      newBoard[idx] = puzzle.pieceType;
+      newBoard[selected] = "";
+      setBoard(newBoard);
+      setSelected(null);
+
       if (idx === puzzle.target) {
         // WIN
-        const newBoard = [...board];
-        newBoard[idx] = puzzle.pieceType;
-        newBoard[selected] = "";
-        setBoard(newBoard);
-        setSelected(null);
         setWin(true);
         sfx.win();
         setTimeout(onComplete, 1500);
       } else {
         // Wrong valid move
-        setSelected(null);
         sfx.hit();
+        setTimeout(() => {
+          const resetBoard = Array(64).fill("");
+          Object.entries(puzzle.initial).forEach(([k, v]) => { resetBoard[parseInt(k)] = v as string; });
+          setBoard(resetBoard);
+        }, 1000);
       }
     } else {
       setSelected(null);
@@ -137,7 +171,7 @@ function ChessPuzzleGame({ onComplete, sfx }: { onComplete: () => void, sfx: any
       </div>
       
       {/* Container is flex to limit height to prevent cropping */}
-      <div className="w-full h-[65vh] max-h-[480px] aspect-square shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-sm overflow-hidden select-none touch-none bg-[#232323]">
+      <div className="h-auto max-h-[60vh] aspect-square w-[60vh] max-w-full shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-sm overflow-hidden select-none touch-none bg-[#232323]">
         <div className="w-full h-full grid grid-cols-8 grid-rows-8">
           {board.map((piece, i) => {
             const row = Math.floor(i / 8);
@@ -763,7 +797,8 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       case 3:
         return {
           tag: "Ticket 3 — Top Cuts", title: "Four Films I Keep Coming Back To",
-          desc: "My Letterboxd is basically a diary. These are the films that shaped my perspective."
+          desc: "My Letterboxd is basically a diary. These are the films that shaped my perspective.",
+          link: { url: "https://letterboxd.com/adityaparihar21", text: "My Letterboxd" }
         };
       case 4:
         return {
