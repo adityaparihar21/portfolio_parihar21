@@ -24,6 +24,7 @@ import { EngineeringPortfolio } from "../components/EngineeringPortfolio";
 import { GithubSection } from "../components/GithubSection";
 import { RadialIntroSequence } from "../components/intro/RadialIntro";
 import { DebugErrorBoundary } from "../components/DebugErrorBoundary";
+import { ArcadeStage } from "../components/ArcadeStage";
 import { useAssetPreloader } from "../hooks/useAssetPreloader";
 import {
   ChevronDown,
@@ -2208,22 +2209,9 @@ export default function Index() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="fixed inset-0 z-[9999] bg-[#050509] flex flex-col"
+            className="fixed inset-0 z-[9999]"
           >
-            <div className="w-full h-16 bg-[#0a0a0f] border-b border-white/10 flex items-center justify-between px-6 shrink-0">
-              <span className="text-white/80 font-mono text-sm tracking-widest uppercase">Interactive Arcade</span>
-              <button 
-                onClick={() => setShowArcade(false)}
-                className="text-white/60 hover:text-white flex items-center gap-2 font-mono text-xs tracking-wider uppercase transition-colors"
-              >
-                Exit Arcade <X className="h-4 w-4" />
-              </button>
-            </div>
-            <iframe 
-              src="/aditya-parihar-reel-runner.html" 
-              className="w-full h-full flex-1 border-none outline-none bg-[#050509]"
-              title="Reel Runner - About Me"
-            />
+            <ArcadeStage onClose={() => setShowArcade(false)} />
           </motion.div>
         )}
       </AnimatePresence>
