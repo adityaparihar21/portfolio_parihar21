@@ -697,12 +697,12 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       case 1:
         return {
           tag: "Ticket 1 — The Setup", title: "Who I Am",
-          desc: "I'm Aditya Parihar — a Computer Science major in my third year at UPES. Code is my major, but cinema is where my head actually lives. It’s chaotic, unpredictable, and you have to keep moving."
+          desc: "I'm Aditya Parihar — a Computer Science major in my third year at UPES. Code is my major, but there's a lot more going on in my head. It’s chaotic, unpredictable, and you have to keep moving."
         };
       case 2:
         return {
           tag: "Ticket 2 — The Strategy", title: "Off Screen",
-          desc: "Football and running keep me moving. Chess keeps me thinking — sitting around 900–1000 Elo, I rely on pattern recognition as much as logic."
+          desc: "Football and running keep me moving. Chess keeps me thinking — sitting around 900–1000 Elo, I rely on pattern recognition as much as logic. This analytical mindset shapes how I approach my craft."
         };
       case 3:
         return {
@@ -716,8 +716,14 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         };
       case 5:
         return {
-          tag: "Ticket 5 — Outtake", title: "The Blooper Reel",
-          desc: "Fun fact: I sometimes stumble over certain sounds when I talk — words starting with things like 'wh-' can trip me up. It's just part of my story — not something I hide. Thanks for watching the whole reel."
+          tag: "Ticket 5 — The Writer", title: "Silent Background",
+          desc: "While I work silently in the background, I also write about things I find interesting and random facts about my life.",
+          link: { url: "https://adityaparihar.substack.com/", text: "Read my Substack" }
+        };
+      case 6:
+        return {
+          tag: "Ticket 6 — Outtake", title: "The Blooper Reel",
+          desc: "Fun fact: I sometimes stumble over certain sounds when I talk — words starting with 'wh-' or 'sh-' can trip me up. It's just part of my story — not something I hide. Thanks for experiencing everything, I really appreciate it."
         };
       default: return null;
     }
@@ -810,12 +816,20 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                     <div>
                       <div className="text-black/50 font-mono text-xs tracking-[0.3em] uppercase mb-4">{content.tag}</div>
                       <h2 className="text-[#241a1e] font-serif italic text-3xl lg:text-4xl mb-4 leading-tight">{content.title}</h2>
-                      <p className="text-black/70 font-sans text-base leading-relaxed mb-8">{content.desc}</p>
+                      <p className="text-black/70 font-sans text-base leading-relaxed mb-4">{content.desc}</p>
+                      {/* @ts-ignore */}
+                      {content.link && (
+                        /* @ts-ignore */
+                        <a href={content.link.url} target="_blank" rel="noreferrer" className="inline-block mb-8 text-[#902424] hover:text-[#b3122e] underline decoration-dashed underline-offset-4 transition-colors font-mono text-sm uppercase tracking-wider">
+                          {/* @ts-ignore */}
+                          {content.link.text} ↗
+                        </a>
+                      )}
                     </div>
                     <div className="flex flex-col gap-6">
                       <div className="ticket-barcode"></div>
                       <div className="flex justify-end">
-                        {currentReel < 5 ? (
+                        {currentReel < 6 ? (
                           <button onClick={startNextReel} className="bg-[#241a1e] text-[#f4ead8] px-8 py-3 rounded-full font-mono uppercase tracking-widest text-xs hover:scale-105 hover:bg-black transition-all">
                             Play Next Scene
                           </button>
