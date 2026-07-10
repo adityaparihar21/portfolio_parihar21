@@ -48,14 +48,14 @@ const useSound = (enabled: boolean) => {
 // CHESS PIECE SVGS
 // -----------------------------------------------------
 const SVGPieces = {
-  wQ: () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" width="100%" height="100%"><g fill="#fff" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 12a2 2 0 1 1-4 0 2 2 0 1 1 4 0zM24.5 7.5a2 2 0 1 1-4 0 2 2 0 1 1 4 0zM41 12a2 2 0 1 1-4 0 2 2 0 1 1 4 0zM16 8.5a2 2 0 1 1-4 0 2 2 0 1 1 4 0zM33 8.5a2 2 0 1 1-4 0 2 2 0 1 1 4 0z"/><path d="M9 26c8.5-1.5 21-1.5 27 0l2-12-7 11V11l-5.5 13.5-3-15-3 15-5.5-14V25L7 14l2 12zM9 26c0 2 1.5 2 2.5 4 1 1.5 1 1 .5 3.5-1.5 1-1.5 2.5-1.5 2.5-1.5 1.5.5 2.5.5 2.5 6.5 1 16.5 1 23 0 0 0 1.5-1 0-2.5 0 0 .5-1.5-1-2.5-.5-2.5-.5-2 .5-3.5 1-2 2.5-2 2.5-4-8.5-1.5-18.5-1.5-27 0z"/><path d="M11.5 30c3.5-1 18.5-1 22 0M12 33.5c6-1 15-1 21 0" fill="none"/></g></svg>,
-  wB: () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" width="100%" height="100%"><g fill="#fff" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><g strokeLinecap="butt"><path d="M9 36c3.39-.97 10.11.43 13.5-2 3.39 2.43 10.11 1.03 13.5 2 0 0 1.65.54 3 2-.68.97-1.65.99-3 .5-3.39-.97-10.11.46-13.5-1-3.39 1.46-10.11.03-13.5 1-1.354.49-2.323.47-3-.5 1.354-1.94 3-2 3-2zM15 32c2.5 2.5 12.5 2.5 15 0 .5-1.5 0-2 0-2 0-2.5-2.5-4-2.5-4 5.5-1.5 6-11.5-5-15.5-11 4-10.5 14-5 15.5 0 0-2.5 1.5-2.5 4 0 0-.5.5 0 2zM25 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 1 1 5 0z"/></g><path d="M17.5 26h10M15 30h15m-7.5-14.5v5M20 18h5" fill="none" strokeLinejoin="miter"/></g></svg>,
-  wR: () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" width="100%" height="100%"><g fill="#fff" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 39h27v-3H9v3zM12 36v-4h21v4H12zM11 14V9h4v2h5V9h5v2h5V9h4v5" strokeLinecap="butt"/><path d="M34 14l-3 3H14l-3-3"/><path d="M31 17v12.5H14V17" strokeLinecap="butt" strokeLinejoin="miter"/><path d="M31 29.5l1.5 2.5h-20l1.5-2.5"/><path d="M11 14h23" fill="none"/></g></svg>,
-  wN: () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" width="100%" height="100%"><g fill="#fff" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M 22,10 C 32.5,11 38.5,18 38,39 L 15,39 C 15,30 25,32.5 23,18" /><path d="M 24,18 C 24.38,20.91 18.45,25.37 16,27 C 13,29 13.18,31.34 11,31 C 9.958,30.06 12.41,27.96 11,28 C 10,28 11.19,29.23 10,30 C 9,30 5.997,31 6,26.5 C 6,24 10,23 11.5,23 C 12,23 12,21.5 10.5,21 C 9,20.5 8.5,19.5 9,18 C 10,16 12,15 14,15 C 16,15 17,14 18,12 C 19,10 20,10 22,10" /><path d="M 9.5,25.5 A 0.5,0.5 0 1 1 8.5,25.5 A 0.5,0.5 0 1 1 9.5,25.5 z" fill="#000" stroke="#000" /><path d="M 15,15.5 A 0.5,1.5 0 1 1 14,15.5 A 0.5,1.5 0 1 1 15,15.5 z" fill="#000" stroke="#000" /></g></svg>,
-  wK: () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" width="100%" height="100%"><g fill="none" fillRule="evenodd" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22.5 11.63V6M20 8h5" strokeLinejoin="miter"/><path d="M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5" fill="#fff" strokeLinecap="butt" strokeLinejoin="miter"/><path d="M11.5 37c5.5 3.5 15.5 3.5 21 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-3.5-7.5-13-10.5-16-4-3 6 5 10.5 5 10.5v7z" fill="#fff"/><path d="M11.5 30c5.5-3 15.5-3 21 0M12.5 33.5c5.5-3 15.5-3 21 0M11.5 37c5.5-3 15.5-3 21 0"/></g></svg>,
-  bK: () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" width="100%" height="100%"><g fill="#000" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22.5 11.63V6M20 8h5"/><path d="M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5"/><path d="M11.5 37c5.5 3.5 15.5 3.5 21 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-3.5-7.5-13-10.5-16-4-3 6 5 10.5 5 10.5v7z"/><path d="M11.5 30c5.5-3 15.5-3 21 0M12.5 33.5c5.5-3 15.5-3 21 0M11.5 37c5.5-3 15.5-3 21 0" stroke="#fff"/></g></svg>,
-  bP: () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" width="100%" height="100%"><g fill="#000" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z"/></g></svg>,
-  bR: () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" width="100%" height="100%"><g fill="#000" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 39h27v-3H9v3zM12.5 32l1.5-2.5h17l1.5 2.5H12.5zM12 36v-4h21v4H12zM14 29.5v-13h17v13H14zM14 16.5L11 14h23l-3 2.5H14zM11 14V9h4v2h5V9h5v2h5V9h4v5H11z" strokeLinecap="butt"/><path d="M12 35.5h21M13 31.5h19M14 29.5h17M14 16.5h17M11 14h23" fill="none" stroke="#fff" strokeWidth="1" strokeLinejoin="miter"/></g></svg>
+  wQ: () => <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/Chess_qlt45.svg" alt="White Queen" className="w-full h-full drop-shadow-lg" />,
+  wB: () => <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Chess_blt45.svg" alt="White Bishop" className="w-full h-full drop-shadow-lg" />,
+  wR: () => <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg" alt="White Rook" className="w-full h-full drop-shadow-lg" />,
+  wN: () => <img src="https://upload.wikimedia.org/wikipedia/commons/7/70/Chess_nlt45.svg" alt="White Knight" className="w-full h-full drop-shadow-lg" />,
+  wK: () => <img src="https://upload.wikimedia.org/wikipedia/commons/4/42/Chess_klt45.svg" alt="White King" className="w-full h-full drop-shadow-lg" />,
+  bK: () => <img src="https://upload.wikimedia.org/wikipedia/commons/f/f0/Chess_kdt45.svg" alt="Black King" className="w-full h-full drop-shadow-lg" />,
+  bP: () => <img src="https://upload.wikimedia.org/wikipedia/commons/c/c7/Chess_pdt45.svg" alt="Black Pawn" className="w-full h-full drop-shadow-lg" />,
+  bR: () => <img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Chess_rdt45.svg" alt="Black Rook" className="w-full h-full drop-shadow-lg" />
 };
 
 // -----------------------------------------------------
@@ -170,8 +170,8 @@ function ChessPuzzleGame({ onComplete, sfx }: { onComplete: () => void, sfx: any
         <p className="text-white/60 text-xs md:text-sm font-sans tracking-wide">White to play and win.</p>
       </div>
       
-      {/* Container is flex to limit height to prevent cropping */}
-      <div className="h-auto max-h-[60vh] aspect-square w-[60vh] max-w-full shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-sm overflow-hidden select-none touch-none bg-[#232323]">
+      {/* Strict square container constraint */}
+      <div className="w-[90vw] max-w-[400px] aspect-square shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-sm overflow-hidden select-none touch-none bg-[#232323]">
         <div className="w-full h-full grid grid-cols-8 grid-rows-8">
           {board.map((piece, i) => {
             const row = Math.floor(i / 8);
@@ -317,52 +317,82 @@ function MemoryMatchGame({ onComplete, sfx }: { onComplete: () => void, sfx: any
   );
 }
 
-// -----------------------------------------------------
-// SUDOKU GAME (Reel 4)
-// -----------------------------------------------------
-function SudokuGame({ onComplete, sfx }: { onComplete: () => void, sfx: any }) {
-  // A simple 4x4 Sudoku
-  // 1 2 3 4
-  // 3 4 1 2
-  // 2 1 4 3
-  // 4 3 2 1
-  const initial = [
-    [1, 0, 3, 4],
-    [3, 4, 1, 0],
-    [0, 1, 4, 3],
-    [4, 3, 0, 1]
+function generateSudoku() {
+  const base = [
+    [1, 2, 3, 4, 5, 6],
+    [4, 5, 6, 1, 2, 3],
+    [2, 3, 1, 5, 6, 4],
+    [5, 6, 4, 2, 3, 1],
+    [3, 1, 2, 6, 4, 5],
+    [6, 4, 5, 3, 1, 2]
   ];
-  const solution = [
-    [1, 2, 3, 4],
-    [3, 4, 1, 2],
-    [2, 1, 4, 3],
-    [4, 3, 2, 1]
-  ];
+  
+  // Random mapping 1-6
+  const map = [1,2,3,4,5,6].sort(() => Math.random() - 0.5);
+  let grid = base.map(row => row.map(v => map[v-1]));
 
-  const [grid, setGrid] = useState(initial);
+  const swapRows = (r1: number, r2: number) => { const t = grid[r1]; grid[r1] = grid[r2]; grid[r2] = t; };
+  if (Math.random() > 0.5) swapRows(0,1);
+  if (Math.random() > 0.5) swapRows(2,3);
+  if (Math.random() > 0.5) swapRows(4,5);
+
+  const b0 = [0,1,2].sort(() => Math.random() - 0.5);
+  const b1 = [3,4,5].sort(() => Math.random() - 0.5);
+  
+  const newGrid: number[][] = [];
+  for (let i=0; i<6; i++) {
+    newGrid.push([
+      grid[i][b0[0]], grid[i][b0[1]], grid[i][b0[2]],
+      grid[i][b1[0]], grid[i][b1[1]], grid[i][b1[2]],
+    ]);
+  }
+  grid = newGrid;
+
+  const initial = grid.map(r => [...r]);
+  let removed = 0;
+  while(removed < 18) {
+    let r = Math.floor(Math.random()*6);
+    let c = Math.floor(Math.random()*6);
+    if(initial[r][c] !== 0) {
+      initial[r][c] = 0;
+      removed++;
+    }
+  }
+
+  return { initial, solution: grid };
+}
+
+function SudokuGame({ onComplete, sfx }: { onComplete: () => void, sfx: any }) {
+  const [puzzle] = useState(() => generateSudoku());
+  const [grid, setGrid] = useState(puzzle.initial);
+  const [selected, setSelected] = useState<{r:number, c:number}|null>(null);
   const [win, setWin] = useState(false);
 
   const handleCellClick = (r: number, c: number) => {
-    if (win || initial[r][c] !== 0) return;
+    if (win) return;
+    setSelected({r, c});
+    
+    if (puzzle.initial[r][c] !== 0) return;
     
     sfx.click();
     const newGrid = [...grid.map(row => [...row])];
     let val = newGrid[r][c];
     val = val === 0 ? 1 : val + 1;
-    if (val > 4) val = 1;
+    if (val > 6) val = 1; // 1-6 for 6x6
     newGrid[r][c] = val;
     setGrid(newGrid);
 
     // Check win
     let isWin = true;
-    for (let i = 0; i < 4; i++) {
-      for (let j = 0; j < 4; j++) {
-        if (newGrid[i][j] !== solution[i][j]) {
+    for (let i = 0; i < 6; i++) {
+      for (let j = 0; j < 6; j++) {
+        if (newGrid[i][j] !== puzzle.solution[i][j]) {
           isWin = false;
         }
       }
     }
     if (isWin) {
+      setSelected(null);
       setWin(true);
       sfx.win();
       setTimeout(onComplete, 1500);
@@ -370,22 +400,31 @@ function SudokuGame({ onComplete, sfx }: { onComplete: () => void, sfx: any }) {
   };
 
   return (
-    <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-8 bg-[#0b0b0f]">
+    <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-8 bg-[#121212] select-none touch-none [-webkit-tap-highlight-color:transparent]">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-serif text-white mb-2">{win ? "Solved!" : "Logic Puzzle"}</h2>
-        <p className="text-white/50 text-xs font-mono">Fill missing numbers (1-4). Click to cycle.</p>
+        <p className="text-white/50 text-xs font-mono">Fill missing numbers (1-6). Click to cycle.</p>
       </div>
-      <div className="grid grid-cols-4 grid-rows-4 w-64 h-64 border-4 border-white/20 bg-black shadow-[0_0_30px_rgba(255,255,255,0.05)]">
+      
+      <div className="grid grid-cols-6 grid-rows-6 w-[80vw] max-w-[320px] aspect-square bg-[#1a1a1a] border-4 border-[#333] shadow-[0_0_30px_rgba(0,0,0,0.5)]">
         {grid.map((row, r) => row.map((val, c) => {
-          const isFixed = initial[r][c] !== 0;
+          const isFixed = puzzle.initial[r][c] !== 0;
+          const isSelected = selected?.r === r && selected?.c === c;
+          const isRelated = selected && !isSelected && (selected.r === r || selected.c === c || (Math.floor(selected.r/2) === Math.floor(r/2) && Math.floor(selected.c/3) === Math.floor(c/3)));
+          
+          let bgClass = "bg-[#1a1a1a]";
+          if (isSelected) bgClass = "bg-[#2b4a6f]";
+          else if (isRelated) bgClass = "bg-[#1e293b]";
+
           return (
             <div 
               key={`${r}-${c}`} 
               onClick={() => handleCellClick(r, c)}
-              className={`flex items-center justify-center border border-white/10 text-2xl font-mono
-                ${isFixed ? 'text-white/50 bg-white/5' : 'text-[#e8b23d] cursor-pointer hover:bg-white/10'}
-                ${r === 1 ? 'border-b-2 border-b-white/30' : ''}
-                ${c === 1 ? 'border-r-2 border-r-white/30' : ''}
+              className={`flex items-center justify-center text-xl md:text-2xl font-semibold cursor-pointer transition-colors duration-100 outline-none
+                ${bgClass}
+                ${isFixed ? 'text-white' : 'text-[#4a90e2]'}
+                ${r % 2 === 1 && r !== 5 ? 'border-b-[3px] border-b-[#333]' : 'border-b border-b-[#333]/30'}
+                ${c % 3 === 2 && c !== 5 ? 'border-r-[3px] border-r-[#333]' : 'border-r border-r-[#333]/30'}
               `}
             >
               {val !== 0 ? val : ""}
@@ -538,23 +577,23 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
 
     function drawObstacle(o: any) {
       ctx!.save();
-      ctx!.translate(o.x, o.y);
+      ctx!.translate(Math.floor(o.x), Math.floor(o.y));
       if (o.type === 'c-stand') {
-        ctx!.fillStyle = "#222";
+        ctx!.fillStyle = "#ff4d4d"; // Bright red for visibility
         ctx!.fillRect(12, -20, 6, o.h + 20); 
         ctx!.fillRect(0, o.h - 6, 30, 6); 
         ctx!.fillRect(12, -15, 20, 4); 
       } else if (o.type === 'pelican') {
-        ctx!.fillStyle = "#111";
+        ctx!.fillStyle = "#ff9f43"; // Bright orange
         ctx!.beginPath(); ctx!.roundRect(0, 8, o.w + 10, o.h - 8, 4); ctx!.fill();
-        ctx!.fillStyle = "#e8b23d"; 
+        ctx!.fillStyle = "#fff"; 
         ctx!.fillRect(4, 14, o.w + 2, 4);
       } else if (o.type === 'boom-mic') {
-        ctx!.fillStyle = "#333";
+        ctx!.fillStyle = "#ff4d4d"; // Bright red
         ctx!.fillRect(o.w/2 - 2, -300, 4, 300); 
-        ctx!.fillStyle = "#1a1a1a";
+        ctx!.fillStyle = "#ff9f43";
         ctx!.beginPath(); ctx!.roundRect(0, 0, o.w, o.h, 10); ctx!.fill(); 
-        ctx!.fillStyle = "#555";
+        ctx!.fillStyle = "#fff";
         ctx!.fillRect(4, 4, o.w-8, 2);
         ctx!.fillRect(4, 12, o.w-8, 2);
       }
@@ -682,7 +721,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
 
       // Draw Coins
       coins.forEach(c => {
-        ctx!.save(); ctx!.translate(c.x, c.y + Math.sin(frame * 0.1 + c.wobble) * 8);
+        ctx!.save(); ctx!.translate(Math.floor(c.x), Math.floor(c.y + Math.sin(frame * 0.1 + c.wobble) * 8));
         ctx!.beginPath();
         // Spinning effect using scale
         const scaleX = Math.abs(Math.cos(frame * 0.08));
@@ -708,8 +747,8 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       ctx!.save();
       if (player.invuln > 0 && frame % 10 < 5) ctx!.globalAlpha = 0.4;
       // Set origin to bottom center of the player
-      const cx = player.x + player.w/2;
-      const cy = player.y + player.h;
+      const cx = Math.floor(player.x + player.w/2);
+      const cy = Math.floor(player.y + player.h);
       
       ctx!.translate(cx, cy); 
       
@@ -739,7 +778,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         ctx!.drawImage(
           processedCanvas,
           col * frameW, row * frameH, frameW, frameH,
-          player.x - 20, player.y - 20, player.w + 40, player.h + 20
+          Math.floor(player.x - 20), Math.floor(player.y - 20), player.w + 40, player.h + 20
         );
       }
       ctx!.restore();
@@ -802,7 +841,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       case 4:
         return {
           tag: "Ticket 4 — The Logic", title: "Method to the Madness",
-          desc: "Whether I'm writing a defense exam or debugging a React component, breaking a massive problem down into simple logic gates is how I get things done."
+          desc: "Whether I'm writing an exam or debugging a React component, breaking a massive problem down into simple logic gates is how I get things done."
         };
       case 5:
         return {
