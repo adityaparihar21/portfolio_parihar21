@@ -46,19 +46,16 @@ const useSound = (enabled: boolean) => {
 
 
 // -----------------------------------------------------
-// CHESS PUZZLE (Reel 2) - Mate in 1
+// CHESS PUZZLE (Reel 2)
 // -----------------------------------------------------
 function ChessPuzzleGame({ onComplete, sfx }: { onComplete: () => void, sfx: any }) {
-  // Simple representation: 8x8 grid. We only care about a few pieces for a classic Mate in 1.
-  // Setup: White Q on d5, White B on c4. Black K on e8. Black pawns on f7, g7, h7.
-  // Winning move: Q from d5 to f7.
   const initialBoard = Array(64).fill("");
-  initialBoard[4] = "♚"; // e8
-  initialBoard[13] = "♟"; // f7
-  initialBoard[14] = "♟"; // g7
-  initialBoard[15] = "♟"; // h7
-  initialBoard[26] = "♗"; // c4
-  initialBoard[35] = "♕"; // d5
+  initialBoard[4] = "♚"; 
+  initialBoard[13] = "♟"; 
+  initialBoard[14] = "♟"; 
+  initialBoard[15] = "♟"; 
+  initialBoard[26] = "♗"; 
+  initialBoard[35] = "♕"; 
 
   const [board, setBoard] = useState(initialBoard);
   const [selected, setSelected] = useState<number | null>(null);
@@ -66,7 +63,6 @@ function ChessPuzzleGame({ onComplete, sfx }: { onComplete: () => void, sfx: any
 
   const handleSquareClick = (idx: number) => {
     if (win) return;
-    
     if (selected === null) {
       if (board[idx] === "♕" || board[idx] === "♗") {
         setSelected(idx);
@@ -74,7 +70,6 @@ function ChessPuzzleGame({ onComplete, sfx }: { onComplete: () => void, sfx: any
       }
     } else {
       if (selected === 35 && idx === 13) {
-        // Winning move: Qd5 x f7#
         const newBoard = [...board];
         newBoard[13] = "♕";
         newBoard[35] = "";
@@ -82,9 +77,8 @@ function ChessPuzzleGame({ onComplete, sfx }: { onComplete: () => void, sfx: any
         setSelected(null);
         setWin(true);
         sfx.win();
-        setTimeout(onComplete, 2500);
+        setTimeout(onComplete, 1500);
       } else {
-        // Wrong move
         setSelected(null);
         sfx.hit();
       }
@@ -97,7 +91,6 @@ function ChessPuzzleGame({ onComplete, sfx }: { onComplete: () => void, sfx: any
         <h2 className="text-2xl font-serif text-white mb-2">{win ? "Checkmate!" : "Find the Mate in 1"}</h2>
         <p className="text-white/50 text-xs font-mono">White to play and win.</p>
       </div>
-      
       <div className="w-full max-w-[320px] aspect-square grid grid-cols-8 border-4 border-[#241a1e] rounded shadow-2xl">
         {board.map((piece, i) => {
           const row = Math.floor(i / 8);
@@ -105,14 +98,7 @@ function ChessPuzzleGame({ onComplete, sfx }: { onComplete: () => void, sfx: any
           const isDark = (row + col) % 2 === 1;
           const isSelected = selected === i;
           return (
-            <div 
-              key={i} 
-              onClick={() => handleSquareClick(i)}
-              className={`flex items-center justify-center text-3xl cursor-pointer select-none
-                ${isDark ? 'bg-[#71828F]' : 'bg-[#C7D0D8]'}
-                ${isSelected ? 'ring-inset ring-4 ring-[#e8b23d] bg-[#e8b23d]/50' : ''}
-              `}
-            >
+            <div key={i} onClick={() => handleSquareClick(i)} className={`flex items-center justify-center text-3xl cursor-pointer select-none ${isDark ? 'bg-[#71828F]' : 'bg-[#C7D0D8]'} ${isSelected ? 'ring-inset ring-4 ring-[#e8b23d] bg-[#e8b23d]/50' : ''}`}>
               <span className={piece === "♕" || piece === "♗" ? "text-white drop-shadow-md" : "text-black drop-shadow-sm"}>{piece}</span>
             </div>
           );
@@ -163,7 +149,7 @@ function MemoryMatchGame({ onComplete, sfx }: { onComplete: () => void, sfx: any
             if (c.every(x => x.matched)) {
               setWin(true);
               sfx.win();
-              setTimeout(onComplete, 2000);
+              setTimeout(onComplete, 1500);
             }
             return c;
           });
@@ -193,13 +179,9 @@ function MemoryMatchGame({ onComplete, sfx }: { onComplete: () => void, sfx: any
       <div className="grid grid-cols-4 gap-4">
         {cards.map((c, i) => (
           <div key={c.id} onClick={() => handleCardClick(i)} className="w-20 h-28 md:w-28 md:h-40 perspective-1000 cursor-pointer">
-            <motion.div 
-              className="w-full h-full relative preserve-3d"
-              animate={{ rotateY: c.flipped || c.matched ? 180 : 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              <div className="absolute inset-0 backface-hidden bg-[#241a1e] border border-white/20 rounded-lg flex items-center justify-center shadow-lg">
-                <span className="text-white/20 font-serif italic text-2xl">?</span>
+            <motion.div className="w-full h-full relative preserve-3d" animate={{ rotateY: c.flipped || c.matched ? 180 : 0 }} transition={{ duration: 0.4 }}>
+              <div className="absolute inset-0 backface-hidden bg-[#241a1e] border border-[#e8b23d]/30 rounded-lg flex items-center justify-center shadow-lg">
+                <span className="text-[#e8b23d]/30 font-serif italic text-3xl">?</span>
               </div>
               <div className="absolute inset-0 backface-hidden bg-black rounded-lg overflow-hidden border border-[#e8b23d] shadow-[0_0_15px_rgba(232,178,61,0.4)]" style={{ transform: 'rotateY(180deg)' }}>
                 <img src={c.img} className="w-full h-full object-cover opacity-90" />
@@ -220,8 +202,9 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const bgmAudio = useRef<HTMLAudioElement | null>(null);
 
+  // START IN "playing" STATE FOR GAME -> STORY FLOW
   const [currentReel, setCurrentReel] = useState(1);
-  const [reelState, setReelState] = useState<"intro" | "playing" | "fail" | "completed">("intro");
+  const [reelState, setReelState] = useState<"playing" | "story" | "fail">("playing");
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [ecoMode, setEcoMode] = useState(false);
   const sfx = useSound(soundEnabled);
@@ -241,7 +224,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
   }, []);
 
   useEffect(() => {
-    if (soundEnabled && (reelState === "playing" || reelState === "completed" || reelState === "intro")) {
+    if (soundEnabled && (reelState === "playing" || reelState === "story")) {
       bgmAudio.current?.play().catch(() => {});
     } else {
       bgmAudio.current?.pause();
@@ -257,9 +240,30 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Load generated sprite sheet
+    // Load generated sprite sheet & apply chroma key
     const spriteSheet = new Image();
     spriteSheet.src = "/runner_sprite.png";
+    const processedCanvas = document.createElement("canvas");
+    let isSpriteReady = false;
+
+    spriteSheet.onload = () => {
+      processedCanvas.width = spriteSheet.naturalWidth;
+      processedCanvas.height = spriteSheet.naturalHeight;
+      const pCtx = processedCanvas.getContext("2d");
+      if (pCtx) {
+        pCtx.drawImage(spriteSheet, 0, 0);
+        const imgData = pCtx.getImageData(0, 0, processedCanvas.width, processedCanvas.height);
+        const data = imgData.data;
+        for (let i = 0; i < data.length; i += 4) {
+          // Remove white background (R, G, B > 230)
+          if (data[i] > 230 && data[i+1] > 230 && data[i+2] > 230) {
+            data[i+3] = 0; 
+          }
+        }
+        pCtx.putImageData(imgData, 0, 0);
+        isSpriteReady = true;
+      }
+    };
 
     const LOGICAL_W = 960;
     const LOGICAL_H = 480;
@@ -272,7 +276,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
     let spawnTimer = 0;
     let animationId: number;
 
-    const player = { x: 110, y: GROUND_Y - 80, w: 60, h: 80, vy: 0, onGround: true, invuln: 0, squash: 1 };
+    const player = { x: 110, y: GROUND_Y - 80, w: 60, h: 80, vy: 0, onGround: true, invuln: 0, squash: 1, isCrouching: false, crouchTimer: 0 };
     let obstacles: any[] = [];
     let coins: any[] = [];
     let particles: any[] = [];
@@ -292,7 +296,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
     window.addEventListener("resize", resize);
 
     const jump = () => {
-      if (player.onGround) {
+      if (player.onGround && !player.isCrouching) {
         player.vy = JUMP_V;
         player.onGround = false;
         player.squash = 1.3;
@@ -301,11 +305,19 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       }
     };
 
+    const crouch = () => {
+      if (player.onGround && !player.isCrouching) {
+        player.crouchTimer = 35; // Crouch for ~0.5s
+        sfx.step(); // Quick slide sound
+      }
+    };
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === "Space" || e.code === "ArrowUp") { e.preventDefault(); jump(); }
+      if (e.code === "ArrowDown" || e.code === "KeyS") { e.preventDefault(); crouch(); }
     };
     window.addEventListener("keydown", handleKeyDown);
-    canvas.addEventListener("pointerdown", jump, { passive: true });
+    canvas.addEventListener("pointerdown", jump, { passive: true }); // Click to jump
 
     function spawnParticles(x: number, y: number, count: number, color: string) {
       for (let i = 0; i < count; i++) {
@@ -339,6 +351,15 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         ctx!.beginPath(); ctx!.roundRect(0, 8, o.w + 10, o.h - 8, 4); ctx!.fill();
         ctx!.fillStyle = "#e8b23d"; // yellow accent
         ctx!.fillRect(4, 14, o.w + 2, 4);
+      } else if (o.type === 'boom-mic') {
+        ctx!.fillStyle = "#333";
+        ctx!.fillRect(o.w/2 - 2, -120, 4, 120); // pole coming from top
+        ctx!.fillStyle = "#1a1a1a";
+        ctx!.beginPath(); ctx!.roundRect(0, 0, o.w, o.h, 10); ctx!.fill(); // fuzzy mic
+        // Small grey details
+        ctx!.fillStyle = "#555";
+        ctx!.fillRect(4, 4, o.w-8, 2);
+        ctx!.fillRect(4, 12, o.w-8, 2);
       }
       ctx!.restore();
     }
@@ -358,6 +379,15 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       frame++;
       speed = 7 + Math.min(5, scoreRef.current / 80);
 
+      // Crouch Logic
+      if (player.crouchTimer > 0) {
+        player.crouchTimer--;
+        player.isCrouching = true;
+      } else {
+        player.isCrouching = false;
+      }
+
+      // Physics
       player.vy += GRAVITY;
       player.y += player.vy;
       if (player.y >= GROUND_Y - player.h) {
@@ -369,19 +399,26 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       if (player.invuln > 0) player.invuln--;
       player.squash += (1 - player.squash) * 0.25;
 
-      if (player.onGround && frame % 12 === 0) sfx.step();
+      if (player.onGround && !player.isCrouching && frame % 12 === 0) sfx.step();
 
       // Spawning
       spawnTimer--;
       if (spawnTimer <= 0) {
-        spawnTimer = 45 + Math.random() * 30;
-        if (Math.random() < 0.55) {
-          coins.push({ x: LOGICAL_W + 20, y: GROUND_Y - 110 - Math.random() * 50, r: 14, wobble: Math.random() * 10 });
+        spawnTimer = 50 + Math.random() * 30;
+        if (Math.random() < 0.50) {
+          coins.push({ x: LOGICAL_W + 20, y: GROUND_Y - 90 - Math.random() * 60, r: 16, wobble: Math.random() * 10 });
         } else {
-          const types = ['c-stand', 'pelican'];
-          obstacles.push({ x: LOGICAL_W + 20, y: GROUND_Y - 40, w: 32, h: 40, type: types[Math.floor(Math.random() * types.length)] });
+          const types = ['c-stand', 'pelican', 'boom-mic'];
+          const type = types[Math.floor(Math.random() * types.length)];
+          const yPos = type === 'boom-mic' ? GROUND_Y - 90 : GROUND_Y - 40;
+          const height = type === 'boom-mic' ? 30 : 40;
+          obstacles.push({ x: LOGICAL_W + 20, y: yPos, w: 32, h: height, type });
         }
       }
+
+      // Dynamic Hitbox for Crouch
+      const hitboxTop = player.y + (player.isCrouching ? player.h * 0.5 : 0);
+      const hitboxHeight = player.isCrouching ? player.h * 0.5 : player.h;
 
       // Update obstacles
       for (let i = obstacles.length - 1; i >= 0; i--) {
@@ -389,7 +426,12 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         o.x -= speed;
         if (o.x + o.w < -20) { obstacles.splice(i, 1); continue; }
         // Hitbox collision
-        if (player.invuln === 0 && player.x + 10 < o.x + o.w && player.x + player.w - 10 > o.x && player.y + player.h > o.y + 10) {
+        if (player.invuln === 0 && 
+            player.x + 10 < o.x + o.w && 
+            player.x + player.w - 10 > o.x && 
+            hitboxTop + hitboxHeight > o.y + 10 && 
+            hitboxTop < o.y + o.h) {
+          
           livesRef.current--;
           setUiLives(livesRef.current);
           player.invuln = 90;
@@ -402,7 +444,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         }
       }
 
-      // Update Coins
+      // Update AP Monogram Coins
       for (let i = coins.length - 1; i >= 0; i--) {
         const c = coins[i];
         c.x -= speed;
@@ -414,7 +456,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
           setUiScore(scoreRef.current);
           if (scoreRef.current >= 40) { 
             sfx.win();
-            setReelState("completed");
+            setReelState("story"); // Go to story when won
             return;
           }
           coins.splice(i, 1);
@@ -429,56 +471,63 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         if (p.life <= 0) particles.splice(i, 1);
       }
 
-      // Draw Background - Sunset for high contrast
+      // Draw Background - Sunset
       ctx!.clearRect(0, 0, LOGICAL_W, LOGICAL_H);
-      
       const sky = ctx!.createLinearGradient(0, 0, 0, GROUND_Y);
       sky.addColorStop(0, "#ff7b54"); sky.addColorStop(1, "#ffd56b");
       ctx!.fillStyle = sky; ctx!.fillRect(0, 0, LOGICAL_W, GROUND_Y);
-
-      // Sun
       ctx!.fillStyle = "#fff4d4";
       ctx!.beginPath(); ctx!.arc(LOGICAL_W * 0.7, GROUND_Y * 0.6, 60, 0, Math.PI*2); ctx!.fill();
 
       drawHillLayer(GROUND_Y - 60, 0.15, "#e36e5c", 80);
       drawHillLayer(GROUND_Y - 20, 0.3, "#a34a58", 50);
 
-      // Ground
       ctx!.fillStyle = "#1a1a24"; ctx!.fillRect(0, GROUND_Y, LOGICAL_W, LOGICAL_H - GROUND_Y);
       ctx!.fillStyle = "#e8b23d"; ctx!.fillRect(0, GROUND_Y, LOGICAL_W, 4);
 
-      // Draw Coins (Golden Lenses)
+      // Draw Coins (AP Monogram)
       coins.forEach(c => {
         ctx!.save(); ctx!.translate(c.x, c.y + Math.sin(frame * 0.1 + c.wobble) * 8);
         ctx!.fillStyle = "#e8b23d";
-        ctx!.shadowColor = "#e8b23d"; ctx!.shadowBlur = 15;
+        ctx!.shadowColor = "#e8b23d"; ctx!.shadowBlur = 10;
         ctx!.beginPath(); ctx!.arc(0, 0, c.r, 0, Math.PI * 2); ctx!.fill();
         ctx!.shadowBlur = 0;
         ctx!.fillStyle = "#111";
-        ctx!.beginPath(); ctx!.arc(0, 0, c.r * 0.6, 0, Math.PI * 2); ctx!.fill();
-        ctx!.fillStyle = "#fff";
-        ctx!.beginPath(); ctx!.arc(-c.r*0.2, -c.r*0.2, c.r * 0.2, 0, Math.PI * 2); ctx!.fill();
+        ctx!.beginPath(); ctx!.arc(0, 0, c.r * 0.8, 0, Math.PI * 2); ctx!.fill();
+        
+        // AP Text
+        ctx!.fillStyle = "#e8b23d";
+        ctx!.font = "bold 14px monospace";
+        ctx!.textAlign = "center";
+        ctx!.textBaseline = "middle";
+        ctx!.fillText("AP", 0, 1);
         ctx!.restore();
       });
 
       obstacles.forEach(drawObstacle);
 
-      // Draw Player (Sprite Sheet)
+      // Draw Player (Transparent Sprite Sheet + Crouch Logic)
       ctx!.save();
       if (player.invuln > 0 && frame % 10 < 5) ctx!.globalAlpha = 0.4;
       const cx = player.x + player.w/2;
       ctx!.translate(cx, GROUND_Y); 
-      ctx!.scale(1 / Math.sqrt(player.squash), player.squash); 
+      
+      // If crouching, squash on Y heavily to simulate slide
+      const renderSquash = player.isCrouching ? player.squash * 0.5 : player.squash;
+      ctx!.scale(1 / Math.sqrt(renderSquash), renderSquash); 
+      
       ctx!.translate(-cx, -GROUND_Y);
       
-      // Calculate sprite frame (2x2 grid)
-      if (spriteSheet.complete && spriteSheet.naturalWidth > 0) {
+      if (isSpriteReady && processedCanvas.width > 0) {
         const cols = 2;
         const rows = 2;
-        const frameW = spriteSheet.naturalWidth / cols;
-        const frameH = spriteSheet.naturalHeight / rows;
+        const frameW = processedCanvas.width / cols;
+        const frameH = processedCanvas.height / rows;
         let currentSpriteFrame = 0;
-        if (player.onGround) {
+        
+        if (player.isCrouching) {
+          currentSpriteFrame = 1; // Use jump frame as a proxy for sliding
+        } else if (player.onGround) {
           currentSpriteFrame = Math.floor((frame / 6) % 4);
         } else {
           currentSpriteFrame = 1; // Jumping frame
@@ -488,14 +537,14 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         const row = Math.floor(currentSpriteFrame / cols);
         
         ctx!.drawImage(
-          spriteSheet,
-          col * frameW, row * frameH, frameW, frameH, // Source
-          player.x - 20, player.y - 20, player.w + 40, player.h + 20 // Dest (padded to fit)
+          processedCanvas,
+          col * frameW, row * frameH, frameW, frameH,
+          player.x - 20, player.y - 20, player.w + 40, player.h + 20
         );
       } else {
-        // Fallback
-        ctx!.fillStyle = "#b3122e";
-        ctx!.fillRect(player.x, player.y, player.w, player.h);
+        // Fallback Box
+        ctx!.fillStyle = "#3b5b82";
+        ctx!.fillRect(player.x, player.y + (player.isCrouching ? player.h/2 : 0), player.w, player.isCrouching ? player.h/2 : player.h);
       }
       ctx!.restore();
 
@@ -525,8 +574,10 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
   const startNextReel = () => {
     scoreRef.current = 0; setUiScore(0);
     livesRef.current = 3; setUiLives(3);
-    setReelState("intro");
-    setCurrentReel(prev => prev + 1);
+    const nextReel = currentReel + 1;
+    setCurrentReel(nextReel);
+    // If it's reel 4 (Outtakes) there is no game, just story.
+    setReelState(nextReel >= 4 ? "story" : "playing"); 
   };
 
   const retryReel = () => {
@@ -539,33 +590,23 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
     switch(currentReel) {
       case 1:
         return {
-          tag: "Ticket 1 — The Setup", title: "Third Year, Frame by Frame",
-          desc: "I'm Aditya Parihar — a Computer Science major in my third year at UPES. Code is my major, but cinema is where my head actually lives. It’s chaotic, unpredictable, and you have to keep moving.",
-          game: "runner"
+          tag: "Ticket 1 — The Setup", title: "Who I Am",
+          desc: "I'm Aditya Parihar — a Computer Science major in my third year at UPES. Code is my major, but cinema is where my head actually lives. It’s chaotic, unpredictable, and you have to keep moving."
         };
       case 2:
         return {
-          tag: "Ticket 2 — The Strategy", title: "When I'm Not Watching Something",
-          desc: "Football and running keep me moving. Chess keeps me thinking — sitting around 900–1000 Elo, I rely on pattern recognition as much as logic. Let's see if you can spot the Mate in 1.",
-          game: "chess"
+          tag: "Ticket 2 — The Strategy", title: "Off Screen",
+          desc: "Football and running keep me moving. Chess keeps me thinking — sitting around 900–1000 Elo, I rely on pattern recognition as much as logic."
         };
       case 3:
         return {
           tag: "Ticket 3 — Top Cuts", title: "Four Films I Keep Coming Back To",
-          desc: "My Letterboxd is basically a diary. Let's see if you can match the films that shaped my perspective.",
-          game: "memory"
+          desc: "My Letterboxd is basically a diary. These are the films that shaped my perspective."
         };
       case 4:
         return {
           tag: "Ticket 4 — Outtake", title: "The Blooper Reel",
-          desc: "Fun fact: I sometimes stumble over certain sounds when I talk — words starting with things like 'wh-' can trip me up. It's just part of my story — not something I hide.",
-          game: "text"
-        };
-      case 5:
-        return {
-          tag: "End of Reel", title: "Roll Credits",
-          desc: "Thanks for watching the whole reel. If any of this resonated — the films, the code, or the journey — I'd genuinely like to hear from you.",
-          game: "end"
+          desc: "Fun fact: I sometimes stumble over certain sounds when I talk — words starting with things like 'wh-' can trip me up. It's just part of my story — not something I hide."
         };
       default: return null;
     }
@@ -599,17 +640,19 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         {currentReel === 1 && (reelState === "playing" || reelState === "fail") && (
           <div className="absolute top-8 left-8 right-8 z-40 flex justify-between font-mono text-black pointer-events-none drop-shadow-md">
             <div>
-              <div className="text-xs uppercase tracking-widest mb-1 font-bold">Lenses</div>
+              <div className="text-xs uppercase tracking-widest mb-1 font-bold text-white/50">AP Coins</div>
               <div className="text-3xl text-white font-bold">{uiScore.toString().padStart(3, '0')}</div>
             </div>
             <div className="text-right">
-              <div className="text-xs uppercase tracking-widest mb-1 font-bold">Takes</div>
+              <div className="text-xs uppercase tracking-widest mb-1 font-bold text-white/50">Takes</div>
               <div className="flex gap-2 justify-end mt-2">
                 {[...Array(3)].map((_, i) => (
                   <div key={i} className={`w-4 h-4 rounded-full ${i < uiLives ? 'bg-[#b3122e] border-2 border-white' : 'border-2 border-black/50'}`} />
                 ))}
               </div>
             </div>
+            {/* Controls hint */}
+            <div className="absolute bottom-[-40px] left-0 text-white/40 text-xs tracking-wider">SPACE = JUMP | DOWN = CROUCH</div>
           </div>
         )}
 
@@ -618,11 +661,11 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
           <div className="arcade-scanlines absolute inset-0 z-40 opacity-50" />
           <div className="arcade-vignette absolute inset-0 z-30 shadow-[inset_0_0_100px_rgba(0,0,0,0.8)] pointer-events-none" />
 
-          {/* Intro Overlay (Cinematic Ticket Style) */}
           <AnimatePresence mode="wait">
-            {reelState === "intro" && content && (
+            {/* Story Overlay (Reward for winning the game) */}
+            {reelState === "story" && content && (
               <motion.div 
-                key="intro"
+                key="story"
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
                 className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/90 backdrop-blur-md p-8 text-center"
               >
@@ -632,9 +675,9 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                   <h2 className="text-white font-serif italic text-4xl lg:text-5xl mb-6 leading-tight">{content.title}</h2>
                   <p className="text-white/70 font-mono text-base leading-relaxed mb-10">{content.desc}</p>
                   
-                  {content.game !== "end" ? (
-                    <button onClick={() => setReelState("playing")} className="bg-white text-black px-10 py-4 rounded-full font-mono uppercase tracking-widest text-sm hover:scale-105 hover:bg-[#e8b23d] transition-all">
-                      {content.game === "text" ? "Continue" : "Play Scene"}
+                  {currentReel < 4 ? (
+                    <button onClick={startNextReel} className="bg-white text-black px-10 py-4 rounded-full font-mono uppercase tracking-widest text-sm hover:scale-105 hover:bg-[#e8b23d] transition-all">
+                      Play Next Scene
                     </button>
                   ) : (
                     <button onClick={onClose} className="border border-white/20 text-white px-10 py-4 rounded-full font-mono uppercase tracking-widest text-sm hover:bg-white/10 transition-colors">
@@ -657,35 +700,18 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                 </button>
               </motion.div>
             )}
-
-            {/* Completed Overlay */}
-            {reelState === "completed" && (
-              <motion.div 
-                key="completed" initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 1, scale: 1 }}
-                className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/90 backdrop-blur-md p-8"
-              >
-                <div className="bg-[#f4ead8] text-[#241a1e] p-10 rounded-2xl max-w-md w-full shadow-2xl relative overflow-hidden text-center border-4 border-[#e8b23d]">
-                  <h2 className="font-serif italic text-4xl mb-4 mt-2">Scene Wrapped</h2>
-                  <p className="text-lg mb-8 font-mono text-black/60">Ready for the next setup.</p>
-                  <button onClick={startNextReel} className="bg-[#241a1e] text-[#f4ead8] px-8 py-4 rounded-full font-mono text-sm uppercase tracking-widest hover:bg-black transition-colors w-full">
-                    Load Next Ticket
-                  </button>
-                </div>
-              </motion.div>
-            )}
           </AnimatePresence>
 
           {/* Reel 1: Runner Canvas */}
-          {currentReel === 1 && <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-cover z-0" style={{ imageRendering: 'pixelated' }} />}
+          {currentReel === 1 && (reelState === "playing" || reelState === "fail") && 
+            <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-cover z-0" style={{ imageRendering: 'pixelated' }} />
+          }
 
           {/* Reel 2: Chess Puzzle */}
-          {currentReel === 2 && reelState === "playing" && <ChessPuzzleGame onComplete={() => setReelState("completed")} sfx={sfx} />}
+          {currentReel === 2 && reelState === "playing" && <ChessPuzzleGame onComplete={() => setReelState("story")} sfx={sfx} />}
 
           {/* Reel 3: Memory Match */}
-          {currentReel === 3 && reelState === "playing" && <MemoryMatchGame onComplete={() => setReelState("completed")} sfx={sfx} />}
-
-          {/* Reel 4: Just Text -> skip straight to completed */}
-          {currentReel === 4 && reelState === "playing" && (() => { setReelState("completed"); return null; })()}
+          {currentReel === 3 && reelState === "playing" && <MemoryMatchGame onComplete={() => setReelState("story")} sfx={sfx} />}
 
         </div>
 
