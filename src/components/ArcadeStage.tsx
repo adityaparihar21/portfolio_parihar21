@@ -50,48 +50,82 @@ const useSound = (enabled: boolean) => {
 const SVGPieces = {
   wQ: () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" width="100%" height="100%"><g fill="#fff" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 12a2 2 0 1 1-4 0 2 2 0 1 1 4 0zM24.5 7.5a2 2 0 1 1-4 0 2 2 0 1 1 4 0zM41 12a2 2 0 1 1-4 0 2 2 0 1 1 4 0zM16 8.5a2 2 0 1 1-4 0 2 2 0 1 1 4 0zM33 8.5a2 2 0 1 1-4 0 2 2 0 1 1 4 0z"/><path d="M9 26c8.5-1.5 21-1.5 27 0l2-12-7 11V11l-5.5 13.5-3-15-3 15-5.5-14V25L7 14l2 12zM9 26c0 2 1.5 2 2.5 4 1 1.5 1 1 .5 3.5-1.5 1-1.5 2.5-1.5 2.5-1.5 1.5.5 2.5.5 2.5 6.5 1 16.5 1 23 0 0 0 1.5-1 0-2.5 0 0 .5-1.5-1-2.5-.5-2.5-.5-2 .5-3.5 1-2 2.5-2 2.5-4-8.5-1.5-18.5-1.5-27 0z"/><path d="M11.5 30c3.5-1 18.5-1 22 0M12 33.5c6-1 15-1 21 0" fill="none"/></g></svg>,
   wB: () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" width="100%" height="100%"><g fill="#fff" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><g strokeLinecap="butt"><path d="M9 36c3.39-.97 10.11.43 13.5-2 3.39 2.43 10.11 1.03 13.5 2 0 0 1.65.54 3 2-.68.97-1.65.99-3 .5-3.39-.97-10.11.46-13.5-1-3.39 1.46-10.11.03-13.5 1-1.354.49-2.323.47-3-.5 1.354-1.94 3-2 3-2zM15 32c2.5 2.5 12.5 2.5 15 0 .5-1.5 0-2 0-2 0-2.5-2.5-4-2.5-4 5.5-1.5 6-11.5-5-15.5-11 4-10.5 14-5 15.5 0 0-2.5 1.5-2.5 4 0 0-.5.5 0 2zM25 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 1 1 5 0z"/></g><path d="M17.5 26h10M15 30h15m-7.5-14.5v5M20 18h5" fill="none" strokeLinejoin="miter"/></g></svg>,
+  wR: () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" width="100%" height="100%"><g fill="#fff" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 39h27v-3H9v3zM12 36v-4h21v4H12zM11 14V9h4v2h5V9h5v2h5V9h4v5" strokeLinecap="butt"/><path d="M34 14l-3 3H14l-3-3"/><path d="M31 17v12.5H14V17" strokeLinecap="butt" strokeLinejoin="miter"/><path d="M31 29.5l1.5 2.5h-20l1.5-2.5"/><path d="M11 14h23" fill="none"/></g></svg>,
+  wN: () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" width="100%" height="100%"><g fill="#fff" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M 22,10 C 32.5,11 38.5,18 38,39 L 15,39 C 15,30 25,32.5 23,18" /><path d="M 24,18 C 24.38,20.91 18.45,25.37 16,27 C 13,29 13.18,31.34 11,31 C 9.958,30.06 12.41,27.96 11,28 C 10,28 11.19,29.23 10,30 C 9,30 5.997,31 6,26.5 C 6,24 10,23 11.5,23 C 12,23 12,21.5 10.5,21 C 9,20.5 8.5,19.5 9,18 C 10,16 12,15 14,15 C 16,15 17,14 18,12 C 19,10 20,10 22,10" /><path d="M 9.5,25.5 A 0.5,0.5 0 1 1 8.5,25.5 A 0.5,0.5 0 1 1 9.5,25.5 z" fill="#000" stroke="#000" /><path d="M 15,15.5 A 0.5,1.5 0 1 1 14,15.5 A 0.5,1.5 0 1 1 15,15.5 z" fill="#000" stroke="#000" /></g></svg>,
+  wK: () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" width="100%" height="100%"><g fill="none" fillRule="evenodd" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22.5 11.63V6M20 8h5" strokeLinejoin="miter"/><path d="M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5" fill="#fff" strokeLinecap="butt" strokeLinejoin="miter"/><path d="M11.5 37c5.5 3.5 15.5 3.5 21 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-3.5-7.5-13-10.5-16-4-3 6 5 10.5 5 10.5v7z" fill="#fff"/><path d="M11.5 30c5.5-3 15.5-3 21 0M12.5 33.5c5.5-3 15.5-3 21 0M11.5 37c5.5-3 15.5-3 21 0"/></g></svg>,
   bK: () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" width="100%" height="100%"><g fill="#000" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22.5 11.63V6M20 8h5"/><path d="M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5"/><path d="M11.5 37c5.5 3.5 15.5 3.5 21 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-3.5-7.5-13-10.5-16-4-3 6 5 10.5 5 10.5v7z"/><path d="M11.5 30c5.5-3 15.5-3 21 0M12.5 33.5c5.5-3 15.5-3 21 0M11.5 37c5.5-3 15.5-3 21 0" stroke="#fff"/></g></svg>,
-  bP: () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" width="100%" height="100%"><g fill="#000" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z"/></g></svg>
+  bP: () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" width="100%" height="100%"><g fill="#000" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z"/></g></svg>,
+  bR: () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" width="100%" height="100%"><g fill="#000" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 39h27v-3H9v3zM12.5 32l1.5-2.5h17l1.5 2.5H12.5zM12 36v-4h21v4H12zM14 29.5v-13h17v13H14zM14 16.5L11 14h23l-3 2.5H14zM11 14V9h4v2h5V9h5v2h5V9h4v5H11z" strokeLinecap="butt"/><path d="M12 35.5h21M13 31.5h19M14 29.5h17M14 16.5h17M11 14h23" fill="none" stroke="#fff" strokeWidth="1" strokeLinejoin="miter"/></g></svg>
 };
 
 // -----------------------------------------------------
 // CHESS PUZZLE (Reel 2)
 // -----------------------------------------------------
-function ChessPuzzleGame({ onComplete, sfx }: { onComplete: () => void, sfx: any }) {
-  const initialBoard = Array(64).fill("");
-  initialBoard[4] = "bK";  // e8
-  initialBoard[13] = "bP"; // f7
-  initialBoard[14] = "bP"; // g7
-  initialBoard[15] = "bP"; // h7
-  initialBoard[26] = "wB"; // c4
-  initialBoard[35] = "wQ"; // d5
+const PUZZLES = [
+  {
+    initial: { 4: "bK", 13: "bP", 14: "bP", 15: "bP", 26: "wB", 35: "wQ" },
+    pieceToMove: 35,
+    target: 13,
+    pieceType: "wQ",
+    validMoves: [3, 11, 19, 27, 43, 51, 59, 32, 33, 34, 36, 37, 38, 39, 8, 17, 26, 44, 53, 62, 56, 49, 42, 28, 21, 14, 13]
+  },
+  {
+    initial: { 6: "bK", 13: "bP", 14: "bP", 15: "bP", 59: "wR", 55: "wK" },
+    pieceToMove: 59,
+    target: 3,
+    pieceType: "wR",
+    validMoves: [3, 11, 19, 27, 35, 43, 51, 56, 57, 58, 60, 61, 62, 63]
+  },
+  {
+    initial: { 7: "bK", 6: "bR", 14: "bP", 15: "bP", 20: "wN", 62: "wK" },
+    pieceToMove: 20,
+    target: 13,
+    pieceType: "wN",
+    validMoves: [11, 13, 18, 22, 35, 37, 43, 45] 
+  }
+];
 
-  const [board, setBoard] = useState(initialBoard);
+function ChessPuzzleGame({ onComplete, sfx }: { onComplete: () => void, sfx: any }) {
+  const puzzle = useMemo(() => PUZZLES[Math.floor(Math.random() * PUZZLES.length)], []);
+  const [board, setBoard] = useState(() => {
+    const b = Array(64).fill("");
+    Object.entries(puzzle.initial).forEach(([k, v]) => { b[parseInt(k)] = v as string; });
+    return b;
+  });
+  
   const [selected, setSelected] = useState<number | null>(null);
   const [win, setWin] = useState(false);
   const [hintActive, setHintActive] = useState(false);
 
   const handleSquareClick = (idx: number) => {
     if (win) return;
-    if (selected === null) {
-      if (board[idx] === "wQ" || board[idx] === "wB") {
-        setSelected(idx);
-        sfx.click();
-      }
-    } else {
-      if (selected === 35 && idx === 13) {
+    
+    // If clicking a white piece, select it
+    if (board[idx] && board[idx].startsWith('w')) {
+      setSelected(idx);
+      sfx.click();
+      return;
+    }
+    
+    // If we have a selected piece and click a valid move dot
+    if (selected === puzzle.pieceToMove && puzzle.validMoves.includes(idx)) {
+      if (idx === puzzle.target) {
+        // WIN
         const newBoard = [...board];
-        newBoard[13] = "wQ";
-        newBoard[35] = "";
+        newBoard[idx] = puzzle.pieceType;
+        newBoard[selected] = "";
         setBoard(newBoard);
         setSelected(null);
         setWin(true);
         sfx.win();
         setTimeout(onComplete, 1500);
       } else {
+        // Wrong valid move
         setSelected(null);
         sfx.hit();
       }
+    } else {
+      setSelected(null);
     }
   };
 
@@ -101,35 +135,55 @@ function ChessPuzzleGame({ onComplete, sfx }: { onComplete: () => void, sfx: any
         <h2 className="text-xl md:text-3xl font-serif text-white mb-2">{win ? "Checkmate!" : "Find the Mate in 1"}</h2>
         <p className="text-white/60 text-xs md:text-sm font-sans tracking-wide">White to play and win.</p>
       </div>
-      <div className="w-full max-w-[360px] md:max-w-[480px] aspect-square grid grid-cols-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-sm overflow-hidden select-none touch-none">
-        {board.map((piece, i) => {
-          const row = Math.floor(i / 8);
-          const col = i % 8;
-          const isDark = (row + col) % 2 === 1;
-          const isSelected = selected === i;
-          const isHintSquare = hintActive && (i === 35 || i === 13);
-          
-          return (
-            <div 
-              key={i} 
-              onClick={() => handleSquareClick(i)} 
-              className={`relative flex items-center justify-center cursor-pointer 
-                ${isDark ? 'bg-[#739552]' : 'bg-[#ebecd0]'}
-              `}
-            >
-              {isSelected && <div className="absolute inset-0 bg-[#f6f669]/60" />}
-              {isHintSquare && !win && <div className="absolute inset-0 border-4 border-dashed border-[#ff4d4d]/70 animate-pulse pointer-events-none" />}
-              {piece && (
-                <div className="w-[80%] h-[80%] relative z-10 drop-shadow-md">
-                  {piece === "wQ" && <SVGPieces.wQ />}
-                  {piece === "wB" && <SVGPieces.wB />}
-                  {piece === "bK" && <SVGPieces.bK />}
-                  {piece === "bP" && <SVGPieces.bP />}
-                </div>
-              )}
-            </div>
-          );
-        })}
+      
+      {/* Container is flex to limit height to prevent cropping */}
+      <div className="w-full h-[65vh] max-h-[480px] aspect-square shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-sm overflow-hidden select-none touch-none bg-[#232323]">
+        <div className="w-full h-full grid grid-cols-8 grid-rows-8">
+          {board.map((piece, i) => {
+            const row = Math.floor(i / 8);
+            const col = i % 8;
+            const isDark = (row + col) % 2 === 1;
+            const isSelected = selected === i;
+            const isHintSquare = hintActive && (i === puzzle.pieceToMove || i === puzzle.target);
+            const isValidMove = selected === puzzle.pieceToMove && puzzle.validMoves.includes(i);
+            const isCapture = isValidMove && board[i] !== "";
+
+            return (
+              <div 
+                key={i} 
+                onClick={() => handleSquareClick(i)} 
+                className={`relative flex items-center justify-center cursor-pointer 
+                  ${isDark ? 'bg-[#739552]' : 'bg-[#ebecd0]'}
+                `}
+              >
+                {isSelected && <div className="absolute inset-0 bg-[#f6f669]/60" />}
+                {isHintSquare && !win && <div className="absolute inset-0 border-4 border-dashed border-[#ff4d4d]/70 animate-pulse pointer-events-none" />}
+                
+                {/* Chess.com style valid move dot */}
+                {isValidMove && !isCapture && (
+                  <div className="absolute w-[30%] h-[30%] bg-black/20 rounded-full z-20 pointer-events-none" />
+                )}
+                {/* Capture circle */}
+                {isValidMove && isCapture && (
+                  <div className="absolute w-[85%] h-[85%] border-[5px] border-black/20 rounded-full z-20 pointer-events-none" />
+                )}
+
+                {piece && (
+                  <div className="w-[85%] h-[85%] relative z-10 drop-shadow-md">
+                    {piece === "wQ" && <SVGPieces.wQ />}
+                    {piece === "wB" && <SVGPieces.wB />}
+                    {piece === "wR" && <SVGPieces.wR />}
+                    {piece === "wN" && <SVGPieces.wN />}
+                    {piece === "wK" && <SVGPieces.wK />}
+                    {piece === "bK" && <SVGPieces.bK />}
+                    {piece === "bP" && <SVGPieces.bP />}
+                    {piece === "bR" && <SVGPieces.bR />}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
       {!win && (
         <button 
@@ -495,6 +549,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       if (player.crouchTimer > 0) {
         player.crouchTimer--;
         player.isCrouching = true;
+        if (frame % 3 === 0) spawnParticles(player.x, player.y + player.h, 4, "#aaa");
       } else {
         player.isCrouching = false;
       }
@@ -615,15 +670,16 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       // Draw Player
       ctx!.save();
       if (player.invuln > 0 && frame % 10 < 5) ctx!.globalAlpha = 0.4;
+      // Set origin to bottom center of the player
       const cx = player.x + player.w/2;
-      const cy = player.y + player.h/2;
+      const cy = player.y + player.h;
       
       ctx!.translate(cx, cy); 
       
-      // Action Slide animation (rotate character backwards)
+      // Action Slide animation (squash vertically, stretch horizontally, skew slightly)
       if (player.isCrouching) {
-        ctx!.rotate(-Math.PI / 2);
-        ctx!.translate(-player.h/2 + 20, -player.w/2); 
+        ctx!.scale(1.15, 0.7);
+        ctx!.transform(1, 0, 0.2, 1, 0, 0); // lean forward
       }
       
       ctx!.translate(-cx, -cy);
