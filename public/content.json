@@ -63,8 +63,8 @@
           "GSAP",
           "TailwindCSS"
         ],
-        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
-        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
+        "problem": "Enterprise tools for data insights are typically fragmented and overwhelmingly complex, causing users to get lost in \"data chaos\" and slowing down decision-making.",
+        "solution": "Designed a unified, semantic AI-driven interface that transforms complex data sets into intuitive, conversational experiences, drastically reducing time-to-insight for enterprise teams."
       },
       {
         "id": "portfolio",
@@ -81,8 +81,8 @@
           "GSAP",
           "TailwindCSS"
         ],
-        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
-        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
+        "problem": "Standard developer portfolios often rely on cookie-cutter templates, failing to capture a unique creative identity or demonstrate advanced front-end engineering capabilities.",
+        "solution": "Engineered a bespoke, dual-themed cinematic web experience from scratch using WebGL and advanced GSAP animations, perfectly showcasing both technical rigor and creative vision."
       },
       {
         "id": "ctj",
@@ -99,8 +99,8 @@
           "GSAP",
           "TailwindCSS"
         ],
-        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
-        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
+        "problem": "Modern digital communication platforms prioritize speed and noise, stripping away the deliberate, reflective pacing of analog writing and the intimacy of shared silence.",
+        "solution": "Developed a real-time synchronized digital space that meticulously recreates the tactile feel of a vintage typewriter, fostering a unique, mindful environment for communal journaling."
       },
       {
         "id": "ascii-engine",
@@ -117,8 +117,8 @@
           "GSAP",
           "TailwindCSS"
         ],
-        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
-        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
+        "problem": "Processing live video feeds into stylized ASCII representations usually incurs severe latency and high CPU overhead, making smooth real-time rendering nearly impossible in pure Java.",
+        "solution": "Built a highly optimized custom computer vision pipeline in pure Java that efficiently maps pixel luminance to ASCII characters, achieving a stable, real-time 30fps conversion."
       },
       {
         "id": "trip-co",
@@ -135,8 +135,8 @@
           "GSAP",
           "TailwindCSS"
         ],
-        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
-        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
+        "problem": "Planning comprehensive travel itineraries is a tedious, multi-hour process that forces users to juggle fragmented research across dozens of websites and tools.",
+        "solution": "Created a blazing-fast, AI-powered streaming application that ingests complex user preferences and generates highly personalized, complete travel itineraries in under two seconds."
       },
       {
         "id": "weather-hut",
@@ -153,8 +153,8 @@
           "GSAP",
           "TailwindCSS"
         ],
-        "problem": "The traditional approach to this problem was overly complex and lacked a cohesive user experience, leading to high drop-off rates and confusion.",
-        "solution": "I engineered a seamless, cinematic interface that consolidated the workflows into a single, highly performant single-page application, resulting in a 40% increase in user retention."
+        "problem": "Most weather applications focus solely on dense, utilitarian data displays, completely neglecting the aesthetic experience and the atmospheric mood of the forecast.",
+        "solution": "Designed a visually stunning, immersive weather interface that leverages rich CSS animations and a curated UX to transform standard REST API data into an atmospheric digital experience."
       }
     ]
   },
