@@ -4,33 +4,18 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const MISSIONS = [
   { id: 1, title: "Escape the Set", objective: "Collect 40 AP Coins", difficulty: "HARD" },
-  {
-    id: 2,
-    title: "Checkmate the Director",
-    objective: "Neutralize the Director's Final Move",
-    difficulty: "HARD",
-  },
-  {
-    id: 3,
-    title: "Recover the Film Archive",
-    objective: "Decrypt all missing film files",
-    difficulty: "MEDIUM",
-  },
-  {
-    id: 4,
-    title: "Decode the Logic Core",
-    objective: "Reconstruct the corrupted system data",
-    difficulty: "EASY",
-  },
+  { id: 2, title: "Checkmate the Director", objective: "Neutralize the Director's Final Move", difficulty: "HARD" },
+  { id: 3, title: "Recover the Film Archive", objective: "Decrypt all missing film files", difficulty: "MEDIUM" },
+  { id: 4, title: "Decode the Logic Core", objective: "Reconstruct the corrupted system data", difficulty: "EASY" },
   { id: 5, title: "Behind the Scenes", objective: "Read About" },
-  { id: 6, title: "Director's Cut", objective: "Complete the Arcade" },
+  { id: 6, title: "Director's Cut", objective: "Complete the Arcade" }
 ];
 
 const ACHIEVEMENTS_LIST = {
   "First Take": "Clear a mission without failing",
   "Film Buff": "Decrypt the archive perfectly",
-  Grandmaster: "Solve the chess puzzle",
-  "Logic Node": "Reconstruct the system core",
+  "Grandmaster": "Solve the chess puzzle",
+  "Logic Node": "Reconstruct the system core"
 };
 
 const useSound = (enabled: boolean) => {
@@ -82,10 +67,10 @@ const useSound = (enabled: boolean) => {
       },
       error: () => playSound(150, 0.2, "sawtooth", 0.1),
       printer: () => {
-        for (let i = 0; i < 6; i++) {
-          playSound(800 + Math.random() * 200, 0.03, "square", 0.05, i * 0.06);
+        for(let i=0; i<6; i++) {
+          playSound(800 + Math.random()*200, 0.03, "square", 0.05, i*0.06);
         }
-      },
+      }
     };
   }, [enabled]);
 };
@@ -285,12 +270,15 @@ function ChessPuzzleGame({ onComplete, sfx }: { onComplete: () => void; sfx: any
     <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-4 bg-[#0a0a0f]">
       {/* Dynamic cinematic lighting overlay */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,#2a3b4c_0%,transparent_70%)] opacity-30 pointer-events-none" />
+      
+      
 
-      <motion.div
+      <motion.div 
         animate={win ? { y: [0, 10, -10, 5, -5, 0], transition: { duration: 0.5 } } : {}}
         className="relative w-[90vw] max-w-[420px] aspect-square rounded-lg p-3 bg-[#111] border border-white/10 shadow-[0_30px_80px_rgba(0,0,0,0.8),inset_0_0_20px_rgba(255,255,255,0.05)]"
       >
         <div className="w-full h-full grid grid-cols-8 grid-rows-8 rounded overflow-hidden border border-white/5 relative">
+          
           {board.map((piece, i) => {
             const row = Math.floor(i / 8);
             const col = i % 8;
@@ -306,33 +294,31 @@ function ChessPuzzleGame({ onComplete, sfx }: { onComplete: () => void; sfx: any
                 onClick={() => handleSquareClick(i)}
                 className={`relative flex items-center justify-center cursor-pointer transition-colors duration-200
                   ${isDark ? "bg-[#344050]" : "bg-[#5b6a7a]"}
-                  ${win && piece.startsWith("b") ? "opacity-20 blur-sm scale-90" : ""}
-                  ${win && piece.startsWith("w") ? "drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] scale-105" : ""}
+                  ${win && piece.startsWith('b') ? 'opacity-20 blur-sm scale-90' : ''}
+                  ${win && piece.startsWith('w') ? 'drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] scale-105' : ''}
                 `}
               >
                 {isSelected && (
-                  <motion.div
+                  <motion.div 
                     layoutId="selection"
-                    className="absolute inset-0 bg-[#e8b23d]/40 shadow-[inset_0_0_20px_rgba(232,178,61,0.6)]"
+                    className="absolute inset-0 bg-[#e8b23d]/40 shadow-[inset_0_0_20px_rgba(232,178,61,0.6)]" 
                   />
                 )}
-
+                
                 {isHintSquare && !win && (
                   <div className="absolute inset-0 border-2 border-[#10b981]/50 shadow-[inset_0_0_15px_rgba(16,185,129,0.4)] animate-pulse pointer-events-none" />
                 )}
 
                 {isValidMove && !isCapture && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="absolute w-[25%] h-[25%] bg-[#10b981]/60 rounded-full z-20 pointer-events-none shadow-[0_0_10px_rgba(16,185,129,0.8)]"
+                  <motion.div 
+                    initial={{ scale: 0 }} animate={{ scale: 1 }}
+                    className="absolute w-[25%] h-[25%] bg-[#10b981]/60 rounded-full z-20 pointer-events-none shadow-[0_0_10px_rgba(16,185,129,0.8)]" 
                   />
                 )}
                 {isValidMove && isCapture && (
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="absolute w-[80%] h-[80%] border-4 border-[#ff4d4d]/60 rounded-full z-20 pointer-events-none shadow-[0_0_15px_rgba(255,77,77,0.6)]"
+                  <motion.div 
+                    initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                    className="absolute w-[80%] h-[80%] border-4 border-[#ff4d4d]/60 rounded-full z-20 pointer-events-none shadow-[0_0_15px_rgba(255,77,77,0.6)]" 
                   />
                 )}
 
@@ -353,13 +339,10 @@ function ChessPuzzleGame({ onComplete, sfx }: { onComplete: () => void; sfx: any
           })}
         </div>
       </motion.div>
-
+      
       {!win && (
         <button
-          onClick={() => {
-            setHintActive(!hintActive);
-            sfx.click();
-          }}
+          onClick={() => { setHintActive(!hintActive); sfx.click(); }}
           className="mt-6 flex items-center gap-2 px-6 py-2 rounded-full border border-white/10 bg-white/5 text-white/70 hover:text-white hover:bg-white/10 transition font-mono uppercase text-xs tracking-widest"
         >
           <HelpCircle className="w-4 h-4" /> {hintActive ? "Hide Analytics" : "Request Hint"}
@@ -368,6 +351,7 @@ function ChessPuzzleGame({ onComplete, sfx }: { onComplete: () => void; sfx: any
     </div>
   );
 }
+
 
 function MemoryMatchGame({ onComplete, sfx }: { onComplete: () => void; sfx: any }) {
   const [cards, setCards] = useState<
@@ -442,13 +426,12 @@ function MemoryMatchGame({ onComplete, sfx }: { onComplete: () => void; sfx: any
   return (
     <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-8 bg-[#1a1c23]">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.03)_0%,transparent_80%)] pointer-events-none" />
+      
+      
 
       <div className="grid grid-cols-4 gap-4 md:gap-6 relative z-10">
         {cards.map((c, i) => {
-          const isWrong =
-            flippedIdx.length === 2 &&
-            flippedIdx.includes(i) &&
-            cards[flippedIdx[0]].img !== cards[flippedIdx[1]].img;
+          const isWrong = flippedIdx.length === 2 && flippedIdx.includes(i) && cards[flippedIdx[0]].img !== cards[flippedIdx[1]].img;
           return (
             <motion.div
               key={c.id}
@@ -459,10 +442,10 @@ function MemoryMatchGame({ onComplete, sfx }: { onComplete: () => void; sfx: any
               <motion.div
                 className="w-full h-full relative preserve-3d"
                 initial={false}
-                animate={{
+                animate={{ 
                   rotateY: c.flipped || c.matched ? 180 : 0,
                   z: c.flipped && !c.matched ? 20 : 0,
-                  scale: c.matched ? 1.05 : 1,
+                  scale: c.matched ? 1.05 : 1
                 }}
                 transition={{ type: "spring", stiffness: 260, damping: 20 }}
               >
@@ -470,23 +453,15 @@ function MemoryMatchGame({ onComplete, sfx }: { onComplete: () => void; sfx: any
                 <div className="absolute inset-0 backface-hidden bg-[#242730] border-2 border-[#3a3f4e] rounded-lg shadow-xl overflow-hidden flex flex-col">
                   <div className="flex-1 border-x-4 border-[#15161a] border-dashed opacity-50 m-2 flex items-center justify-center relative">
                     <div className="absolute -left-1 w-2 h-full bg-[#1a1c23] flex flex-col justify-between py-1">
-                      {[...Array(6)].map((_, j) => (
-                        <div key={j} className="w-full h-1.5 bg-[#242730]" />
-                      ))}
+                      {[...Array(6)].map((_, j) => <div key={j} className="w-full h-1.5 bg-[#242730]" />)}
                     </div>
                     <div className="absolute -right-1 w-2 h-full bg-[#1a1c23] flex flex-col justify-between py-1">
-                      {[...Array(6)].map((_, j) => (
-                        <div key={j} className="w-full h-1.5 bg-[#242730]" />
-                      ))}
+                      {[...Array(6)].map((_, j) => <div key={j} className="w-full h-1.5 bg-[#242730]" />)}
                     </div>
-                    <span className="text-[#3a3f4e] font-mono font-bold text-3xl rotate-90 tracking-widest opacity-30">
-                      NEG
-                    </span>
+                    <span className="text-[#3a3f4e] font-mono font-bold text-3xl rotate-90 tracking-widest opacity-30">NEG</span>
                   </div>
                   <div className="h-6 bg-[#3a3f4e] w-full flex items-center justify-center">
-                    <span className="text-[8px] font-mono text-[#1a1c23] font-bold tracking-widest uppercase">
-                      PROJECT AP
-                    </span>
+                    <span className="text-[8px] font-mono text-[#1a1c23] font-bold tracking-widest uppercase">PROJECT AP</span>
                   </div>
                 </div>
 
@@ -495,15 +470,10 @@ function MemoryMatchGame({ onComplete, sfx }: { onComplete: () => void; sfx: any
                   className="absolute inset-0 backface-hidden bg-black rounded-lg overflow-hidden border-2 border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.6)]"
                   style={{ transform: "rotateY(180deg)" }}
                 >
-                  <img
-                    src={c.img}
-                    className={`w-full h-full object-cover transition-opacity duration-500 ${c.matched ? "opacity-100" : "opacity-80"}`}
-                  />
+                  <img src={c.img} className={`w-full h-full object-cover transition-opacity duration-500 ${c.matched ? 'opacity-100' : 'opacity-80'}`} />
                   {c.matched && (
-                    <motion.div
-                      initial={{ opacity: 1 }}
-                      animate={{ opacity: 0 }}
-                      transition={{ duration: 1 }}
+                    <motion.div 
+                      initial={{ opacity: 1 }} animate={{ opacity: 0 }} transition={{ duration: 1 }}
                       className="absolute inset-0 bg-white mix-blend-overlay"
                     />
                   )}
@@ -640,15 +610,8 @@ function SudokuGame({ onComplete, sfx }: { onComplete: () => void; sfx: any }) {
       <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%] pointer-events-none z-0" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,180,255,0.05)_0%,transparent_70%)] pointer-events-none" />
 
-      <motion.div
-        animate={
-          win
-            ? {
-                scale: [1, 1.02, 1],
-                filter: ["hue-rotate(0deg)", "hue-rotate(90deg)", "hue-rotate(0deg)"],
-              }
-            : {}
-        }
+      <motion.div 
+        animate={win ? { scale: [1, 1.02, 1], filter: ["hue-rotate(0deg)", "hue-rotate(90deg)", "hue-rotate(0deg)"] } : {}}
         transition={{ duration: 1, ease: "easeInOut" }}
         className="relative z-10 w-[85vw] max-w-[340px] aspect-square p-2 bg-[#0a1220] rounded-xl border border-[#00f0ff]/20 shadow-[0_0_50px_rgba(0,240,255,0.1),inset_0_0_20px_rgba(0,240,255,0.05)]"
       >
@@ -673,14 +636,11 @@ function SudokuGame({ onComplete, sfx }: { onComplete: () => void; sfx: any }) {
                 const delay = (r + c) * 0.05;
                 if (completionProgress > delay) bgClass = "bg-[#00f0ff]/20";
               } else {
-                if (isSelected)
-                  bgClass = "bg-[#00f0ff]/30 shadow-[inset_0_0_15px_rgba(0,240,255,0.5)]";
+                if (isSelected) bgClass = "bg-[#00f0ff]/30 shadow-[inset_0_0_15px_rgba(0,240,255,0.5)]";
                 else if (isRelated) bgClass = "bg-[#00f0ff]/10";
               }
 
-              let textClass = isFixed
-                ? "text-white font-bold"
-                : "text-[#00f0ff] font-light text-shadow-[0_0_8px_rgba(0,240,255,0.8)]";
+              let textClass = isFixed ? "text-white font-bold" : "text-[#00f0ff] font-light text-shadow-[0_0_8px_rgba(0,240,255,0.8)]";
               if (isError) {
                 textClass = "text-[#ff4d4d] font-bold text-shadow-[0_0_8px_rgba(255,77,77,0.8)]";
               }
@@ -697,13 +657,10 @@ function SudokuGame({ onComplete, sfx }: { onComplete: () => void; sfx: any }) {
                 `}
                 >
                   {isSelected && !win && (
-                    <motion.div
-                      layoutId="cellHighlight"
-                      className="absolute inset-0 bg-[#00f0ff]/20"
-                    />
+                    <motion.div layoutId="cellHighlight" className="absolute inset-0 bg-[#00f0ff]/20" />
                   )}
                   {val !== 0 ? val : ""}
-
+                  
                   {win && completionProgress > (r + c) * 0.05 && (
                     <div className="absolute inset-0 bg-[#00f0ff]/30 mix-blend-screen pointer-events-none animate-pulse" />
                   )}
@@ -717,6 +674,7 @@ function SudokuGame({ onComplete, sfx }: { onComplete: () => void; sfx: any }) {
   );
 }
 
+
 // -----------------------------------------------------
 // MAIN COMPONENT
 // -----------------------------------------------------
@@ -725,16 +683,14 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
   const bgmAudio = useRef<HTMLAudioElement | null>(null);
 
   const [currentMission, setCurrentMission] = useState(1);
-  const [reelState, setReelState] = useState<
-    "briefing" | "playing" | "completed" | "story" | "fail"
-  >("briefing");
+  const [reelState, setReelState] = useState<"briefing" | "playing" | "completed" | "story" | "fail">("briefing");
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [ecoMode, setEcoMode] = useState(false);
   const sfx = useSound(soundEnabled);
 
   const [achievements, setAchievements] = useState<string[]>([]);
   const [hasFailedMission, setHasFailedMission] = useState(false);
-
+  
   const scoreRef = useRef(0);
   const [totalCoins, setTotalCoins] = useState(0);
   const livesRef = useRef(3);
@@ -745,7 +701,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
   const [perfectMissions, setPerfectMissions] = useState(0);
 
   const unlockAchievement = (name: string) => {
-    setAchievements((prev) => {
+    setAchievements(prev => {
       if (!prev.includes(name)) {
         sfx.chime();
         return [...prev, name];
@@ -782,7 +738,8 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [reelState, sfx]);
 
-  // Handle Reel 1 Canvas Loop
+
+// Handle Reel 1 Canvas Loop
   useEffect(() => {
     if (currentMission !== 1 || (reelState !== "playing" && reelState !== "fail")) return;
 
@@ -888,9 +845,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
 
     const triggerZoom = (mag: number) => {
       targetZoom = mag;
-      setTimeout(() => {
-        targetZoom = 1.0;
-      }, 100);
+      setTimeout(() => { targetZoom = 1.0; }, 100);
     };
 
     const addFloatingText = (txt: string, x: number, y: number, color: string = "#fff") => {
@@ -961,7 +916,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       w: number,
       spacing: number,
       arr: number[],
-      stage: number,
+      stage: number
     ) {
       const scrollX =
         (frame * speed * speedMul * timeScale) % (w * arr.length + spacing * arr.length);
@@ -970,7 +925,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       for (let i = 0; i < arr.length * 3; i++) {
         const h = arr[i % arr.length];
         ctx!.fillRect(x, baseY - h, w, h);
-
+        
         // Windows/lights based on stage
         if (w > 40 && i % 3 === 0 && stage === 0) {
           ctx!.fillStyle = "#e8b23d"; // Warm lights for studio entrance
@@ -981,7 +936,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
           ctx!.fillRect(x + 10, baseY - h - 5, 4, 4);
           ctx!.fillStyle = color;
         }
-
+        
         // Easter Eggs
         if (i === 2 && w === 80) {
           ctx!.fillStyle = "#e8b23d";
@@ -1103,8 +1058,6 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       speed = 6.5 + Math.min(5, scoreRef.current / 80);
       const stage = getStage();
 
-      drawHUD();
-
       if (gameState === "STARTING") {
         startSequenceTimer -= dt * 0.06;
         if (startSequenceTimer <= 0) {
@@ -1133,7 +1086,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
               y: GROUND_Y - 90 - Math.random() * 60,
               r: 16,
               wobble: Math.random() * 10,
-              golden: Math.random() < 0.05, // 5% chance of Golden Coin
+              golden: Math.random() < 0.05 // 5% chance of Golden Coin
             });
           } else {
             const types = ["c-stand", "pelican", "boom-mic", "director-chair", "camera-dolly"];
@@ -1143,21 +1096,18 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
             obstacles.push({ x: LOGICAL_W + 20, y: yPos, w: 32, h: height, type });
           }
         }
-
+        
         // Random camera flashes in Premiere stage (Stage 3)
         if (stage === 3 && Math.random() < 0.02) {
           flashes.push({ life: 10, x: Math.random() * LOGICAL_W, y: Math.random() * GROUND_Y });
         }
-
+        
         // Particles/Dust for atmosphere
         if (Math.random() < 0.1) {
           particles.push({
-            x: LOGICAL_W + 10,
-            y: Math.random() * LOGICAL_H,
-            vx: -speed * 0.5,
-            vy: (Math.random() - 0.5) * 0.5,
-            life: 1,
-            color: "rgba(255,255,255,0.2)",
+            x: LOGICAL_W + 10, y: Math.random() * LOGICAL_H,
+            vx: -speed * 0.5, vy: (Math.random() - 0.5) * 0.5,
+            life: 1, color: "rgba(255,255,255,0.2)"
           });
         }
       }
@@ -1299,7 +1249,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
           ft.life -= timeScale;
           if (ft.life <= 0) floatingTexts.splice(i, 1);
         }
-
+        
         for (let i = flashes.length - 1; i >= 0; i--) {
           flashes[i].life -= timeScale;
           if (flashes[i].life <= 0) flashes.splice(i, 1);
@@ -1312,10 +1262,10 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       ctx!.save();
 
       // Camera System
-      ctx!.translate(LOGICAL_W / 2, LOGICAL_H / 2);
+      ctx!.translate(LOGICAL_W/2, LOGICAL_H/2);
       ctx!.scale(zoomLevel, zoomLevel);
-      ctx!.translate(-LOGICAL_W / 2, -LOGICAL_H / 2);
-
+      ctx!.translate(-LOGICAL_W/2, -LOGICAL_H/2);
+      
       if (shakeTimer > 0) {
         shakeTimer -= timeScale;
         ctx!.translate((Math.random() - 0.5) * shakeMag, (Math.random() - 0.5) * shakeMag);
@@ -1351,17 +1301,13 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       // Dynamic City/Bg Layers based on Stage
       let backColor, frontColor;
       if (stage === 0) {
-        backColor = "#3b3754";
-        frontColor = "#2a273b";
+        backColor = "#3b3754"; frontColor = "#2a273b";
       } else if (stage === 1) {
-        backColor = "#2c3e50";
-        frontColor = "#2c3e50"; // Dark rigs
+        backColor = "#2c3e50"; frontColor = "#2c3e50"; // Dark rigs
       } else if (stage === 2) {
-        backColor = "#00b894";
-        frontColor = "#55efc4"; // Green screen markers
+        backColor = "#00b894"; frontColor = "#55efc4"; // Green screen markers
       } else {
-        backColor = "#d63031";
-        frontColor = "#ff7675"; // Red carpet accents
+        backColor = "#d63031"; frontColor = "#ff7675"; // Red carpet accents
       }
 
       drawCityLayer(GROUND_Y, 0.1, backColor, 80, 20, cityBack, stage);
@@ -1462,12 +1408,12 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         ctx!.fillText(ft.txt, ft.x, ft.y);
         ctx!.globalAlpha = 1;
       });
-
+      
       // Camera flashes
-      flashes.forEach((f) => {
-        ctx!.globalAlpha = f.life / 10;
-        ctx!.fillStyle = "#fff";
-        ctx!.fillRect(f.x - 10, f.y - 10, 20, 20);
+      flashes.forEach(f => {
+         ctx!.globalAlpha = f.life / 10;
+         ctx!.fillStyle = "#fff";
+         ctx!.fillRect(f.x - 10, f.y - 10, 20, 20);
       });
       ctx!.globalAlpha = 1;
 
@@ -1478,6 +1424,8 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       }
 
       ctx!.restore();
+
+      drawHUD();
 
       if (gameState === "STARTING") {
         ctx!.fillStyle = "rgba(0,0,0,0.7)";
@@ -1505,27 +1453,28 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
     };
   }, [currentMission, reelState, sfx, ecoMode]);
 
+
   const startNextReel = () => {
     // Add runner score to total coins
     if (currentMission === 1) {
-      setTotalCoins((prev) => prev + scoreRef.current);
+      setTotalCoins(prev => prev + scoreRef.current);
     }
-
+    
     scoreRef.current = 0;
     setUiScore(0);
     livesRef.current = 3;
     setUiLives(3);
-
+    
     if (!hasFailedMission && currentMission <= 4) {
       unlockAchievement("First Take");
-      setPerfectMissions((prev) => prev + 1);
+      setPerfectMissions(prev => prev + 1);
     }
-
+    
     setHasFailedMission(false);
-
+    
     const nextMission = currentMission + 1;
     setCurrentMission(nextMission);
-
+    
     if (nextMission >= 5) {
       setReelState("story");
     } else {
@@ -1541,7 +1490,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
     setHasFailedMission(true);
     setReelState("playing");
   };
-
+  
   const handleFail = () => {
     setHasFailedMission(true);
     setReelState("fail");
@@ -1550,40 +1499,16 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
   const getReelContent = () => {
     switch (currentMission) {
       case 1:
-        return {
-          tag: "Ticket 1 — The Setup",
-          title: "Who I Am",
-          desc: "I'm Aditya Parihar — a Computer Science major in my third year at UPES. Code is my major, but there's a lot more going on in my head. It’s chaotic, unpredictable, and you have to keep moving.",
-        };
+        return { tag: "Ticket 1 — The Setup", title: "Who I Am", desc: "I'm Aditya Parihar — a Computer Science major in my third year at UPES. Code is my major, but there's a lot more going on in my head. It’s chaotic, unpredictable, and you have to keep moving." };
       case 2:
-        return {
-          tag: "Ticket 2 — The Strategy",
-          title: "Off Screen",
-          desc: "Football and running keep me moving. Chess keeps me thinking — sitting around 900–1000 Elo, I rely on pattern recognition as much as logic. This analytical mindset shapes how I approach my craft.",
-        };
+        return { tag: "Ticket 2 — The Strategy", title: "Off Screen", desc: "Football and running keep me moving. Chess keeps me thinking — sitting around 900–1000 Elo, I rely on pattern recognition as much as logic. This analytical mindset shapes how I approach my craft." };
       case 3:
-        return {
-          tag: "Ticket 3 — Top Cuts",
-          title: "Four Films I Keep Coming Back To",
-          desc: "My Letterboxd is basically a diary. These are the films that shaped my perspective.",
-          link: { url: "https://letterboxd.com/adityaparihar21", text: "My Letterboxd" },
-        };
+        return { tag: "Ticket 3 — Top Cuts", title: "Four Films I Keep Coming Back To", desc: "My Letterboxd is basically a diary. These are the films that shaped my perspective.", link: { url: "https://letterboxd.com/adityaparihar21", text: "My Letterboxd" } };
       case 4:
-        return {
-          tag: "Ticket 4 — The Logic",
-          title: "Method to the Madness",
-          desc: "Whether I'm writing an exam or debugging a React component, breaking a massive problem down into simple logic gates is how I get things done.",
-        };
+        return { tag: "Ticket 4 — The Logic", title: "Method to the Madness", desc: "Whether I'm writing an exam or debugging a React component, breaking a massive problem down into simple logic gates is how I get things done." };
       case 5:
-        return {
-          tag: "Ticket 5 — The Writer",
-          title: "Silent Background",
-          desc: "While I work silently in the background, I also write about things I find interesting and random facts about my life.",
-          link: { url: "https://substack.com/@adityaparihar21", text: "Read my Substack" },
-          image: "/about.jpg",
-        };
-      default:
-        return null;
+        return { tag: "Ticket 5 — The Writer", title: "Silent Background", desc: "While I work silently in the background, I also write about things I find interesting and random facts about my life.", link: { url: "https://substack.com/@adityaparihar21", text: "Read my Substack" }, image: "/about.jpg" };
+      default: return null;
     }
   };
 
@@ -1594,13 +1519,11 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
     const ms = Date.now() - startTime;
     const mins = Math.floor(ms / 60000);
     const secs = Math.floor((ms % 60000) / 1000);
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
-    <div
-      className={`fixed inset-0 z-[9999] bg-[#050509] flex flex-col font-sans ${ecoMode ? "eco-mode" : ""}`}
-    >
+    <div className={`fixed inset-0 z-[9999] bg-[#050509] flex flex-col font-sans ${ecoMode ? "eco-mode" : ""}`}>
       <style
         dangerouslySetInnerHTML={{
           __html: `
@@ -1633,7 +1556,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
           background: repeating-linear-gradient(to right, #241a1e 0px, #241a1e 3px, transparent 3px, transparent 6px, #241a1e 6px, #241a1e 7px, transparent 7px, transparent 10px);
           width: 100%; height: 40px;
         }
-      `,
+      `
         }}
       />
 
@@ -1650,23 +1573,25 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       </div>
 
       <div className="relative flex-1 flex flex-col items-center justify-center p-4 lg:p-8 overflow-hidden bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02),transparent_70%)]">
+        
         {/* Slow moving ambient dust for global UI */}
         <div className="absolute inset-0 pointer-events-none opacity-50 z-0">
           {[...Array(20)].map((_, i) => (
-            <motion.div
-              key={i}
-              animate={{
-                y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight - 200],
-                x: [Math.random() * window.innerWidth, Math.random() * window.innerWidth + 100],
-                opacity: [0, 0.5, 0],
-              }}
-              transition={{ duration: 10 + Math.random() * 20, repeat: Infinity, ease: "linear" }}
-              className="absolute w-1 h-1 bg-white/20 rounded-full blur-[1px]"
-            />
+             <motion.div
+               key={i}
+               animate={{ 
+                 y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight - 200],
+                 x: [Math.random() * window.innerWidth, Math.random() * window.innerWidth + 100],
+                 opacity: [0, 0.5, 0]
+               }}
+               transition={{ duration: 10 + Math.random() * 20, repeat: Infinity, ease: "linear" }}
+               className="absolute w-1 h-1 bg-white/20 rounded-full blur-[1px]"
+             />
           ))}
         </div>
-
+        
         <div className="relative w-full max-w-5xl flex flex-col p-4 md:p-6 bg-[#161616] rounded-[2rem] border border-[#2a2a2a] shadow-[0_40px_100px_rgba(0,0,0,0.8),inset_0_4px_2px_rgba(255,255,255,0.03)] ring-1 ring-black z-10">
+          
           <div className="flex justify-between items-center mb-4 px-2 font-mono text-[10px] md:text-xs text-[#555] tracking-widest uppercase select-none">
             <div className="flex items-center gap-4">
               <span className="font-bold text-[#888]">CINEMA EOS</span>
@@ -1688,34 +1613,29 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
               <div className="arcade-vignette absolute inset-0 z-30 shadow-[inset_0_0_120px_rgba(0,0,0,0.9)] pointer-events-none" />
 
               {/* GLOBAL HUD */}
-              {(reelState === "playing" || reelState === "completed") &&
-                currentMission > 1 &&
-                currentMission < 6 && (
-                  <div className="absolute top-4 left-6 right-6 z-40 flex justify-between font-mono pointer-events-none select-none">
-                    <div className="flex flex-col">
-                      <div className="text-[10px] text-[#e8b23d] font-bold tracking-[0.2em] uppercase mb-1">
-                        MISSION 0{currentMission}
-                      </div>
-                      <div className="text-white text-lg font-serif italic">
-                        {currentMissionInfo.title}
-                      </div>
+              {(reelState === "playing" || reelState === "completed") && currentMission > 1 && currentMission < 6 && (
+                <div className="absolute top-4 left-6 right-6 z-40 flex justify-between font-mono pointer-events-none select-none">
+                  <div className="flex flex-col">
+                    <div className="text-[10px] text-[#e8b23d] font-bold tracking-[0.2em] uppercase mb-1">
+                      MISSION 0{currentMission}
                     </div>
-                    <div className="flex flex-col items-end">
-                      <div className="text-[10px] text-white/50 tracking-[0.2em] uppercase mb-1 flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse" />
-                        PROGRESS
-                      </div>
-                      <div className="flex gap-2">
-                        {[1, 2, 3, 4, 5, 6].map((i) => (
-                          <div
-                            key={i}
-                            className={`w-2 h-2 rounded-full ${i < currentMission ? "bg-[#10b981]" : i === currentMission ? "bg-[#e8b23d] shadow-[0_0_8px_#e8b23d] animate-pulse" : "bg-white/10"}`}
-                          />
-                        ))}
-                      </div>
+                    <div className="text-white text-lg font-serif italic">
+                      {currentMissionInfo.title}
                     </div>
                   </div>
-                )}
+                  <div className="flex flex-col items-end">
+                    <div className="text-[10px] text-white/50 tracking-[0.2em] uppercase mb-1 flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse" />
+                      PROGRESS
+                    </div>
+                    <div className="flex gap-2">
+                      {[1, 2, 3, 4, 5, 6].map(i => (
+                        <div key={i} className={`w-2 h-2 rounded-full ${i < currentMission ? 'bg-[#10b981]' : i === currentMission ? 'bg-[#e8b23d] shadow-[0_0_8px_#e8b23d] animate-pulse' : 'bg-white/10'}`} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <AnimatePresence mode="wait">
                 {/* BRIEFING STATE OVERLAY */}
@@ -1727,15 +1647,12 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                     exit={{ opacity: 0, scale: 1.1, filter: "blur(10px)" }}
                     transition={{ duration: 0.5 }}
                     className="absolute inset-0 z-[60] flex flex-col items-center justify-center bg-black font-mono text-white select-none"
-                    onClick={() => {
-                      setReelState("playing");
-                      sfx.click();
-                    }}
+                    onClick={() => { setReelState("playing"); sfx.click(); }}
                   >
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,transparent_80%)]" />
-
+                    
                     {/* Projector flicker effect */}
-                    <motion.div
+                    <motion.div 
                       animate={{ opacity: [0.1, 0.3, 0.1, 0.4, 0.2] }}
                       transition={{ duration: 2, repeat: Infinity }}
                       className="absolute inset-0 bg-white/5 pointer-events-none mix-blend-overlay"
@@ -1743,28 +1660,24 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
 
                     <div className="relative z-10 w-full max-w-lg border border-white/10 bg-[#0a0a0f]/80 p-8 flex flex-col items-center text-center backdrop-blur-sm">
                       <div className="w-full border-b border-white/20 pb-2 mb-6">
-                        <span className="text-[#e8b23d] font-bold tracking-[0.3em] uppercase text-sm">
-                          MISSION 0{currentMission}
-                        </span>
+                        <span className="text-[#e8b23d] font-bold tracking-[0.3em] uppercase text-sm">MISSION 0{currentMission}</span>
                       </div>
-
+                      
                       <h2 className="text-3xl font-serif italic mb-6 tracking-widest uppercase drop-shadow-md">
                         {currentMissionInfo.title}
                       </h2>
-
+                      
                       <div className="flex flex-col gap-4 text-xs tracking-widest uppercase text-white/70 mb-12 w-full text-left bg-white/5 p-4 border-l-2 border-[#10b981]">
                         <div className="flex justify-between">
                           <span className="text-white/40">Objective</span>
-                          <span className="text-white font-bold">
-                            {currentMissionInfo.objective}
-                          </span>
+                          <span className="text-white font-bold">{currentMissionInfo.objective}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-white/40">Difficulty</span>
                           <span className="text-[#ff4d4d]">{currentMissionInfo.difficulty}</span>
                         </div>
                       </div>
-
+                      
                       <motion.div
                         animate={{ opacity: [0.3, 1, 0.3] }}
                         transition={{ repeat: Infinity, duration: 1.5 }}
@@ -1787,7 +1700,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                     className="absolute inset-0 z-[60] flex flex-col items-center justify-center bg-black/85 backdrop-blur-md"
                   >
                     <div className="flex flex-col items-center justify-center text-center">
-                      <motion.h2
+                      <motion.h2 
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.2 }}
@@ -1795,7 +1708,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                       >
                         MISSION COMPLETE
                       </motion.h2>
-                      <motion.div
+                      <motion.div 
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ delay: 0.4 }}
@@ -1803,8 +1716,8 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                       >
                         ★★★★★
                       </motion.div>
-
-                      <motion.div
+                      
+                      <motion.div 
                         initial={{ y: -10, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.6 }}
@@ -1814,7 +1727,11 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                           <CheckCircle2 className="w-4 h-4" />
                           Objective Cleared
                         </div>
-
+                        {currentMissionInfo.unlocks && (
+                          <div className="text-white/70 font-mono text-xs tracking-[0.2em] uppercase">
+                            Project Unlocked: <span className="text-[#10b981] font-bold">{currentMissionInfo.unlocks}</span>
+                          </div>
+                        )}
                         {!hasFailedMission && currentMission <= 4 && (
                           <div className="text-[#e8b23d] font-mono text-xs tracking-[0.2em] uppercase mt-2">
                             Achievement: First Take
@@ -1822,7 +1739,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                         )}
                       </motion.div>
 
-                      <motion.button
+                      <motion.button 
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 1.5 }}
@@ -1888,7 +1805,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                           )}
                         </div>
                         <div className="flex flex-col gap-6">
-                          <motion.div
+                          <motion.div 
                             initial={{ width: 0 }}
                             animate={{ width: "100%" }}
                             transition={{ duration: 1.5, ease: "linear" }}
@@ -1918,22 +1835,21 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                     className="absolute inset-0 z-[60] flex flex-col items-center justify-center bg-black text-white p-8 overflow-hidden"
                   >
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,transparent_60%)]" />
-
+                    
                     <div className="relative z-10 w-full max-w-2xl border border-white/10 p-12 bg-black/70 backdrop-blur-md rounded-lg flex flex-col items-center">
                       <div className="w-full border-t border-b border-white/20 py-4 mb-8 flex justify-between items-center text-white/50 font-mono text-xs tracking-[0.3em] uppercase">
                         <span>Interactive Portfolio Complete</span>
                         <span>v1.0.0</span>
                       </div>
-
+                      
                       <h1 className="text-5xl md:text-7xl font-serif italic mb-8 tracking-wider text-center drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]">
                         DIRECTOR'S CUT
                       </h1>
 
                       <div className="w-full text-center text-white/60 font-sans italic mb-8 text-sm max-w-sm">
-                        "The gameplay never changes—but the scenery evolves to mirror the stages of
-                        making a film."
+                        "The gameplay never changes—but the scenery evolves to mirror the stages of making a film."
                       </div>
-
+                      
                       <div className="w-full max-w-md flex flex-col gap-4 font-mono text-sm tracking-widest uppercase mb-12">
                         <div className="flex justify-between items-center border-b border-white/10 pb-2">
                           <span className="text-white/50">Runtime</span>
@@ -1947,23 +1863,18 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                           <span className="text-white/50">Perfect Missions</span>
                           <span className="text-[#10b981]">{perfectMissions}</span>
                         </div>
-
+                        
                         {/* Achievements Section */}
                         {achievements.length > 0 && (
                           <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-white/20">
                             <span className="text-white/30 mb-2">Achievements Unlocked</span>
                             {achievements.map((ach) => (
-                              <div
-                                key={ach}
-                                className="flex items-center justify-between text-[#00f0ff]"
-                              >
+                              <div key={ach} className="flex items-center justify-between text-[#00f0ff]">
                                 <div className="flex items-center gap-2">
                                   <CheckCircle2 className="w-4 h-4" />
                                   <span>{ach}</span>
                                 </div>
-                                <span className="text-white/30 text-[10px]">
-                                  {ACHIEVEMENTS_LIST[ach as keyof typeof ACHIEVEMENTS_LIST]}
-                                </span>
+                                <span className="text-white/30 text-[10px]">{ACHIEVEMENTS_LIST[ach as keyof typeof ACHIEVEMENTS_LIST]}</span>
                               </div>
                             ))}
                           </div>
@@ -1988,8 +1899,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                         onClick={onClose}
                         className="flex items-center gap-3 px-8 py-4 border border-white/20 rounded-full hover:bg-white hover:text-black transition-all duration-300 font-mono tracking-widest text-sm uppercase group"
                       >
-                        Explore Portfolio{" "}
-                        <span className="group-hover:translate-x-1 transition-transform">→</span>
+                        Explore Portfolio <span className="group-hover:translate-x-1 transition-transform">→</span>
                       </button>
                     </div>
                   </motion.div>
@@ -2013,40 +1923,21 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                 )}
               </AnimatePresence>
 
-              {currentMission === 1 &&
-                (reelState === "playing" || reelState === "fail" || reelState === "completed") && (
-                  <canvas
-                    ref={canvasRef}
-                    className="absolute inset-0 w-full h-full object-cover z-0"
-                    style={{ imageRendering: "pixelated" }}
-                  />
-                )}
-              {currentMission === 2 && (reelState === "playing" || reelState === "completed") && (
-                <ChessPuzzleGame
-                  onComplete={() => {
-                    unlockAchievement("Grandmaster");
-                    setReelState("completed");
-                  }}
-                  sfx={sfx}
+              {currentMission === 1 && (reelState === "playing" || reelState === "fail" || reelState === "completed") && (
+                <canvas
+                  ref={canvasRef}
+                  className="absolute inset-0 w-full h-full object-cover z-0"
+                  style={{ imageRendering: "pixelated" }}
                 />
+              )}
+              {currentMission === 2 && (reelState === "playing" || reelState === "completed") && (
+                <ChessPuzzleGame onComplete={() => { unlockAchievement("Grandmaster"); setReelState("completed"); }} sfx={sfx} />
               )}
               {currentMission === 3 && (reelState === "playing" || reelState === "completed") && (
-                <MemoryMatchGame
-                  onComplete={() => {
-                    unlockAchievement("Film Buff");
-                    setReelState("completed");
-                  }}
-                  sfx={sfx}
-                />
+                <MemoryMatchGame onComplete={() => { unlockAchievement("Film Buff"); setReelState("completed"); }} sfx={sfx} />
               )}
               {currentMission === 4 && (reelState === "playing" || reelState === "completed") && (
-                <SudokuGame
-                  onComplete={() => {
-                    unlockAchievement("Logic Node");
-                    setReelState("completed");
-                  }}
-                  sfx={sfx}
-                />
+                <SudokuGame onComplete={() => { unlockAchievement("Logic Node"); setReelState("completed"); }} sfx={sfx} />
               )}
             </div>
           </div>
