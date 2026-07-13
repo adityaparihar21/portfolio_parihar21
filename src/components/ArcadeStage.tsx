@@ -3,24 +3,33 @@ import { X, Volume2, VolumeX, HelpCircle, Trophy, CheckCircle2 } from "lucide-re
 import { motion, AnimatePresence } from "framer-motion";
 
 const MISSIONS = [
-  { id: 1, title: "Escape the Set", objective: "Collect 40 AP Coins", difficulty: "HARD" },
+  {
+    id: 1,
+    title: "Escape the Set",
+    objective: "Collect 40 AP Coins",
+    difficulty: "HARD",
+    unlocks: "WeatherHUT",
+  },
   {
     id: 2,
     title: "Checkmate the Director",
     objective: "Neutralize the Director's Final Move",
     difficulty: "HARD",
+    unlocks: "Chess AI Project",
   },
   {
     id: 3,
     title: "Recover the Film Archive",
     objective: "Decrypt all missing film files",
     difficulty: "MEDIUM",
+    unlocks: "Fragmento",
   },
   {
     id: 4,
     title: "Decode the Logic Core",
     objective: "Reconstruct the corrupted system data",
     difficulty: "EASY",
+    unlocks: "AI Project",
   },
   { id: 5, title: "Behind the Scenes", objective: "Read About" },
   { id: 6, title: "Director's Cut", objective: "Complete the Arcade" },
@@ -265,7 +274,7 @@ function ChessPuzzleGame({ onComplete, sfx }: { onComplete: () => void; sfx: any
       if (idx === puzzle.target) {
         setWin(true);
         sfx.win();
-        setTimeout(onComplete, 3000);
+        setTimeout(onComplete, 1000);
       } else {
         sfx.error();
         setTimeout(() => {
@@ -285,18 +294,6 @@ function ChessPuzzleGame({ onComplete, sfx }: { onComplete: () => void; sfx: any
     <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-4 bg-[#0a0a0f]">
       {/* Dynamic cinematic lighting overlay */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,#2a3b4c_0%,transparent_70%)] opacity-30 pointer-events-none" />
-
-      {win && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none"
-        >
-          <div className="text-center font-serif italic text-6xl text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.8)]">
-            MISSION COMPLETE\n★★★★★
-          </div>
-        </motion.div>
-      )}
 
       <motion.div
         animate={win ? { y: [0, 10, -10, 5, -5, 0], transition: { duration: 0.5 } } : {}}
@@ -428,7 +425,7 @@ function MemoryMatchGame({ onComplete, sfx }: { onComplete: () => void; sfx: any
               if (newM === 4) {
                 setWin(true);
                 sfx.win();
-                setTimeout(onComplete, 3000);
+                setTimeout(onComplete, 1000);
               }
               return newM;
             });
@@ -454,21 +451,6 @@ function MemoryMatchGame({ onComplete, sfx }: { onComplete: () => void; sfx: any
   return (
     <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-8 bg-[#1a1c23]">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.03)_0%,transparent_80%)] pointer-events-none" />
-
-      {win && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="absolute inset-0 z-50 flex flex-col items-center justify-center pointer-events-none"
-        >
-          <div className="text-center font-serif italic text-4xl text-[#e8b23d] drop-shadow-[0_0_20px_rgba(232,178,61,0.5)]">
-            MISSION COMPLETE\n★★★★★
-          </div>
-          <div className="text-white/50 font-mono text-sm mt-2 tracking-widest uppercase">
-            All files decrypted
-          </div>
-        </motion.div>
-      )}
 
       <div className="grid grid-cols-4 gap-4 md:gap-6 relative z-10">
         {cards.map((c, i) => {
@@ -617,7 +599,7 @@ function SudokuGame({ onComplete, sfx }: { onComplete: () => void; sfx: any }) {
         val += 0.05;
         if (val > 1) {
           clearInterval(interval);
-          setTimeout(onComplete, 1500);
+          setTimeout(onComplete, 500); // reduced delay since ArcadeStage will handle the overlay
         }
         setCompletionProgress(val);
       }, 50);
@@ -631,13 +613,19 @@ function SudokuGame({ onComplete, sfx }: { onComplete: () => void; sfx: any }) {
 
     if (puzzle.initial[r][c] !== 0) return;
 
-    sfx.click();
     const newGrid = [...grid.map((row) => [...row])];
     let val = newGrid[r][c];
     val = val === 0 ? 1 : val + 1;
     if (val > 6) val = 1; // 1-6 for 6x6
     newGrid[r][c] = val;
     setGrid(newGrid);
+
+    // Feedback sound based on correctness
+    if (val === puzzle.solution[r][c]) {
+      sfx.click();
+    } else {
+      sfx.error();
+    }
 
     // Check win
     let isWin = true;
@@ -660,18 +648,6 @@ function SudokuGame({ onComplete, sfx }: { onComplete: () => void; sfx: any }) {
       {/* Sci-fi scanning lines overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%] pointer-events-none z-0" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,180,255,0.05)_0%,transparent_70%)] pointer-events-none" />
-
-      {win && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: completionProgress > 0.8 ? 1 : 0 }}
-          className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm pointer-events-none"
-        >
-          <div className="text-center font-mono font-bold text-3xl md:text-5xl text-[#00f0ff] drop-shadow-[0_0_20px_rgba(0,240,255,0.8)] tracking-[0.2em] uppercase">
-            MISSION COMPLETE\n★★★★★
-          </div>
-        </motion.div>
-      )}
 
       <motion.div
         animate={
@@ -698,6 +674,8 @@ function SudokuGame({ onComplete, sfx }: { onComplete: () => void; sfx: any }) {
                   (Math.floor(selected.r / 2) === Math.floor(r / 2) &&
                     Math.floor(selected.c / 3) === Math.floor(c / 3)));
 
+              const isError = !isFixed && val !== 0 && val !== puzzle.solution[r][c];
+
               let bgClass = "bg-[#0a1220]";
               if (win) {
                 // Completion sweep effect
@@ -709,13 +687,20 @@ function SudokuGame({ onComplete, sfx }: { onComplete: () => void; sfx: any }) {
                 else if (isRelated) bgClass = "bg-[#00f0ff]/10";
               }
 
+              let textClass = isFixed
+                ? "text-white font-bold"
+                : "text-[#00f0ff] font-light text-shadow-[0_0_8px_rgba(0,240,255,0.8)]";
+              if (isError) {
+                textClass = "text-[#ff4d4d] font-bold text-shadow-[0_0_8px_rgba(255,77,77,0.8)]";
+              }
+
               return (
                 <div
                   key={`${r}-${c}`}
                   onClick={() => handleCellClick(r, c)}
                   className={`relative flex items-center justify-center text-xl md:text-2xl font-mono cursor-pointer transition-all duration-200 outline-none
                   ${bgClass}
-                  ${isFixed ? "text-white font-bold" : "text-[#00f0ff] font-light text-shadow-[0_0_8px_rgba(0,240,255,0.8)]"}
+                  ${textClass}
                   ${r % 2 === 1 && r !== 5 ? "border-b-2 border-b-[#00f0ff]/30" : "border-b border-b-[#00f0ff]/10"}
                   ${c % 3 === 2 && c !== 5 ? "border-r-2 border-r-[#00f0ff]/30" : "border-r border-r-[#00f0ff]/10"}
                 `}
@@ -749,7 +734,9 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
   const bgmAudio = useRef<HTMLAudioElement | null>(null);
 
   const [currentMission, setCurrentMission] = useState(1);
-  const [reelState, setReelState] = useState<"briefing" | "playing" | "story" | "fail">("briefing");
+  const [reelState, setReelState] = useState<
+    "briefing" | "playing" | "completed" | "story" | "fail"
+  >("briefing");
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [ecoMode, setEcoMode] = useState(false);
   const sfx = useSound(soundEnabled);
@@ -758,15 +745,20 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
   const [hasFailedMission, setHasFailedMission] = useState(false);
 
   const scoreRef = useRef(0);
+  const [totalCoins, setTotalCoins] = useState(0);
   const livesRef = useRef(3);
   const frameTimes = useRef<number[]>([]);
   const [uiScore, setUiScore] = useState(0);
   const [uiLives, setUiLives] = useState(3);
   const [startTime] = useState(Date.now());
+  const [perfectMissions, setPerfectMissions] = useState(0);
 
   const unlockAchievement = (name: string) => {
     setAchievements((prev) => {
-      if (!prev.includes(name)) return [...prev, name];
+      if (!prev.includes(name)) {
+        sfx.chime();
+        return [...prev, name];
+      }
       return prev;
     });
   };
@@ -867,11 +859,14 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
     const coins: any[] = [];
     const particles: any[] = [];
     const floatingTexts: any[] = [];
+    const flashes: any[] = [];
 
     let shakeTimer = 0;
     let shakeMag = 0;
     let cameraY = 0;
     let targetCameraY = 0;
+    let zoomLevel = 1.0;
+    let targetZoom = 1.0;
 
     let gameState = "STARTING";
     let startSequenceTimer = 180;
@@ -879,7 +874,8 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
     let timeScale = 1.0;
     let combo = 0;
 
-    const atmosphere = Math.floor(Math.random() * 3);
+    // Get current stage based on score (0 to 3)
+    const getStage = () => Math.min(3, Math.floor((scoreRef.current || 0) / 10));
 
     const resize = () => {
       const parent = canvas.parentElement;
@@ -899,6 +895,13 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       shakeTimer = time;
     };
 
+    const triggerZoom = (mag: number) => {
+      targetZoom = mag;
+      setTimeout(() => {
+        targetZoom = 1.0;
+      }, 100);
+    };
+
     const addFloatingText = (txt: string, x: number, y: number, color: string = "#fff") => {
       floatingTexts.push({ txt, x, y, life: 60, color, vy: -1.5 });
     };
@@ -910,6 +913,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         player.onGround = false;
         player.scaleX = 0.8;
         player.scaleY = 1.25;
+        targetCameraY = -15; // Pan camera down
         spawnParticles(player.x + 30, player.y + 80, 15, "#e8e8e8", 4, -2);
         sfx.jump();
       }
@@ -966,6 +970,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       w: number,
       spacing: number,
       arr: number[],
+      stage: number,
     ) {
       const scrollX =
         (frame * speed * speedMul * timeScale) % (w * arr.length + spacing * arr.length);
@@ -974,11 +979,32 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       for (let i = 0; i < arr.length * 3; i++) {
         const h = arr[i % arr.length];
         ctx!.fillRect(x, baseY - h, w, h);
-        if (w > 40 && i % 3 === 0) {
-          ctx!.fillStyle = atmosphere === 0 ? "#e8b23d" : "#ff4d4d";
+
+        // Windows/lights based on stage
+        if (w > 40 && i % 3 === 0 && stage === 0) {
+          ctx!.fillStyle = "#e8b23d"; // Warm lights for studio entrance
+          ctx!.fillRect(x + 10, baseY - h - 5, 4, 4);
+          ctx!.fillStyle = color;
+        } else if (w > 40 && i % 2 === 0 && stage === 1) {
+          ctx!.fillStyle = "#ff4d4d"; // Red recording lights
           ctx!.fillRect(x + 10, baseY - h - 5, 4, 4);
           ctx!.fillStyle = color;
         }
+
+        // Easter Eggs
+        if (i === 2 && w === 80) {
+          ctx!.fillStyle = "#e8b23d";
+          ctx!.font = "bold 10px sans-serif";
+          ctx!.fillText("WeatherHUT", x + 5, baseY - h + 15);
+          ctx!.fillStyle = color;
+        }
+        if (i === 5 && w === 60) {
+          ctx!.fillStyle = "#ff4d4d";
+          ctx!.font = "italic 8px serif";
+          ctx!.fillText("Fragmento", x + 5, baseY - h + 15);
+          ctx!.fillStyle = color;
+        }
+
         x += w + spacing;
       }
     }
@@ -1039,35 +1065,8 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
     }
 
     function drawHUD() {
-      ctx!.save();
-      const hw = LOGICAL_W / 2;
-      ctx!.translate(hw - 150, 40);
-
-      ctx!.fillStyle = "#fff";
-      ctx!.font = "bold 12px sans-serif";
-      ctx!.textAlign = "center";
-      ctx!.fillText("MISSION: Collect 40 AP Coins", 150, -15);
-
-      const pRatio = Math.min(1, scoreRef.current / 40);
-      ctx!.fillStyle = "rgba(0,0,0,0.5)";
-      ctx!.fillRect(0, 0, 300, 12);
-      ctx!.fillStyle = "#e8b23d";
-      ctx!.fillRect(0, 0, 300 * pRatio, 12);
-      ctx!.strokeStyle = "#fff";
-      ctx!.lineWidth = 2;
-      ctx!.strokeRect(0, 0, 300, 12);
-
-      ctx!.textAlign = "left";
-      ctx!.font = "bold 24px sans-serif";
-      ctx!.fillText(scoreRef.current.toString().padStart(3, "0"), -60, 10);
-
-      for (let i = 0; i < 3; i++) {
-        ctx!.fillStyle = i < livesRef.current ? "#ff4d4d" : "#333";
-        ctx!.beginPath();
-        ctx!.arc(340 + i * 20, 6, 6, 0, Math.PI * 2);
-        ctx!.fill();
-      }
-      ctx!.restore();
+      // We removed the main canvas HUD since the HTML Global HUD handles it now.
+      // But we can still draw floating score if needed. We'll leave it empty to let HTML HUD shine.
     }
 
     function loop() {
@@ -1084,6 +1083,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
 
       frame += timeScale;
       speed = 6.5 + Math.min(5, scoreRef.current / 80);
+      const stage = getStage();
 
       if (gameState === "STARTING") {
         startSequenceTimer -= dt * 0.06;
@@ -1096,7 +1096,8 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         timeScale = Math.max(0.05, timeScale * 0.95);
         endSequenceTimer += dt * 0.06;
         if (endSequenceTimer > 180) {
-          setReelState("story");
+          // Changed to set ReelState to "completed" so ArcadeStage handles it
+          setReelState("completed");
           return;
         }
       }
@@ -1112,6 +1113,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
               y: GROUND_Y - 90 - Math.random() * 60,
               r: 16,
               wobble: Math.random() * 10,
+              golden: Math.random() < 0.05, // 5% chance of Golden Coin
             });
           } else {
             const types = ["c-stand", "pelican", "boom-mic", "director-chair", "camera-dolly"];
@@ -1120,6 +1122,23 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
             const height = type === "boom-mic" ? 30 : 40;
             obstacles.push({ x: LOGICAL_W + 20, y: yPos, w: 32, h: height, type });
           }
+        }
+
+        // Random camera flashes in Premiere stage (Stage 3)
+        if (stage === 3 && Math.random() < 0.02) {
+          flashes.push({ life: 10, x: Math.random() * LOGICAL_W, y: Math.random() * GROUND_Y });
+        }
+
+        // Particles/Dust for atmosphere
+        if (Math.random() < 0.1) {
+          particles.push({
+            x: LOGICAL_W + 10,
+            y: Math.random() * LOGICAL_H,
+            vx: -speed * 0.5,
+            vy: (Math.random() - 0.5) * 0.5,
+            life: 1,
+            color: "rgba(255,255,255,0.2)",
+          });
         }
       }
 
@@ -1137,7 +1156,8 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
           if (!player.onGround && player.vy > 0) {
             player.scaleX = 1.2;
             player.scaleY = 0.8;
-            triggerShake(2, 5);
+            targetCameraY = 0; // Return camera to center
+            triggerShake(3, 5); // bounce
             spawnParticles(player.x + 30, GROUND_Y, 10, "#aaa", 6, -1);
             sfx.step();
           }
@@ -1160,8 +1180,8 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
           spawnParticles(player.x + 10, GROUND_Y, 2, "#999", 2, -1);
         }
 
-        targetCameraY = (player.y - (GROUND_Y - 80)) * 0.1;
         cameraY += (targetCameraY - cameraY) * 0.1;
+        zoomLevel += (targetZoom - zoomLevel) * 0.15;
 
         const hitboxTop = player.y + (player.isCrouching ? player.h * 0.6 : 0);
         const hitboxHeight = player.isCrouching ? player.h * 0.4 : player.h;
@@ -1189,7 +1209,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
               spawnParticles(player.x + 30, player.y + 40, 30, "#ff4d4d", 10, 10);
               sfx.hit();
               if (livesRef.current <= 0) {
-                setReelState("fail");
+                handleFail();
                 return;
               }
             } else if (player.x > o.x + o.w - 15 && player.y < o.y) {
@@ -1212,9 +1232,10 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
           const dx = player.x + player.w / 2 - c.x;
           const dy = player.y + player.h / 2 - c.y;
           if (Math.sqrt(dx * dx + dy * dy) < c.r + 24 && gameState === "PLAYING") {
-            scoreRef.current += 10;
+            scoreRef.current += c.golden ? 50 : 10;
             setUiScore(scoreRef.current);
             combo++;
+            triggerZoom(1.03); // micro-zoom on coin
 
             if (combo > 2) {
               const txts = ["Nice!", "Great!", "Perfect!", "Excellent!"];
@@ -1226,13 +1247,13 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
               );
             }
 
-            if (scoreRef.current >= 40) {
+            if (scoreRef.current >= 40 && gameState === "PLAYING") {
               gameState = "SCENE_COMPLETE";
               sfx.win();
               coins.forEach((cc) => spawnParticles(cc.x, cc.y, 15, "#e8b23d", 8, 8));
             }
             coins.splice(i, 1);
-            spawnParticles(c.x, c.y, 25, "#e8b23d", 6, 6);
+            spawnParticles(c.x, c.y, 25, c.golden ? "#fff" : "#e8b23d", 6, 6);
             triggerShake(3, 5);
             sfx.coin();
           }
@@ -1242,8 +1263,13 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
           const p = particles[i];
           p.x += p.vx * timeScale;
           p.y += p.vy * timeScale;
-          p.vy += 0.2 * timeScale;
-          p.life -= 0.03 * timeScale;
+          // Only add gravity if it's not ambient dust
+          if (p.color !== "rgba(255,255,255,0.2)") {
+            p.vy += 0.2 * timeScale;
+            p.life -= 0.03 * timeScale;
+          } else {
+            p.life -= 0.005 * timeScale;
+          }
           if (p.life <= 0) particles.splice(i, 1);
         }
 
@@ -1253,6 +1279,11 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
           ft.life -= timeScale;
           if (ft.life <= 0) floatingTexts.splice(i, 1);
         }
+
+        for (let i = flashes.length - 1; i >= 0; i--) {
+          flashes[i].life -= timeScale;
+          if (flashes[i].life <= 0) flashes.splice(i, 1);
+        }
       }
 
       ctx!.fillStyle = "#111";
@@ -1260,52 +1291,66 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
 
       ctx!.save();
 
+      // Camera System
+      ctx!.translate(LOGICAL_W / 2, LOGICAL_H / 2);
+      ctx!.scale(zoomLevel, zoomLevel);
+      ctx!.translate(-LOGICAL_W / 2, -LOGICAL_H / 2);
+
       if (shakeTimer > 0) {
         shakeTimer -= timeScale;
         ctx!.translate((Math.random() - 0.5) * shakeMag, (Math.random() - 0.5) * shakeMag);
       }
       ctx!.translate(0, -cameraY);
 
+      // Dynamic Sky based on Stage
       const sky = ctx!.createLinearGradient(0, 0, 0, GROUND_Y);
-      if (atmosphere === 0) {
+      if (stage === 0) {
         sky.addColorStop(0, "#191724");
         sky.addColorStop(1, "#3c385c");
-      } else if (atmosphere === 1) {
-        sky.addColorStop(0, "#4a536b");
-        sky.addColorStop(1, "#7d8494");
+      } else if (stage === 1) {
+        sky.addColorStop(0, "#2c3e50");
+        sky.addColorStop(1, "#34495e");
+      } else if (stage === 2) {
+        sky.addColorStop(0, "#00b894");
+        sky.addColorStop(1, "#55efc4");
       } else {
-        sky.addColorStop(0, "#2c1c38");
-        sky.addColorStop(1, "#522b47");
+        sky.addColorStop(0, "#2d3436");
+        sky.addColorStop(1, "#636e72");
       }
 
       ctx!.fillStyle = sky;
       ctx!.fillRect(0, cameraY, LOGICAL_W, GROUND_Y - cameraY);
 
-      ctx!.fillStyle = atmosphere === 2 ? "#ff9f43" : "#f6f6f6";
-      ctx!.beginPath();
-      ctx!.arc(LOGICAL_W * 0.8 - ((frame * 0.1) % LOGICAL_W), GROUND_Y * 0.4, 50, 0, Math.PI * 2);
-      ctx!.fill();
-
-      ctx!.fillStyle = "rgba(255,255,255,0.1)";
-      for (let i = 0; i < 3; i++) {
+      if (stage === 0) {
+        ctx!.fillStyle = "#f6f6f6";
         ctx!.beginPath();
-        ctx!.arc(
-          (frame * 0.2 + i * 300) % LOGICAL_W,
-          GROUND_Y * 0.3 + Math.sin(i) * 20,
-          40,
-          0,
-          Math.PI * 2,
-        );
+        ctx!.arc(LOGICAL_W * 0.8 - ((frame * 0.1) % LOGICAL_W), GROUND_Y * 0.4, 50, 0, Math.PI * 2);
         ctx!.fill();
       }
 
-      drawCityLayer(GROUND_Y, 0.1, atmosphere === 1 ? "#686e7a" : "#3b3754", 80, 20, cityBack);
-      drawCityLayer(GROUND_Y, 0.3, atmosphere === 1 ? "#535966" : "#2a273b", 60, 40, cityFront);
+      // Dynamic City/Bg Layers based on Stage
+      let backColor, frontColor;
+      if (stage === 0) {
+        backColor = "#3b3754";
+        frontColor = "#2a273b";
+      } else if (stage === 1) {
+        backColor = "#2c3e50";
+        frontColor = "#2c3e50"; // Dark rigs
+      } else if (stage === 2) {
+        backColor = "#00b894";
+        frontColor = "#55efc4"; // Green screen markers
+      } else {
+        backColor = "#d63031";
+        frontColor = "#ff7675"; // Red carpet accents
+      }
+
+      drawCityLayer(GROUND_Y, 0.1, backColor, 80, 20, cityBack, stage);
+      drawCityLayer(GROUND_Y, 0.3, frontColor, 60, 40, cityFront, stage);
 
       ctx!.fillStyle = "#11111a";
       ctx!.fillRect(0, GROUND_Y, LOGICAL_W, LOGICAL_H - GROUND_Y + Math.max(0, cameraY));
 
-      ctx!.fillStyle = "#222";
+      ctx!.fillStyle = stage === 3 ? "#d63031" : "#222"; // Red carpet in stage 3
       for (let i = 0; i < LOGICAL_W; i += 40) {
         const sx = (i - frame * speed * timeScale) % LOGICAL_W;
         const rx = sx < 0 ? sx + LOGICAL_W : sx;
@@ -1321,20 +1366,20 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         const scaleX = Math.abs(Math.cos(frame * 0.08));
 
         if (!ecoMode) {
-          ctx!.shadowColor = "#e8b23d";
+          ctx!.shadowColor = c.golden ? "#fff" : "#e8b23d";
           ctx!.shadowBlur = 10;
         }
 
         ctx!.scale(scaleX, 1);
         ctx!.beginPath();
         ctx!.arc(0, 0, c.r, 0, Math.PI * 2);
-        ctx!.fillStyle = "#e8b23d";
+        ctx!.fillStyle = c.golden ? "#fff" : "#e8b23d";
         ctx!.fill();
         ctx!.lineWidth = 2;
         ctx!.strokeStyle = "#fff";
         ctx!.stroke();
 
-        ctx!.fillStyle = "#fff";
+        ctx!.fillStyle = c.golden ? "#111" : "#fff";
         ctx!.font = "bold 14px sans-serif";
         ctx!.textAlign = "center";
         ctx!.textBaseline = "middle";
@@ -1398,14 +1443,21 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         ctx!.globalAlpha = 1;
       });
 
-      if (atmosphere === 1 && !ecoMode) {
+      // Camera flashes
+      flashes.forEach((f) => {
+        ctx!.globalAlpha = f.life / 10;
+        ctx!.fillStyle = "#fff";
+        ctx!.fillRect(f.x - 10, f.y - 10, 20, 20);
+      });
+      ctx!.globalAlpha = 1;
+
+      // Fog in stage 0 and 1
+      if ((stage === 0 || stage === 1) && !ecoMode) {
         ctx!.fillStyle = "rgba(125, 132, 148, 0.2)";
         ctx!.fillRect(0, cameraY, LOGICAL_W, LOGICAL_H);
       }
 
       ctx!.restore();
-
-      drawHUD();
 
       if (gameState === "STARTING") {
         ctx!.fillStyle = "rgba(0,0,0,0.7)";
@@ -1418,19 +1470,6 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         else if (startSequenceTimer > 60) txt = "2";
         else if (startSequenceTimer > 0) txt = "1";
         ctx!.fillText(txt, LOGICAL_W / 2, LOGICAL_H / 2);
-      }
-
-      if (gameState === "SCENE_COMPLETE") {
-        ctx!.fillStyle = `rgba(0,0,0,${Math.min(0.8, endSequenceTimer / 100)})`;
-        ctx!.fillRect(0, 0, LOGICAL_W, LOGICAL_H);
-        if (endSequenceTimer > 60) {
-          ctx!.fillStyle = "#e8b23d";
-          ctx!.textAlign = "center";
-          ctx!.font = "bold 48px serif";
-          ctx!.fillText("SCENE COMPLETE", LOGICAL_W / 2, LOGICAL_H / 2);
-          ctx!.font = "24px serif";
-          ctx!.fillText("★★★★★", LOGICAL_W / 2, LOGICAL_H / 2 + 40);
-        }
       }
 
       animationId = requestAnimationFrame(loop);
@@ -1447,14 +1486,19 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
   }, [currentMission, reelState, sfx, ecoMode]);
 
   const startNextReel = () => {
+    // Add runner score to total coins
+    if (currentMission === 1) {
+      setTotalCoins((prev) => prev + scoreRef.current);
+    }
+
     scoreRef.current = 0;
     setUiScore(0);
     livesRef.current = 3;
     setUiLives(3);
 
-    // Check for "First Take" achievement
     if (!hasFailedMission && currentMission <= 4) {
       unlockAchievement("First Take");
+      setPerfectMissions((prev) => prev + 1);
     }
 
     setHasFailedMission(false);
@@ -1586,7 +1630,23 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       </div>
 
       <div className="relative flex-1 flex flex-col items-center justify-center p-4 lg:p-8 overflow-hidden bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02),transparent_70%)]">
-        <div className="relative w-full max-w-5xl flex flex-col p-4 md:p-6 bg-[#161616] rounded-[2rem] border border-[#2a2a2a] shadow-[0_40px_100px_rgba(0,0,0,0.8),inset_0_4px_2px_rgba(255,255,255,0.03)] ring-1 ring-black">
+        {/* Slow moving ambient dust for global UI */}
+        <div className="absolute inset-0 pointer-events-none opacity-50 z-0">
+          {[...Array(20)].map((_, i) => (
+            <motion.div
+              key={i}
+              animate={{
+                y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight - 200],
+                x: [Math.random() * window.innerWidth, Math.random() * window.innerWidth + 100],
+                opacity: [0, 0.5, 0],
+              }}
+              transition={{ duration: 10 + Math.random() * 20, repeat: Infinity, ease: "linear" }}
+              className="absolute w-1 h-1 bg-white/20 rounded-full blur-[1px]"
+            />
+          ))}
+        </div>
+
+        <div className="relative w-full max-w-5xl flex flex-col p-4 md:p-6 bg-[#161616] rounded-[2rem] border border-[#2a2a2a] shadow-[0_40px_100px_rgba(0,0,0,0.8),inset_0_4px_2px_rgba(255,255,255,0.03)] ring-1 ring-black z-10">
           <div className="flex justify-between items-center mb-4 px-2 font-mono text-[10px] md:text-xs text-[#555] tracking-widest uppercase select-none">
             <div className="flex items-center gap-4">
               <span className="font-bold text-[#888]">CINEMA EOS</span>
@@ -1604,36 +1664,38 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
 
           <div className="relative p-2 md:p-3 bg-[#050505] rounded-[1.25rem] border border-[#222] shadow-[inset_0_10px_30px_rgba(0,0,0,1)]">
             <div className="relative w-full aspect-[16/8.8] rounded-xl overflow-hidden shadow-[0_0_50px_rgba(255,255,255,0.02)] bg-[#0b0b0f] ring-1 ring-white/10">
-              <div className="arcade-scanlines absolute inset-0 z-40 opacity-40 mix-blend-overlay" />
+              <div className="arcade-scanlines absolute inset-0 z-[100] opacity-40 mix-blend-overlay" />
               <div className="arcade-vignette absolute inset-0 z-30 shadow-[inset_0_0_120px_rgba(0,0,0,0.9)] pointer-events-none" />
 
               {/* GLOBAL HUD */}
-              {reelState === "playing" && currentMission > 1 && currentMission < 6 && (
-                <div className="absolute top-4 left-6 right-6 z-40 flex justify-between font-mono pointer-events-none select-none">
-                  <div className="flex flex-col">
-                    <div className="text-[10px] text-[#e8b23d] font-bold tracking-[0.2em] uppercase mb-1">
-                      MISSION 0{currentMission}
+              {(reelState === "playing" || reelState === "completed") &&
+                currentMission > 1 &&
+                currentMission < 6 && (
+                  <div className="absolute top-4 left-6 right-6 z-40 flex justify-between font-mono pointer-events-none select-none">
+                    <div className="flex flex-col">
+                      <div className="text-[10px] text-[#e8b23d] font-bold tracking-[0.2em] uppercase mb-1">
+                        MISSION 0{currentMission}
+                      </div>
+                      <div className="text-white text-lg font-serif italic">
+                        {currentMissionInfo.title}
+                      </div>
                     </div>
-                    <div className="text-white text-lg font-serif italic">
-                      {currentMissionInfo.title}
+                    <div className="flex flex-col items-end">
+                      <div className="text-[10px] text-white/50 tracking-[0.2em] uppercase mb-1 flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse" />
+                        PROGRESS
+                      </div>
+                      <div className="flex gap-2">
+                        {[1, 2, 3, 4, 5, 6].map((i) => (
+                          <div
+                            key={i}
+                            className={`w-2 h-2 rounded-full ${i < currentMission ? "bg-[#10b981]" : i === currentMission ? "bg-[#e8b23d] shadow-[0_0_8px_#e8b23d] animate-pulse" : "bg-white/10"}`}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end">
-                    <div className="text-[10px] text-white/50 tracking-[0.2em] uppercase mb-1 flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse" />
-                      PROGRESS
-                    </div>
-                    <div className="flex gap-2">
-                      {[1, 2, 3, 4, 5, 6].map((i) => (
-                        <div
-                          key={i}
-                          className={`w-2 h-2 rounded-full ${i < currentMission ? "bg-[#10b981]" : i === currentMission ? "bg-[#e8b23d] shadow-[0_0_8px_#e8b23d] animate-pulse" : "bg-white/10"}`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
+                )}
 
               <AnimatePresence mode="wait">
                 {/* BRIEFING STATE OVERLAY */}
@@ -1644,7 +1706,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0, scale: 1.1, filter: "blur(10px)" }}
                     transition={{ duration: 0.5 }}
-                    className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black font-mono text-white select-none"
+                    className="absolute inset-0 z-[60] flex flex-col items-center justify-center bg-black font-mono text-white select-none"
                     onClick={() => {
                       setReelState("playing");
                       sfx.click();
@@ -1652,14 +1714,21 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                   >
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,transparent_80%)]" />
 
-                    <div className="relative z-10 w-full max-w-lg border border-white/10 bg-[#0a0a0f]/80 p-8 flex flex-col items-center text-center">
+                    {/* Projector flicker effect */}
+                    <motion.div
+                      animate={{ opacity: [0.1, 0.3, 0.1, 0.4, 0.2] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className="absolute inset-0 bg-white/5 pointer-events-none mix-blend-overlay"
+                    />
+
+                    <div className="relative z-10 w-full max-w-lg border border-white/10 bg-[#0a0a0f]/80 p-8 flex flex-col items-center text-center backdrop-blur-sm">
                       <div className="w-full border-b border-white/20 pb-2 mb-6">
                         <span className="text-[#e8b23d] font-bold tracking-[0.3em] uppercase text-sm">
                           MISSION 0{currentMission}
                         </span>
                       </div>
 
-                      <h2 className="text-3xl font-serif italic mb-6 tracking-widest uppercase">
+                      <h2 className="text-3xl font-serif italic mb-6 tracking-widest uppercase drop-shadow-md">
                         {currentMissionInfo.title}
                       </h2>
 
@@ -1679,7 +1748,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                       <motion.div
                         animate={{ opacity: [0.3, 1, 0.3] }}
                         transition={{ repeat: Infinity, duration: 1.5 }}
-                        className="text-[10px] text-white/50 tracking-[0.3em] uppercase"
+                        className="text-[10px] text-white/50 tracking-[0.3em] uppercase cursor-pointer"
                       >
                         Press Any Key to Continue
                       </motion.div>
@@ -1687,6 +1756,73 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                   </motion.div>
                 )}
 
+                {/* MISSION COMPLETE SCREEN */}
+                {reelState === "completed" && (
+                  <motion.div
+                    key="completed"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="absolute inset-0 z-[60] flex flex-col items-center justify-center bg-black/85 backdrop-blur-md"
+                  >
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <motion.h2
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className="text-4xl font-serif text-[#f4f4f4] tracking-widest mb-4"
+                      >
+                        MISSION COMPLETE
+                      </motion.h2>
+                      <motion.div
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.4 }}
+                        className="text-[#e8b23d] text-3xl tracking-[0.4em] mb-8 drop-shadow-[0_0_15px_rgba(232,178,61,0.5)]"
+                      >
+                        ★★★★★
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ y: -10, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.6 }}
+                        className="flex flex-col gap-2 items-center mb-8"
+                      >
+                        <div className="text-white font-mono text-sm tracking-[0.3em] uppercase text-[#00f0ff] mb-2 flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4" />
+                          Objective Cleared
+                        </div>
+                        {currentMissionInfo.unlocks && (
+                          <div className="text-white/70 font-mono text-xs tracking-[0.2em] uppercase">
+                            Project Unlocked:{" "}
+                            <span className="text-[#10b981] font-bold">
+                              {currentMissionInfo.unlocks}
+                            </span>
+                          </div>
+                        )}
+                        {!hasFailedMission && currentMission <= 4 && (
+                          <div className="text-[#e8b23d] font-mono text-xs tracking-[0.2em] uppercase mt-2">
+                            Achievement: First Take
+                          </div>
+                        )}
+                      </motion.div>
+
+                      <motion.button
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 1.5 }}
+                        onClick={() => setReelState("story")}
+                        className="px-8 py-3 bg-transparent border border-[#e8b23d] text-[#e8b23d] font-mono uppercase text-sm tracking-widest hover:bg-[#e8b23d] hover:text-black transition-colors rounded-full"
+                      >
+                        Continue →
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* STORY TICKETS */}
                 {reelState === "story" && currentMission < 6 && content && (
                   <motion.div
                     key="story"
@@ -1770,7 +1906,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                   >
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,transparent_60%)]" />
 
-                    <div className="relative z-10 w-full max-w-2xl border border-white/10 p-12 bg-black/50 backdrop-blur-sm rounded-lg flex flex-col items-center">
+                    <div className="relative z-10 w-full max-w-2xl border border-white/10 p-12 bg-black/70 backdrop-blur-md rounded-lg flex flex-col items-center">
                       <div className="w-full border-t border-b border-white/20 py-4 mb-8 flex justify-between items-center text-white/50 font-mono text-xs tracking-[0.3em] uppercase">
                         <span>Interactive Portfolio Complete</span>
                         <span>v1.0.0</span>
@@ -1780,14 +1916,23 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                         DIRECTOR'S CUT
                       </h1>
 
+                      <div className="w-full text-center text-white/60 font-sans italic mb-8 text-sm max-w-sm">
+                        "The gameplay never changes—but the scenery evolves to mirror the stages of
+                        making a film."
+                      </div>
+
                       <div className="w-full max-w-md flex flex-col gap-4 font-mono text-sm tracking-widest uppercase mb-12">
                         <div className="flex justify-between items-center border-b border-white/10 pb-2">
                           <span className="text-white/50">Runtime</span>
                           <span className="text-[#e8b23d]">{getRuntime()}</span>
                         </div>
                         <div className="flex justify-between items-center border-b border-white/10 pb-2">
-                          <span className="text-white/50">Missions Cleared</span>
-                          <span className="text-[#10b981]">4 / 4</span>
+                          <span className="text-white/50">Coins Collected</span>
+                          <span className="text-[#00f0ff]">{totalCoins}</span>
+                        </div>
+                        <div className="flex justify-between items-center border-b border-white/10 pb-2">
+                          <span className="text-white/50">Perfect Missions</span>
+                          <span className="text-[#10b981]">{perfectMissions}</span>
                         </div>
 
                         {/* Achievements Section */}
@@ -1795,9 +1940,17 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                           <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-white/20">
                             <span className="text-white/30 mb-2">Achievements Unlocked</span>
                             {achievements.map((ach) => (
-                              <div key={ach} className="flex items-center gap-2 text-[#00f0ff]">
-                                <CheckCircle2 className="w-4 h-4" />
-                                <span>{ach}</span>
+                              <div
+                                key={ach}
+                                className="flex items-center justify-between text-[#00f0ff]"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <CheckCircle2 className="w-4 h-4" />
+                                  <span>{ach}</span>
+                                </div>
+                                <span className="text-white/30 text-[10px]">
+                                  {ACHIEVEMENTS_LIST[ach as keyof typeof ACHIEVEMENTS_LIST]}
+                                </span>
                               </div>
                             ))}
                           </div>
@@ -1810,6 +1963,12 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                           <Trophy className="w-6 h-6" />
                           <Trophy className="w-6 h-6" />
                         </div>
+                      </div>
+
+                      <div className="flex flex-col items-center gap-4 text-xs font-mono text-white/40 uppercase tracking-[0.3em] mb-8">
+                        <div>Director ............ Aditya Parihar</div>
+                        <div>Developer ........... Aditya Parihar</div>
+                        <div>Designer ............ Aditya Parihar</div>
                       </div>
 
                       <button
@@ -1828,7 +1987,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                     key="fail"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/95 backdrop-blur-md"
+                    className="absolute inset-0 z-[60] flex flex-col items-center justify-center bg-black/95 backdrop-blur-md"
                   >
                     <h2 className="text-[#ff6a82] font-serif italic text-5xl mb-4">Cut! Take 2.</h2>
                     <button
@@ -1841,36 +2000,37 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                 )}
               </AnimatePresence>
 
-              {currentMission === 1 && (reelState === "playing" || reelState === "fail") && (
-                <canvas
-                  ref={canvasRef}
-                  className="absolute inset-0 w-full h-full object-cover z-0"
-                  style={{ imageRendering: "pixelated" }}
-                />
-              )}
-              {currentMission === 2 && reelState === "playing" && (
+              {currentMission === 1 &&
+                (reelState === "playing" || reelState === "fail" || reelState === "completed") && (
+                  <canvas
+                    ref={canvasRef}
+                    className="absolute inset-0 w-full h-full object-cover z-0"
+                    style={{ imageRendering: "pixelated" }}
+                  />
+                )}
+              {currentMission === 2 && (reelState === "playing" || reelState === "completed") && (
                 <ChessPuzzleGame
                   onComplete={() => {
                     unlockAchievement("Grandmaster");
-                    setReelState("story");
+                    setReelState("completed");
                   }}
                   sfx={sfx}
                 />
               )}
-              {currentMission === 3 && reelState === "playing" && (
+              {currentMission === 3 && (reelState === "playing" || reelState === "completed") && (
                 <MemoryMatchGame
                   onComplete={() => {
                     unlockAchievement("Film Buff");
-                    setReelState("story");
+                    setReelState("completed");
                   }}
                   sfx={sfx}
                 />
               )}
-              {currentMission === 4 && reelState === "playing" && (
+              {currentMission === 4 && (reelState === "playing" || reelState === "completed") && (
                 <SudokuGame
                   onComplete={() => {
                     unlockAchievement("Logic Node");
-                    setReelState("story");
+                    setReelState("completed");
                   }}
                   sfx={sfx}
                 />
@@ -1878,7 +2038,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
             </div>
           </div>
 
-          <div className="mt-4 flex justify-between items-center px-4 font-mono text-[10px] md:text-xs text-[#666] tracking-widest uppercase select-none">
+          <div className="mt-4 flex justify-between items-center px-4 font-mono text-[10px] md:text-xs text-[#666] tracking-widest uppercase select-none z-10">
             <div className="flex gap-6">
               {currentMission === 1 ? (
                 <span className="text-white/50 bg-white/5 px-3 py-1 rounded">
