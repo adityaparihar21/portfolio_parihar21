@@ -1120,7 +1120,8 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
           player.isCrouching = false;
         }
 
-        player.vy += GRAVITY * timeScale;
+        const currentGravity = player.vy > 0 ? GRAVITY * 1.6 : GRAVITY;
+        player.vy += currentGravity * timeScale;
         player.y += player.vy * timeScale;
         if (player.y >= GROUND_Y - player.h) {
           if (!player.onGround && player.vy > 0) {
@@ -1202,7 +1203,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
           const dx = player.x + player.w / 2 - c.x;
           const dy = player.y + player.h / 2 - c.y;
           if (Math.sqrt(dx * dx + dy * dy) < c.r + 24 && gameState === "PLAYING") {
-            scoreRef.current += c.golden ? 50 : 10;
+            scoreRef.current += c.golden ? 5 : 1;
             setUiScore(scoreRef.current);
             combo++;
             triggerZoom(1.03); // micro-zoom on coin
