@@ -3,33 +3,24 @@ import { X, Volume2, VolumeX, HelpCircle, Trophy, CheckCircle2 } from "lucide-re
 import { motion, AnimatePresence } from "framer-motion";
 
 const MISSIONS = [
-  {
-    id: 1,
-    title: "Escape the Set",
-    objective: "Collect 40 AP Coins",
-    difficulty: "HARD",
-    unlocks: "WeatherHUT",
-  },
+  { id: 1, title: "Escape the Set", objective: "Collect 40 AP Coins", difficulty: "HARD" },
   {
     id: 2,
     title: "Checkmate the Director",
     objective: "Neutralize the Director's Final Move",
     difficulty: "HARD",
-    unlocks: "Chess AI Project",
   },
   {
     id: 3,
     title: "Recover the Film Archive",
     objective: "Decrypt all missing film files",
     difficulty: "MEDIUM",
-    unlocks: "Fragmento",
   },
   {
     id: 4,
     title: "Decode the Logic Core",
     objective: "Reconstruct the corrupted system data",
     difficulty: "EASY",
-    unlocks: "AI Project",
   },
   { id: 5, title: "Behind the Scenes", objective: "Read About" },
   { id: 6, title: "Director's Cut", objective: "Complete the Arcade" },
@@ -1065,8 +1056,35 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
     }
 
     function drawHUD() {
-      // We removed the main canvas HUD since the HTML Global HUD handles it now.
-      // But we can still draw floating score if needed. We'll leave it empty to let HTML HUD shine.
+      ctx!.save();
+      const hw = LOGICAL_W / 2;
+      ctx!.translate(hw - 150, 40);
+
+      ctx!.fillStyle = "#fff";
+      ctx!.font = "bold 12px sans-serif";
+      ctx!.textAlign = "center";
+      ctx!.fillText("MISSION: Collect 40 AP Coins", 150, -15);
+
+      const pRatio = Math.min(1, scoreRef.current / 40);
+      ctx!.fillStyle = "rgba(0,0,0,0.5)";
+      ctx!.fillRect(0, 0, 300, 12);
+      ctx!.fillStyle = "#e8b23d";
+      ctx!.fillRect(0, 0, 300 * pRatio, 12);
+      ctx!.strokeStyle = "#fff";
+      ctx!.lineWidth = 2;
+      ctx!.strokeRect(0, 0, 300, 12);
+
+      ctx!.textAlign = "left";
+      ctx!.font = "bold 24px sans-serif";
+      ctx!.fillText(scoreRef.current.toString().padStart(3, "0"), -60, 10);
+
+      for (let i = 0; i < 3; i++) {
+        ctx!.fillStyle = i < livesRef.current ? "#ff4d4d" : "#333";
+        ctx!.beginPath();
+        ctx!.arc(340 + i * 20, 6, 6, 0, Math.PI * 2);
+        ctx!.fill();
+      }
+      ctx!.restore();
     }
 
     function loop() {
@@ -1084,6 +1102,8 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       frame += timeScale;
       speed = 6.5 + Math.min(5, scoreRef.current / 80);
       const stage = getStage();
+
+      drawHUD();
 
       if (gameState === "STARTING") {
         startSequenceTimer -= dt * 0.06;
