@@ -895,118 +895,162 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         }
       `}} />
 
-      <div className="w-full h-16 bg-[#0a0a0f] border-b border-white/10 flex items-center justify-between px-6 shrink-0 z-50">
-        <span className="text-white/80 font-mono text-sm tracking-widest uppercase">Interactive Cinema {ecoMode && '(Eco)'}</span>
-        <button onClick={onClose} className="text-white/60 hover:text-white flex items-center gap-2 font-mono text-xs tracking-wider uppercase">
+      <div className="w-full h-16 bg-[#0a0a0f] border-b border-white/5 flex items-center justify-between px-6 shrink-0 z-50">
+        <span className="text-white/60 font-mono text-sm tracking-widest uppercase">Interactive Cinema {ecoMode && '(Eco)'}</span>
+        <button onClick={onClose} className="text-white/60 hover:text-white flex items-center gap-2 font-mono text-xs tracking-wider uppercase transition-colors">
           Exit <X className="h-4 w-4" />
         </button>
       </div>
 
-      <div className="relative flex-1 flex flex-col items-center justify-center p-4 lg:p-8 overflow-hidden bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03),transparent_60%)]">
+      <div className="relative flex-1 flex flex-col items-center justify-center p-4 lg:p-8 overflow-hidden bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02),transparent_70%)]">
         
-        {/* HUD (Only show during Reel 1 Runner Game) */}
-        {currentReel === 1 && (reelState === "playing" || reelState === "fail") && (
-          <div className="absolute top-8 left-8 right-8 z-40 flex justify-between font-mono text-black pointer-events-none drop-shadow-md">
-            <div>
-              <div className="text-xs uppercase tracking-widest mb-1 font-bold text-white/50">AP Coins</div>
-              <div className="text-3xl text-white font-bold">{uiScore.toString().padStart(3, '0')}</div>
+        {/* Director's Monitor Hardware Bezel */}
+        <div className="relative w-full max-w-5xl flex flex-col p-4 md:p-6 bg-[#161616] rounded-[2rem] border border-[#2a2a2a] shadow-[0_40px_100px_rgba(0,0,0,0.8),inset_0_4px_2px_rgba(255,255,255,0.03)] ring-1 ring-black">
+          
+          {/* Top Hardware Info/Tally bar */}
+          <div className="flex justify-between items-center mb-4 px-2 font-mono text-[10px] md:text-xs text-[#555] tracking-widest uppercase select-none">
+            <div className="flex items-center gap-4">
+              <span className="font-bold text-[#888]">CINEMA EOS</span>
+              <span className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse"></div> 8K RAW</span>
             </div>
-            <div className="text-right">
-              <div className="text-xs uppercase tracking-widest mb-1 font-bold text-white/50">Takes</div>
-              <div className="flex gap-2 justify-end mt-2">
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className={`w-4 h-4 rounded-full ${i < uiLives ? 'bg-[#b3122e] border-2 border-white' : 'border-2 border-black/50'}`} />
-                ))}
+            {currentReel === 1 && (reelState === "playing" || reelState === "fail") && (
+              <div className="flex items-center gap-2 text-[#ff4d4d] animate-pulse font-bold tracking-widest bg-[#ff4d4d]/10 px-3 py-1 rounded border border-[#ff4d4d]/30 shadow-[0_0_10px_rgba(255,77,77,0.2)]">
+                <div className="w-2 h-2 bg-[#ff4d4d] rounded-full shadow-[0_0_8px_#ff4d4d]"></div>
+                REC
               </div>
-            </div>
-            <div className="absolute bottom-[-40px] left-0 text-white/40 text-xs tracking-wider">SPACE = JUMP | DOWN = CROUCH</div>
+            )}
           </div>
-        )}
 
-        <div className="relative w-full max-w-5xl aspect-[16/8.8] rounded-3xl overflow-hidden border border-white/10 shadow-[0_30px_80px_rgba(0,0,0,0.5)] bg-[#0b0b0f]">
-          <div className="arcade-scanlines absolute inset-0 z-40 opacity-50" />
-          <div className="arcade-vignette absolute inset-0 z-30 shadow-[inset_0_0_100px_rgba(0,0,0,0.8)] pointer-events-none" />
-
-          <AnimatePresence mode="wait">
-            {/* Story Overlay - Now looks like a Cinema Ticket */}
-            {reelState === "story" && content && (
-              <motion.div 
-                key="story"
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
-                className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/95 backdrop-blur-md p-8"
-              >
-                <div className="cinema-ticket w-full max-w-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex">
-                  <div className="w-[100px] flex-shrink-0 flex items-center justify-center border-r border-dashed border-black/10 relative">
-                    <div className="ticket-dashed-line"></div>
-                    <div className="text-black/30 font-mono text-xs uppercase tracking-[0.4em] rotate-180" style={{ writingMode: 'vertical-rl' }}>
-                      Admit One
-                    </div>
+          {/* Inner Bezel framing the screen */}
+          <div className="relative p-2 md:p-3 bg-[#050505] rounded-[1.25rem] border border-[#222] shadow-[inset_0_10px_30px_rgba(0,0,0,1)]">
+            
+            {/* The Actual Screen */}
+            <div className="relative w-full aspect-[16/8.8] rounded-xl overflow-hidden shadow-[0_0_50px_rgba(255,255,255,0.02)] bg-[#0b0b0f] ring-1 ring-white/10">
+              <div className="arcade-scanlines absolute inset-0 z-40 opacity-40 mix-blend-overlay" />
+              <div className="arcade-vignette absolute inset-0 z-30 shadow-[inset_0_0_120px_rgba(0,0,0,0.9)] pointer-events-none" />
+              
+              {/* Overlay HUD inside screen */}
+              {currentReel === 1 && (reelState === "playing" || reelState === "fail") && (
+                <div className="absolute top-6 left-6 right-6 z-40 flex justify-between font-mono pointer-events-none drop-shadow-lg">
+                  <div className="bg-black/60 backdrop-blur-md border border-white/10 px-4 py-2 rounded-lg shadow-xl">
+                    <div className="text-[10px] uppercase tracking-[0.2em] mb-0.5 font-semibold text-[#e8b23d]/80">AP Coins</div>
+                    <div className="text-2xl md:text-3xl text-white font-bold tracking-tight">{uiScore.toString().padStart(3, '0')}</div>
                   </div>
-                  <div className="p-10 flex-1 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center gap-4 mb-4">
-                        {/* @ts-ignore */}
-                        {content.image && (
-                          /* @ts-ignore */
-                          <img src={content.image} alt="Profile" className="w-10 h-10 rounded-full object-cover border border-black/20 grayscale" />
-                        )}
-                        <div className="text-black/50 font-mono text-xs tracking-[0.3em] uppercase">{content.tag}</div>
-                      </div>
-                      <h2 className="text-[#241a1e] font-serif italic text-3xl lg:text-4xl mb-4 leading-tight">{content.title}</h2>
-                      <p className="text-black/70 font-sans text-base leading-relaxed mb-4">{content.desc}</p>
-                      {/* @ts-ignore */}
-                      {content.link && (
-                        /* @ts-ignore */
-                        <a href={content.link.url} target="_blank" rel="noreferrer" className="inline-block mb-8 text-[#902424] hover:text-[#b3122e] underline decoration-dashed underline-offset-4 transition-colors font-mono text-sm uppercase tracking-wider">
-                          {/* @ts-ignore */}
-                          {content.link.text} ↗
-                        </a>
-                      )}
-                    </div>
-                    <div className="flex flex-col gap-6">
-                      <div className="ticket-barcode"></div>
-                      <div className="flex justify-end">
-                        {currentReel < 6 ? (
-                          <button onClick={startNextReel} className="bg-[#241a1e] text-[#f4ead8] px-8 py-3 rounded-full font-mono uppercase tracking-widest text-xs hover:scale-105 hover:bg-black transition-all">
-                            Play Next Scene
-                          </button>
-                        ) : (
-                          <button onClick={onClose} className="border border-black/20 text-black px-8 py-3 rounded-full font-mono uppercase tracking-widest text-xs hover:bg-black/5 transition-colors">
-                            Return to Portfolio
-                          </button>
-                        )}
-                      </div>
+                  <div className="bg-black/60 backdrop-blur-md border border-white/10 px-4 py-2 rounded-lg shadow-xl text-right flex flex-col items-end justify-center">
+                    <div className="text-[10px] uppercase tracking-[0.2em] mb-1.5 font-semibold text-white/50">Takes</div>
+                    <div className="flex gap-2 justify-end">
+                      {[...Array(3)].map((_, i) => (
+                        <div key={i} className={`w-3.5 h-3.5 rounded-full shadow-inner ${i < uiLives ? 'bg-[#ff4d4d] border border-white/80 shadow-[0_0_10px_rgba(255,77,77,0.8)]' : 'bg-[#1a1a1a] border border-white/10'}`} />
+                      ))}
                     </div>
                   </div>
                 </div>
-              </motion.div>
-            )}
+              )}
 
-            {reelState === "fail" && (
-              <motion.div 
-                key="fail" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/95 backdrop-blur-md"
-              >
-                <h2 className="text-[#ff6a82] font-serif italic text-5xl mb-4">Cut! Take 2.</h2>
-                <button onClick={retryReel} className="border border-white/20 text-white px-8 py-3 rounded-full font-mono uppercase tracking-widest hover:bg-white/10 transition-colors">
-                  Reset Scene
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              <AnimatePresence mode="wait">
+                {/* Story Overlay - Now looks like a Cinema Ticket */}
+                {reelState === "story" && content && (
+                  <motion.div 
+                    key="story"
+                    initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.05 }}
+                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                    className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/95 backdrop-blur-xl p-8"
+                  >
+                    <div className="cinema-ticket w-full max-w-2xl shadow-[0_30px_60px_rgba(0,0,0,0.8)] flex">
+                      <div className="w-[100px] flex-shrink-0 flex items-center justify-center border-r border-dashed border-black/10 relative">
+                        <div className="ticket-dashed-line"></div>
+                        <div className="text-black/30 font-mono text-xs uppercase tracking-[0.4em] rotate-180" style={{ writingMode: 'vertical-rl' }}>
+                          Admit One
+                        </div>
+                      </div>
+                      <div className="p-10 flex-1 flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-center gap-4 mb-4">
+                            {/* @ts-ignore */}
+                            {content.image && (
+                              /* @ts-ignore */
+                              <img src={content.image} alt="Profile" className="w-10 h-10 rounded-full object-cover border border-black/20 grayscale" />
+                            )}
+                            <div className="text-black/50 font-mono text-xs tracking-[0.3em] uppercase">{content.tag}</div>
+                          </div>
+                          <h2 className="text-[#241a1e] font-serif italic text-3xl lg:text-4xl mb-4 leading-tight">{content.title}</h2>
+                          <p className="text-black/70 font-sans text-base leading-relaxed mb-4">{content.desc}</p>
+                          {/* @ts-ignore */}
+                          {content.link && (
+                            /* @ts-ignore */
+                            <a href={content.link.url} target="_blank" rel="noreferrer" className="inline-block mb-8 text-[#902424] hover:text-[#b3122e] underline decoration-dashed underline-offset-4 transition-colors font-mono text-sm uppercase tracking-wider">
+                              {/* @ts-ignore */}
+                              {content.link.text} ↗
+                            </a>
+                          )}
+                        </div>
+                        <div className="flex flex-col gap-6">
+                          <div className="ticket-barcode"></div>
+                          <div className="flex justify-end">
+                            {currentReel < 6 ? (
+                              <button onClick={startNextReel} className="bg-[#241a1e] text-[#f4ead8] px-8 py-3 rounded-full font-mono uppercase tracking-widest text-xs hover:scale-105 hover:bg-black transition-all shadow-lg">
+                                Play Next Scene
+                              </button>
+                            ) : (
+                              <button onClick={onClose} className="border border-black/20 text-black px-8 py-3 rounded-full font-mono uppercase tracking-widest text-xs hover:bg-black/5 transition-colors">
+                                Return to Portfolio
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
 
-          {currentReel === 1 && (reelState === "playing" || reelState === "fail") && 
-            <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-cover z-0" style={{ imageRendering: 'pixelated' }} />
-          }
-          {currentReel === 2 && reelState === "playing" && <ChessPuzzleGame onComplete={() => setReelState("story")} sfx={sfx} />}
-          {currentReel === 3 && reelState === "playing" && <MemoryMatchGame onComplete={() => setReelState("story")} sfx={sfx} />}
-          {currentReel === 4 && reelState === "playing" && <SudokuGame onComplete={() => setReelState("story")} sfx={sfx} />}
+                {reelState === "fail" && (
+                  <motion.div 
+                    key="fail" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                    className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/95 backdrop-blur-md"
+                  >
+                    <h2 className="text-[#ff6a82] font-serif italic text-5xl mb-4">Cut! Take 2.</h2>
+                    <button onClick={retryReel} className="border border-white/20 text-white px-8 py-3 rounded-full font-mono uppercase tracking-widest hover:bg-white/10 transition-colors">
+                      Reset Scene
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {currentReel === 1 && (reelState === "playing" || reelState === "fail") && 
+                <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-cover z-0" style={{ imageRendering: 'pixelated' }} />
+              }
+              {currentReel === 2 && reelState === "playing" && <ChessPuzzleGame onComplete={() => setReelState("story")} sfx={sfx} />}
+              {currentReel === 3 && reelState === "playing" && <MemoryMatchGame onComplete={() => setReelState("story")} sfx={sfx} />}
+              {currentReel === 4 && reelState === "playing" && <SudokuGame onComplete={() => setReelState("story")} sfx={sfx} />}
+              
+            </div>
+          </div>
           
+          {/* Bottom Hardware Info / Status Bar */}
+          <div className="mt-4 flex justify-between items-center px-4 font-mono text-[10px] md:text-xs text-[#666] tracking-widest uppercase select-none">
+            <div className="flex gap-6">
+              {currentReel === 1 ? (
+                <span className="text-white/50 bg-white/5 px-3 py-1 rounded">CTL: SPACE/JUMP, DOWN/CROUCH</span>
+              ) : (
+                <span className="text-white/50 bg-white/5 px-3 py-1 rounded">CTL: MOUSE/TOUCH</span>
+              )}
+              <span className="hidden md:flex items-center gap-2">SDI IN <div className="w-1.5 h-1.5 rounded-full bg-[#10b981]"></div></span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span>TC 01:24:43:12</span>
+              <div className="flex gap-1.5">
+                <div className="w-1.5 h-3 bg-[#444] rounded-sm"></div>
+                <div className="w-1.5 h-3 bg-[#444] rounded-sm"></div>
+                <div className="w-1.5 h-3 bg-[#10b981] rounded-sm shadow-[0_0_5px_#10b981]"></div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
         <button 
           onClick={() => setSoundEnabled(!soundEnabled)}
-          className="absolute bottom-8 right-8 z-40 bg-black/50 backdrop-blur-md border border-white/20 p-3 rounded-full text-[#e8b23d] hover:bg-black/70 transition-colors"
+          className="absolute bottom-8 right-8 z-50 bg-black/50 backdrop-blur-md border border-white/20 p-3 rounded-full text-[#e8b23d] hover:bg-black/70 transition-colors shadow-xl"
         >
           {soundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
         </button>
