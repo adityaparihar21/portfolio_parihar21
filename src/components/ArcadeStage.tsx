@@ -1814,14 +1814,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                           <CheckCircle2 className="w-4 h-4" />
                           Objective Cleared
                         </div>
-                        {currentMissionInfo.unlocks && (
-                          <div className="text-white/70 font-mono text-xs tracking-[0.2em] uppercase">
-                            Project Unlocked:{" "}
-                            <span className="text-[#10b981] font-bold">
-                              {currentMissionInfo.unlocks}
-                            </span>
-                          </div>
-                        )}
+
                         {!hasFailedMission && currentMission <= 4 && (
                           <div className="text-[#e8b23d] font-mono text-xs tracking-[0.2em] uppercase mt-2">
                             Achievement: First Take
