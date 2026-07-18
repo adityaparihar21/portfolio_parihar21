@@ -2,11 +2,19 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { X, Volume2, VolumeX, HelpCircle, Trophy, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const MISSIONS = [
-  { id: 1, title: "Escape the Set", objective: "Collect 40 AP Coins", difficulty: "HARD" },
-  { id: 2, title: "Checkmate the Director", objective: "Neutralize the Director's Final Move", difficulty: "HARD" },
-  { id: 3, title: "Recover the Film Archive", objective: "Decrypt all missing film files", difficulty: "MEDIUM" },
-  { id: 4, title: "Decode the Logic Core", objective: "Reconstruct the corrupted system data", difficulty: "EASY" },
+interface Mission {
+  id: number;
+  title: string;
+  objective: string;
+  difficulty?: string;
+  unlocks?: string;
+}
+
+const MISSIONS: Mission[] = [
+  { id: 1, title: "Escape the Set", objective: "Collect 15 AP Coins", difficulty: "HARD", unlocks: "WeatherHUT" },
+  { id: 2, title: "Checkmate the Director", objective: "Neutralize the Director's Final Move", difficulty: "HARD", unlocks: "Chess AI Project" },
+  { id: 3, title: "Recover the Film Archive", objective: "Decrypt all missing film files", difficulty: "MEDIUM", unlocks: "Fragmento" },
+  { id: 4, title: "Decode the Logic Core", objective: "Reconstruct the corrupted system data", difficulty: "EASY", unlocks: "AI Project" },
   { id: 5, title: "Behind the Scenes", objective: "Read About" },
   { id: 6, title: "Director's Cut", objective: "Complete the Arcade" }
 ];
@@ -790,6 +798,9 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
     let animationId: number;
     let lastTime = performance.now();
 
+    const activeKeys = new Set<string>();
+    let slowMoScale = 1.0;
+
     const player = {
       x: 110,
       y: GROUND_Y - 80,
@@ -854,13 +865,14 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
 
     const jump = () => {
       if (gameState !== "PLAYING") return;
-      if (player.onGround && !player.isCrouching) {
+      if (player.onGround) {
         player.vy = JUMP_V;
         player.onGround = false;
+        player.isCrouching = false;
+        player.crouchTimer = 0;
         player.scaleX = 0.8;
         player.scaleY = 1.25;
         targetCameraY = -15; // Pan camera down
-        spawnParticles(player.x + 30, player.y + 80, 15, "#e8e8e8", 4, -2);
         sfx.jump();
       }
     };
@@ -868,7 +880,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
     const crouch = () => {
       if (gameState !== "PLAYING") return;
       if (player.onGround && !player.isCrouching) {
-        player.crouchTimer = 35;
+        player.isCrouching = true;
         sfx.step();
       }
     };
@@ -876,14 +888,27 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === "Space" || e.code === "ArrowUp") {
         e.preventDefault();
+        activeKeys.add(e.code);
         jump();
       }
       if (e.code === "ArrowDown" || e.code === "KeyS") {
         e.preventDefault();
+        activeKeys.add(e.code);
         crouch();
       }
     };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      activeKeys.delete(e.code);
+      if (e.code === "ArrowDown" || e.code === "KeyS") {
+        if (!activeKeys.has("ArrowDown") && !activeKeys.has("KeyS")) {
+          player.isCrouching = false;
+        }
+      }
+    };
+
     window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
     canvas.addEventListener("pointerdown", jump, { passive: true });
 
     function spawnParticles(
@@ -1018,9 +1043,9 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       ctx!.fillStyle = "#fff";
       ctx!.font = "bold 12px sans-serif";
       ctx!.textAlign = "center";
-      ctx!.fillText("MISSION: Collect 40 AP Coins", 150, -15);
+      ctx!.fillText("MISSION: Collect 15 AP Coins", 150, -15);
 
-      const pRatio = Math.min(1, scoreRef.current / 40);
+      const pRatio = Math.min(1, scoreRef.current / 15);
       ctx!.fillStyle = "rgba(0,0,0,0.5)";
       ctx!.fillRect(0, 0, 300, 12);
       ctx!.fillStyle = "#e8b23d";
@@ -1044,14 +1069,24 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
 
     function loop() {
       const now = performance.now();
-      const dt = now - lastTime;
+      let dt = now - lastTime;
       lastTime = now;
+      if (dt > 100) dt = 16.667; // avoid huge lag spikes on tab refocus
 
       frameTimes.current.push(dt);
       if (frameTimes.current.length > 60) {
         frameTimes.current.shift();
         const avgDt = frameTimes.current.reduce((a, b) => a + b) / 60;
         if (avgDt > 24 && !ecoMode) setEcoMode(true);
+      }
+
+      // Calculate timeScale dynamically based on 60fps baseline
+      let dtScale = Math.min(3.0, dt / 16.667);
+      if (gameState === "PLAYING" || gameState === "STARTING") {
+        timeScale = dtScale;
+      } else if (gameState === "SCENE_COMPLETE") {
+        slowMoScale = Math.max(0.05, slowMoScale * 0.95);
+        timeScale = dtScale * slowMoScale;
       }
 
       frame += timeScale;
@@ -1066,7 +1101,6 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       }
 
       if (gameState === "SCENE_COMPLETE") {
-        timeScale = Math.max(0.05, timeScale * 0.95);
         endSequenceTimer += dt * 0.06;
         if (endSequenceTimer > 180) {
           // Changed to set ReelState to "completed" so ArcadeStage handles it
@@ -1076,7 +1110,6 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       }
 
       if (gameState === "PLAYING") {
-        timeScale = 1.0;
         spawnTimer -= 1 * timeScale;
         if (spawnTimer <= 0) {
           spawnTimer = 55 + Math.random() * 30;
@@ -1113,8 +1146,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       }
 
       if (gameState !== "STARTING") {
-        if (player.crouchTimer > 0) {
-          player.crouchTimer -= timeScale;
+        if (player.onGround && (activeKeys.has("ArrowDown") || activeKeys.has("KeyS"))) {
           player.isCrouching = true;
         } else {
           player.isCrouching = false;
@@ -1218,7 +1250,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
               );
             }
 
-            if (scoreRef.current >= 40 && gameState === "PLAYING") {
+            if (scoreRef.current >= 15 && gameState === "PLAYING") {
               gameState = "SCENE_COMPLETE";
               sfx.win();
               coins.forEach((cc) => spawnParticles(cc.x, cc.y, 15, "#e8b23d", 8, 8));
@@ -1450,6 +1482,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       cancelAnimationFrame(animationId);
       window.removeEventListener("resize", resize);
       window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
       canvas.removeEventListener("pointerdown", jump);
     };
   }, [currentMission, reelState, sfx, ecoMode]);
