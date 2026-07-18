@@ -757,7 +757,6 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
     if (!ctx) return;
 
     const spriteSheet = new Image();
-    spriteSheet.src = "/runner_sprite.png";
     const processedCanvas = document.createElement("canvas");
     let isSpriteReady = false;
 
@@ -785,6 +784,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         isSpriteReady = true;
       }
     };
+    spriteSheet.src = "/runner_sprite.png";
 
     const LOGICAL_W = 960;
     const LOGICAL_H = 480;
@@ -944,7 +944,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
       stage: number
     ) {
       const scrollX =
-        (frame * speed * speedMul * timeScale) % (w * arr.length + spacing * arr.length);
+        (frame * speed * speedMul) % (w * arr.length + spacing * arr.length);
       ctx!.fillStyle = color;
       let x = -scrollX;
       for (let i = 0; i < arr.length * 3; i++) {
@@ -1351,7 +1351,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
 
       ctx!.fillStyle = stage === 3 ? "#d63031" : "#222"; // Red carpet in stage 3
       for (let i = 0; i < LOGICAL_W; i += 40) {
-        const sx = (i - frame * speed * timeScale) % LOGICAL_W;
+        const sx = (i - frame * speed) % LOGICAL_W;
         const rx = sx < 0 ? sx + LOGICAL_W : sx;
         ctx!.fillRect(rx, GROUND_Y + 10, 15, 10);
         ctx!.fillRect(rx, GROUND_Y + LOGICAL_H - GROUND_Y - 20, 15, 10);
@@ -1422,6 +1422,10 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
           player.w + 40,
           player.h + 20,
         );
+      } else {
+        // Fallback temporary silhouette for the player while the sprite sheet loads
+        ctx!.fillStyle = "#e8b23d";
+        ctx!.fillRect(Math.floor(player.x), Math.floor(player.y), player.w, player.h);
       }
       ctx!.restore();
 
