@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useMemo } from "react";
-import { X, Volume2, VolumeX, Trophy, ArrowRight, ArrowLeft, Eye, Sparkles, Film, ExternalLink } from "lucide-react";
+import { X, Volume2, VolumeX, Trophy, ArrowRight, ArrowLeft, Sparkles, Film, ExternalLink, Pencil } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Mission {
@@ -67,14 +67,6 @@ const MISSIONS: Mission[] = [
   },
 ];
 
-const ACHIEVEMENTS_LIST = {
-  "First Take": "Explore your first story board",
-  "Film Buff": "Check out the Letterboxd film collection",
-  "Grandmaster": "Inspect the strategic chess notes",
-  "Logic Node": "Decode the logic core board",
-  "The Writer": "Read the Substack publication ticket",
-};
-
 const FILMS = [
   {
     title: "Beautiful Boy",
@@ -137,20 +129,22 @@ const useSound = (enabled: boolean) => {
 };
 
 /* -----------------------------------------------------
-   CANVAS LIVE SKETCH ENGINE
-   Real-time Sobel Edge Detection + Animated Pencil Strokes
+   CANVAS LIVE PENCIL SKETCH ENGINE
+   Real-time Sobel Edge Detection + Animated Drawing Cursor
    ----------------------------------------------------- */
 function CanvasSketchEngine({
   imageSrc,
   isSketchMode,
   sfx,
+  title,
 }: {
   imageSrc: string;
   isSketchMode: boolean;
   sfx: any;
+  title: string;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [sketchProgress, setSketchProgress] = useState(0);
+  const [pencilPos, setPencilPos] = useState({ x: 0, y: 0, active: true });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -160,21 +154,20 @@ function CanvasSketchEngine({
 
     let animId: number;
     let startTime: number | null = null;
-    const duration = 1000; // 1s sketch animation
+    const duration = 1200; // 1.2s pencil sketch drawing animation
 
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.src = imageSrc;
 
     img.onload = () => {
-      // Set canvas resolution
       const parent = canvas.parentElement;
-      const width = parent?.clientWidth || 1200;
-      const height = parent?.clientHeight || 800;
+      const width = parent?.clientWidth || 600;
+      const height = parent?.clientHeight || 450;
       canvas.width = width;
       canvas.height = height;
 
-      // Draw original image scaled (cover) onto offscreen canvas
+      // Offscreen canvas for scaling and pixel processing
       const offCanvas = document.createElement("canvas");
       offCanvas.width = width;
       offCanvas.height = height;
@@ -198,24 +191,23 @@ function CanvasSketchEngine({
 
       offCtx.drawImage(img, offsetX, offsetY, renderW, renderH);
 
-      // Perform Sobel edge detection to generate graphite sketch
+      // Perform Sobel edge detection to generate graphite pencil sketch
       const imageData = offCtx.getImageData(0, 0, width, height);
       const data = imageData.data;
       const sketchData = offCtx.createImageData(width, height);
       const sData = sketchData.data;
 
-      // Convert image to grayscale buffer
+      // Grayscale
       const gray = new Uint8Array(width * height);
       for (let i = 0; i < data.length; i += 4) {
         gray[i / 4] = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
       }
 
-      // Sobel kernels
+      // Sobel gradient matrix
       for (let y = 1; y < height - 1; y++) {
         for (let x = 1; x < width - 1; x++) {
           const idx = y * width + x;
 
-          // Gradients
           const gx =
             -gray[idx - width - 1] +
             gray[idx - width + 1] -
@@ -232,38 +224,36 @@ function CanvasSketchEngine({
             2 * gray[idx + width] +
             gray[idx + width + 1];
 
-          const mag = Math.min(255, Math.sqrt(gx * gx + gy * gy) * 1.8);
-          // Invert magnitude: dark graphite pencil lines (0) on light off-white paper (245)
-          const strokeVal = 245 - mag;
+          const mag = Math.min(255, Math.sqrt(gx * gx + gy * gy) * 2.2);
+          const strokeVal = 250 - mag; // Invert to get dark graphite strokes on light paper
           const pixelIdx = idx * 4;
 
-          sData[pixelIdx] = strokeVal * 0.15; // Dark graphite R
-          sData[pixelIdx + 1] = strokeVal * 0.15; // Dark graphite G
-          sData[pixelIdx + 2] = strokeVal * 0.18; // Dark graphite B
-          sData[pixelIdx + 3] = 255; // Full opacity
+          sData[pixelIdx] = strokeVal * 0.12; // Dark graphite R
+          sData[pixelIdx + 1] = strokeVal * 0.12; // Dark graphite G
+          sData[pixelIdx + 2] = strokeVal * 0.15; // Dark graphite B
+          sData[pixelIdx + 3] = 255;
         }
       }
 
-      // Animation loop for live pencil line sketching
       sfx.sketch();
+      setPencilPos({ x: 20, y: 20, active: true });
 
       const animateSketch = (timestamp: number) => {
         if (!startTime) startTime = timestamp;
         const elapsed = timestamp - startTime;
         const p = Math.min(1, elapsed / duration);
-        setSketchProgress(p);
 
         ctx.clearRect(0, 0, width, height);
 
         if (isSketchMode) {
-          // Draw dark paper blueprint background
-          ctx.fillStyle = "#0c0d12";
+          // Off-white architectural drafting paper background
+          ctx.fillStyle = "#12141c";
           ctx.fillRect(0, 0, width, height);
 
-          // Draw fine grid lines
-          ctx.strokeStyle = "rgba(255, 255, 255, 0.03)";
+          // Grid lines
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.04)";
           ctx.lineWidth = 1;
-          const gridSize = 40;
+          const gridSize = 30;
           for (let x = 0; x < width; x += gridSize) {
             ctx.beginPath();
             ctx.moveTo(x, 0);
@@ -277,24 +267,30 @@ function CanvasSketchEngine({
             ctx.stroke();
           }
 
-          // Draw animated sketch mask revealing top to bottom
-          const currentHeight = Math.floor(height * p);
-          if (currentHeight > 0) {
-            ctx.putImageData(sketchData, 0, 0, 0, 0, width, currentHeight);
+          // Draw progressive sketch mask line by line
+          const currentH = Math.floor(height * p);
+          if (currentH > 0) {
+            ctx.putImageData(sketchData, 0, 0, 0, 0, width, currentH);
           }
 
-          // Draw active pencil cursor line
+          // Move active pencil cursor
+          const currentY = Math.min(height - 10, currentH);
+          const currentX = (Math.sin(p * Math.PI * 8) * 0.4 + 0.5) * width;
+          setPencilPos({ x: currentX, y: currentY, active: p < 1 });
+
+          // Pencil sweep indicator line
           if (p < 1) {
             ctx.strokeStyle = "rgba(232, 178, 61, 0.8)";
             ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.moveTo(0, currentHeight);
-            ctx.lineTo(width, currentHeight);
+            ctx.moveTo(0, currentY);
+            ctx.lineTo(width, currentY);
             ctx.stroke();
           }
         } else {
           // Full color photo mode
           ctx.drawImage(offCanvas, 0, 0);
+          setPencilPos({ x: 0, y: 0, active: false });
         }
 
         if (p < 1 && isSketchMode) {
@@ -311,9 +307,27 @@ function CanvasSketchEngine({
   }, [imageSrc, isSketchMode]);
 
   return (
-    <div className="relative w-full h-full overflow-hidden">
-      <canvas ref={canvasRef} className="w-full h-full object-cover transition-opacity duration-700" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent pointer-events-none" />
+    <div className="relative w-full h-full overflow-hidden bg-[#0c0d14] flex items-center justify-center">
+      <canvas ref={canvasRef} className="w-full h-full object-cover transition-opacity duration-500" />
+
+      {/* Pencil Tip Icon Cursor moving live along sketch lines */}
+      {isSketchMode && pencilPos.active && (
+        <motion.div
+          className="absolute z-20 pointer-events-none flex items-center gap-1 bg-[#e8b23d] text-black px-2 py-0.5 rounded-full font-mono text-[9px] font-bold shadow-lg"
+          style={{ left: pencilPos.x, top: pencilPos.y }}
+          animate={{ scale: [1, 1.15, 1] }}
+          transition={{ repeat: Infinity, duration: 0.3 }}
+        >
+          <Pencil className="w-3 h-3 text-black" />
+          <span>SKETCHING...</span>
+        </motion.div>
+      )}
+
+      {/* Title tag overlay */}
+      <div className="absolute top-3 left-3 z-10 px-3 py-1 rounded bg-black/70 border border-white/10 backdrop-blur-md text-[10px] font-mono text-white/80 uppercase tracking-widest flex items-center gap-2">
+        <span className="w-2 h-2 rounded-full bg-[#e8b23d] animate-ping" />
+        <span>LIVE ART CANVAS — {title}</span>
+      </div>
     </div>
   );
 }
@@ -333,6 +347,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
   const [startTime] = useState(Date.now());
 
   const currentInfo = MISSIONS[currentMission - 1] || MISSIONS[0];
+  const isOddBoard = currentMission % 2 === 1; // 1, 3, 5: Content Left, Sketch Right. 2, 4: Sketch Left, Content Right
 
   const unlockAchievement = (name: string) => {
     setAchievements((prev) => {
@@ -361,7 +376,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
     }
   }, [soundEnabled]);
 
-  // Keyboard navigation
+  // Keyboard arrow navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight") {
@@ -405,7 +420,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-[#050508] text-white overflow-hidden select-none font-sans">
-      {/* 35MM FILM REEL TOP SPROCKET BAR */}
+      {/* 35MM FILM REEL TOP BAR */}
       <div className="relative z-30 flex items-center justify-between px-6 py-3 bg-black/90 border-b border-white/10 backdrop-blur-md">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
@@ -443,7 +458,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
               setIsSketchMode((prev) => !prev);
             }}
             className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-white/80 transition-all active:scale-95"
-            title="Toggle between Live Pencil Sketch and Color Photo"
+            title="Toggle between Pencil Sketch and Raw Photo"
           >
             <Sparkles className={`w-3.5 h-3.5 ${isSketchMode ? "text-[#e8b23d]" : "text-white/40"}`} />
             <span>{isSketchMode ? "Pencil Sketch" : "Raw Photo"}</span>
@@ -474,29 +489,25 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
         ))}
       </div>
 
-      {/* MAIN VIEWPORT: SKETCH CANVAS BACKGROUND + STORYBOARD CARD FOREGROUND */}
-      <div className="relative flex-1 w-full h-full overflow-hidden flex items-center justify-center">
-        {/* Real-time Pencil Sketch Canvas Engine */}
-        <div className="absolute inset-0 z-0">
-          <CanvasSketchEngine imageSrc={currentInfo.image} isSketchMode={isSketchMode} sfx={sfx} />
-        </div>
-
-        {/* FOREGROUND STORY TICKET BOARD */}
+      {/* MAIN VIEWPORT: SIDE-BY-SIDE ALTERNATING LAYOUT */}
+      <div className="relative flex-1 w-full h-full overflow-hidden flex items-center justify-center p-6 lg:p-12">
         <AnimatePresence mode="wait">
           {currentMission < 6 ? (
             <motion.div
               key={currentMission}
-              initial={{ opacity: 0, y: 40, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -40, scale: 1.03 }}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -30 }}
               transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-              className="relative z-20 w-full max-w-3xl px-6 py-4"
+              className={`w-full max-w-6xl flex flex-col ${
+                isOddBoard ? "lg:flex-row" : "lg:flex-row-reverse"
+              } items-center justify-between gap-8 lg:gap-12`}
             >
-              {/* TICKET CARD STUB CONTAINER */}
-              <div className="relative bg-[#0d0e14]/90 border border-white/15 backdrop-blur-xl rounded-2xl shadow-[0_25px_70px_rgba(0,0,0,0.8)] overflow-hidden">
-                {/* Top Ticket Header */}
-                <div className="flex items-center justify-between px-8 py-5 border-b border-white/10 bg-white/[0.02]">
-                  <div className="flex items-center gap-3">
+              {/* BOARD CARD (LEFT or RIGHT depending on board number) */}
+              <div className="flex-1 w-full bg-[#0d0e14]/90 border border-white/15 backdrop-blur-xl rounded-2xl p-8 md:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.8)] flex flex-col justify-between min-h-[440px]">
+                <div>
+                  {/* Top Ticket Header */}
+                  <div className="flex items-center justify-between pb-6 mb-6 border-b border-white/10">
                     <span className="px-3 py-1 rounded bg-[#e8b23d]/15 text-[#e8b23d] font-mono text-xs uppercase tracking-widest border border-[#e8b23d]/30 font-semibold">
                       {currentInfo.tag}
                     </span>
@@ -504,143 +515,143 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                       FRAME 0{currentMission} / 05
                     </span>
                   </div>
-                  {currentInfo.difficulty && (
-                    <span className="text-xs font-mono tracking-widest text-white/50 uppercase">
-                      Unlock: <span className="text-[#00f0ff] font-semibold">{currentInfo.unlocks}</span>
-                    </span>
+
+                  <h2 className="text-3xl md:text-5xl font-serif italic text-white font-medium tracking-tight mb-4 drop-shadow-md">
+                    {currentInfo.title}
+                  </h2>
+
+                  {/* SCRIPT CONTENT */}
+                  {currentMission === 1 && (
+                    <p className="text-white/80 font-sans text-base md:text-lg leading-relaxed font-light">
+                      I'm <span className="text-white font-semibold underline decoration-[#e8b23d]">Aditya Parihar</span> — a Computer Science major in my third year at UPES. Code is my major, but there's a lot more going on in my head. It’s chaotic, unpredictable, and you have to keep moving.
+                    </p>
+                  )}
+
+                  {currentMission === 2 && (
+                    <p className="text-white/80 font-sans text-base md:text-lg leading-relaxed font-light">
+                      Football and running keep me moving. Chess keeps me thinking — sitting around <span className="text-[#00f0ff] font-mono font-bold">900–1000 Elo</span>, I rely on pattern recognition as much as logic. This analytical mindset shapes how I approach my craft.
+                    </p>
+                  )}
+
+                  {currentMission === 3 && (
+                    <div className="flex flex-col gap-5">
+                      <p className="text-white/80 font-sans text-base leading-relaxed font-light">
+                        My Letterboxd is basically a diary. These are the films that shaped my perspective:
+                      </p>
+
+                      {/* FILM POSTER CARDS */}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {FILMS.map((f, i) => (
+                          <motion.div
+                            key={i}
+                            whileHover={{ scale: 1.05 }}
+                            className="group relative aspect-[2/3] rounded-lg overflow-hidden border border-white/10 bg-black/40 shadow-lg"
+                          >
+                            <img src={f.url} alt={f.title} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-2 flex items-end">
+                              <span className="text-[9px] font-mono text-white font-bold leading-tight">{f.title}</span>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+
+                      <a
+                        href="https://letterboxd.com/adityaparihar21"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 self-start px-4 py-2 rounded-full bg-[#902424]/80 hover:bg-[#b3122e] text-white font-mono text-xs uppercase tracking-widest transition-all shadow-md active:scale-95"
+                      >
+                        My Letterboxd Diary <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
+                  )}
+
+                  {currentMission === 4 && (
+                    <div className="flex flex-col gap-5">
+                      <p className="text-white/80 font-sans text-base md:text-lg leading-relaxed font-light">
+                        Whether I'm writing an exam or debugging a React component, breaking a massive problem down into simple logic gates is how I get things done.
+                      </p>
+
+                      {/* LOGIC GATE DIAGRAM */}
+                      <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-around font-mono text-xs text-white/70">
+                        <div className="flex flex-col items-center gap-1">
+                          <span className="text-[#00f0ff] font-bold">INPUT A</span>
+                          <span className="text-white/40">State Change</span>
+                        </div>
+                        <span className="text-[#e8b23d] text-base font-bold">AND</span>
+                        <div className="flex flex-col items-center gap-1">
+                          <span className="text-[#00f0ff] font-bold">INPUT B</span>
+                          <span className="text-white/40">Clean Logic</span>
+                        </div>
+                        <span className="text-[#10b981] text-base font-bold">➔</span>
+                        <div className="flex flex-col items-center gap-1">
+                          <span className="text-[#10b981] font-bold">OUTPUT</span>
+                          <span className="text-white/40">Perfect Build</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {currentMission === 5 && (
+                    <div className="flex flex-col gap-5">
+                      <p className="text-white/80 font-sans text-base md:text-lg leading-relaxed font-light">
+                        While I work silently in the background, I also write about things I find interesting and random facts about my life.
+                      </p>
+
+                      <a
+                        href="https://substack.com/@adityaparihar21"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 self-start px-5 py-2.5 rounded-full bg-[#ff6b00] hover:bg-[#ff8533] text-black font-semibold font-mono text-xs uppercase tracking-widest transition-all shadow-lg active:scale-95"
+                      >
+                        Read My Substack Essays <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
                   )}
                 </div>
 
-                {/* Main Ticket Body */}
-                <div className="p-8 md:p-10 flex flex-col gap-6">
-                  <div>
-                    <h2 className="text-3xl md:text-5xl font-serif italic text-white font-medium tracking-tight mb-4 drop-shadow-md">
-                      {currentInfo.title}
-                    </h2>
+                {/* BOTTOM NAVIGATION INSIDE CARD */}
+                <div className="flex items-center justify-between border-t border-white/10 pt-6 mt-6">
+                  <button
+                    onClick={prevBoard}
+                    disabled={currentMission === 1}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full font-mono text-xs uppercase tracking-widest transition-all ${
+                      currentMission === 1
+                        ? "opacity-30 cursor-not-allowed text-white/40"
+                        : "bg-white/5 hover:bg-white/10 text-white active:scale-95"
+                    }`}
+                  >
+                    <ArrowLeft className="w-4 h-4" /> Previous
+                  </button>
 
-                    {/* SCRIPT CONTENTS */}
-                    {currentMission === 1 && (
-                      <p className="text-white/80 font-sans text-lg md:text-xl leading-relaxed font-light">
-                        I'm <span className="text-white font-semibold underline decoration-[#e8b23d]">Aditya Parihar</span> — a Computer Science major in my third year at UPES. Code is my major, but there's a lot more going on in my head. It’s chaotic, unpredictable, and you have to keep moving.
-                      </p>
-                    )}
-
-                    {currentMission === 2 && (
-                      <p className="text-white/80 font-sans text-lg md:text-xl leading-relaxed font-light">
-                        Football and running keep me moving. Chess keeps me thinking — sitting around <span className="text-[#00f0ff] font-mono font-bold">900–1000 Elo</span>, I rely on pattern recognition as much as logic. This analytical mindset shapes how I approach my craft.
-                      </p>
-                    )}
-
-                    {currentMission === 3 && (
-                      <div className="flex flex-col gap-6">
-                        <p className="text-white/80 font-sans text-lg md:text-xl leading-relaxed font-light">
-                          My Letterboxd is basically a diary. These are the films that shaped my perspective:
-                        </p>
-
-                        {/* FILM POSTER CARDS */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          {FILMS.map((f, i) => (
-                            <motion.div
-                              key={i}
-                              whileHover={{ scale: 1.05 }}
-                              className="group relative aspect-[2/3] rounded-lg overflow-hidden border border-white/10 bg-black/40 shadow-lg"
-                            >
-                              <img src={f.url} alt={f.title} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-2 flex items-end">
-                                <span className="text-[10px] font-mono text-white font-bold leading-tight">{f.title}</span>
-                              </div>
-                            </motion.div>
-                          ))}
-                        </div>
-
-                        <a
-                          href="https://letterboxd.com/adityaparihar21"
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center gap-2 self-start px-5 py-2.5 rounded-full bg-[#902424]/80 hover:bg-[#b3122e] text-white font-mono text-xs uppercase tracking-widest transition-all shadow-md active:scale-95"
-                        >
-                          My Letterboxd Diary <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
-                      </div>
-                    )}
-
-                    {currentMission === 4 && (
-                      <div className="flex flex-col gap-6">
-                        <p className="text-white/80 font-sans text-lg md:text-xl leading-relaxed font-light">
-                          Whether I'm writing an exam or debugging a React component, breaking a massive problem down into simple logic gates is how I get things done.
-                        </p>
-
-                        {/* LOGIC GATE VISUALIZER */}
-                        <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-around font-mono text-xs text-white/70">
-                          <div className="flex flex-col items-center gap-1">
-                            <span className="text-[#00f0ff] font-bold">INPUT A</span>
-                            <span className="text-white/40">State Change</span>
-                          </div>
-                          <span className="text-[#e8b23d] text-lg font-bold">AND</span>
-                          <div className="flex flex-col items-center gap-1">
-                            <span className="text-[#00f0ff] font-bold">INPUT B</span>
-                            <span className="text-white/40">Clean Logic</span>
-                          </div>
-                          <span className="text-[#10b981] text-lg font-bold">➔</span>
-                          <div className="flex flex-col items-center gap-1">
-                            <span className="text-[#10b981] font-bold">OUTPUT</span>
-                            <span className="text-white/40">Perfect Build</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {currentMission === 5 && (
-                      <div className="flex flex-col gap-6">
-                        <p className="text-white/80 font-sans text-lg md:text-xl leading-relaxed font-light">
-                          While I work silently in the background, I also write about things I find interesting and random facts about my life.
-                        </p>
-
-                        <a
-                          href="https://substack.com/@adityaparihar21"
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center gap-2 self-start px-6 py-3 rounded-full bg-[#ff6b00] hover:bg-[#ff8533] text-black font-semibold font-mono text-xs uppercase tracking-widest transition-all shadow-lg active:scale-95"
-                        >
-                          Read My Substack Essays <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
-                      </div>
-                    )}
+                  <div className="flex items-center gap-2">
+                    {MISSIONS.slice(0, 5).map((m) => (
+                      <div
+                        key={m.id}
+                        className={`w-2 h-2 rounded-full transition-all ${
+                          currentMission === m.id ? "bg-[#e8b23d] w-6" : "bg-white/20"
+                        }`}
+                      />
+                    ))}
                   </div>
 
-                  {/* BOTTOM NAVIGATION FOOTER INSIDE TICKET */}
-                  <div className="flex items-center justify-between border-t border-white/10 pt-6 mt-2">
-                    <button
-                      onClick={prevBoard}
-                      disabled={currentMission === 1}
-                      className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-mono text-xs uppercase tracking-widest transition-all ${
-                        currentMission === 1
-                          ? "opacity-30 cursor-not-allowed text-white/40"
-                          : "bg-white/5 hover:bg-white/10 text-white active:scale-95"
-                      }`}
-                    >
-                      <ArrowLeft className="w-4 h-4" /> Previous
-                    </button>
-
-                    <div className="flex items-center gap-2">
-                      {MISSIONS.slice(0, 5).map((m) => (
-                        <div
-                          key={m.id}
-                          className={`w-2 h-2 rounded-full transition-all ${
-                            currentMission === m.id ? "bg-[#e8b23d] w-6" : "bg-white/20"
-                          }`}
-                        />
-                      ))}
-                    </div>
-
-                    <button
-                      onClick={nextBoard}
-                      className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#e8b23d] hover:bg-[#f5c760] text-black font-semibold font-mono text-xs uppercase tracking-widest transition-all shadow-lg active:scale-95"
-                    >
-                      {currentMission === 5 ? "View Director's Cut" : "Next Board"} <ArrowRight className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <button
+                    onClick={nextBoard}
+                    className="flex items-center gap-2 px-5 py-2 rounded-full bg-[#e8b23d] hover:bg-[#f5c760] text-black font-semibold font-mono text-xs uppercase tracking-widest transition-all shadow-lg active:scale-95"
+                  >
+                    {currentMission === 5 ? "View Director's Cut" : "Next Board"} <ArrowRight className="w-4 h-4" />
+                  </button>
                 </div>
+              </div>
+
+              {/* LIVE CANVAS SKETCH ENGINE (RIGHT or LEFT side-by-side) */}
+              <div className="flex-1 w-full aspect-[4/3] rounded-2xl overflow-hidden border border-white/20 shadow-2xl relative min-h-[350px] lg:min-h-[440px]">
+                <CanvasSketchEngine
+                  imageSrc={currentInfo.image}
+                  isSketchMode={isSketchMode}
+                  sfx={sfx}
+                  title={currentInfo.title}
+                />
               </div>
             </motion.div>
           ) : (
