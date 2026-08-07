@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useMemo } from "react";
-import { X, Volume2, VolumeX, Trophy, ArrowRight, ArrowLeft, Sparkles, Film, ExternalLink, Pencil } from "lucide-react";
+import { X, Volume2, VolumeX, Trophy, ArrowRight, ArrowLeft, Sparkles, Film, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Mission {
@@ -54,7 +54,7 @@ const MISSIONS: Mission[] = [
     tag: "Ticket 5 — The Writer",
     title: "Silent Background",
     objective: "Substack Essays & Life Facts",
-    image: "/DOMEGALLERY/IMG_6025.jpeg",
+    image: "/DOMEGALLERY/IMG_1353.jpeg",
     difficulty: "EASY",
     unlocks: "Substack Archives",
   },
@@ -129,8 +129,7 @@ const useSound = (enabled: boolean) => {
 };
 
 /* -----------------------------------------------------
-   CANVAS LIVE PENCIL SKETCH ENGINE
-   Real-time Sobel Edge Detection + Animated Drawing Cursor
+   CANVAS LIVE INTERACTIVE HOVER PENCIL SKETCH ENGINE
    ----------------------------------------------------- */
 function CanvasSketchEngine({
   imageSrc,
@@ -144,17 +143,19 @@ function CanvasSketchEngine({
   title: string;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [pencilPos, setPencilPos] = useState({ x: 0, y: 0, active: true });
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const photoCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const sketchCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-
-    let animId: number;
-    let startTime: number | null = null;
-    const duration = 1200; // 1.2s pencil sketch drawing animation
 
     const img = new Image();
     img.crossOrigin = "anonymous";
@@ -167,12 +168,12 @@ function CanvasSketchEngine({
       canvas.width = width;
       canvas.height = height;
 
-      // Offscreen canvas for scaling and pixel processing
-      const offCanvas = document.createElement("canvas");
-      offCanvas.width = width;
-      offCanvas.height = height;
-      const offCtx = offCanvas.getContext("2d");
-      if (!offCtx) return;
+      // 1. Offscreen Photo Canvas (Crisp & Bright)
+      const pCanvas = document.createElement("canvas");
+      pCanvas.width = width;
+      pCanvas.height = height;
+      const pCtx = pCanvas.getContext("2d");
+      if (!pCtx) return;
 
       const imgAspect = img.naturalWidth / img.naturalHeight;
       const canvasAspect = width / height;
@@ -189,21 +190,48 @@ function CanvasSketchEngine({
         offsetY = -(renderH - height) / 2;
       }
 
-      offCtx.drawImage(img, offsetX, offsetY, renderW, renderH);
+      pCtx.drawImage(img, offsetX, offsetY, renderW, renderH);
+      photoCanvasRef.current = pCanvas;
 
-      // Perform Sobel edge detection to generate graphite pencil sketch
-      const imageData = offCtx.getImageData(0, 0, width, height);
+      // 2. Offscreen Pencil Sketch Canvas (Clean, Bright Light-Mode Graphite Sketch)
+      const sCanvas = document.createElement("canvas");
+      sCanvas.width = width;
+      sCanvas.height = height;
+      const sCtx = sCanvas.getContext("2d");
+      if (!sCtx) return;
+
+      // Draw paper background
+      sCtx.fillStyle = "#f5f3eb"; // Warm off-white paper
+      sCtx.fillRect(0, 0, width, height);
+
+      // Fine grid texture
+      sCtx.strokeStyle = "rgba(0, 0, 0, 0.04)";
+      sCtx.lineWidth = 1;
+      for (let x = 0; x < width; x += 25) {
+        sCtx.beginPath();
+        sCtx.moveTo(x, 0);
+        sCtx.lineTo(x, height);
+        sCtx.stroke();
+      }
+      for (let y = 0; y < height; y += 25) {
+        sCtx.beginPath();
+        sCtx.moveTo(0, y);
+        sCtx.lineTo(width, y);
+        sCtx.stroke();
+      }
+
+      // Edge detection processing
+      const imageData = pCtx.getImageData(0, 0, width, height);
       const data = imageData.data;
-      const sketchData = offCtx.createImageData(width, height);
-      const sData = sketchData.data;
-
-      // Grayscale
       const gray = new Uint8Array(width * height);
+
       for (let i = 0; i < data.length; i += 4) {
         gray[i / 4] = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
       }
 
-      // Sobel gradient matrix
+      const sketchData = sCtx.createImageData(width, height);
+      const sData = sketchData.data;
+
       for (let y = 1; y < height - 1; y++) {
         for (let x = 1; x < width - 1; x++) {
           const idx = y * width + x;
@@ -224,109 +252,115 @@ function CanvasSketchEngine({
             2 * gray[idx + width] +
             gray[idx + width + 1];
 
-          const mag = Math.min(255, Math.sqrt(gx * gx + gy * gy) * 2.2);
-          const strokeVal = 250 - mag; // Invert to get dark graphite strokes on light paper
+          const mag = Math.min(255, Math.sqrt(gx * gx + gy * gy) * 2.5);
+          const strokeVal = 245 - mag; // Graphite strokes on light paper
           const pixelIdx = idx * 4;
 
-          sData[pixelIdx] = strokeVal * 0.12; // Dark graphite R
-          sData[pixelIdx + 1] = strokeVal * 0.12; // Dark graphite G
-          sData[pixelIdx + 2] = strokeVal * 0.15; // Dark graphite B
+          sData[pixelIdx] = strokeVal * 0.2; // Graphite R
+          sData[pixelIdx + 1] = strokeVal * 0.2; // Graphite G
+          sData[pixelIdx + 2] = strokeVal * 0.25; // Graphite B
           sData[pixelIdx + 3] = 255;
         }
       }
 
-      sfx.sketch();
-      setPencilPos({ x: 20, y: 20, active: true });
+      // Merge sketch onto paper background
+      const tempC = document.createElement("canvas");
+      tempC.width = width;
+      tempC.height = height;
+      const tempCtx = tempC.getContext("2d");
+      if (tempCtx) {
+        tempCtx.putImageData(sketchData, 0, 0);
+        sCtx.drawImage(tempC, 0, 0);
+      }
 
-      const animateSketch = (timestamp: number) => {
-        if (!startTime) startTime = timestamp;
-        const elapsed = timestamp - startTime;
-        const p = Math.min(1, elapsed / duration);
+      sketchCanvasRef.current = sCanvas;
 
-        ctx.clearRect(0, 0, width, height);
-
-        if (isSketchMode) {
-          // Off-white architectural drafting paper background
-          ctx.fillStyle = "#12141c";
-          ctx.fillRect(0, 0, width, height);
-
-          // Grid lines
-          ctx.strokeStyle = "rgba(255, 255, 255, 0.04)";
-          ctx.lineWidth = 1;
-          const gridSize = 30;
-          for (let x = 0; x < width; x += gridSize) {
-            ctx.beginPath();
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, height);
-            ctx.stroke();
-          }
-          for (let y = 0; y < height; y += gridSize) {
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(width, y);
-            ctx.stroke();
-          }
-
-          // Draw progressive sketch mask line by line
-          const currentH = Math.floor(height * p);
-          if (currentH > 0) {
-            ctx.putImageData(sketchData, 0, 0, 0, 0, width, currentH);
-          }
-
-          // Move active pencil cursor
-          const currentY = Math.min(height - 10, currentH);
-          const currentX = (Math.sin(p * Math.PI * 8) * 0.4 + 0.5) * width;
-          setPencilPos({ x: currentX, y: currentY, active: p < 1 });
-
-          // Pencil sweep indicator line
-          if (p < 1) {
-            ctx.strokeStyle = "rgba(232, 178, 61, 0.8)";
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(0, currentY);
-            ctx.lineTo(width, currentY);
-            ctx.stroke();
-          }
-        } else {
-          // Full color photo mode
-          ctx.drawImage(offCanvas, 0, 0);
-          setPencilPos({ x: 0, y: 0, active: false });
-        }
-
-        if (p < 1 && isSketchMode) {
-          animId = requestAnimationFrame(animateSketch);
-        }
-      };
-
-      animId = requestAnimationFrame(animateSketch);
+      // Initial Render
+      renderCanvas();
     };
+  }, [imageSrc]);
 
-    return () => {
-      if (animId) cancelAnimationFrame(animId);
-    };
-  }, [imageSrc, isSketchMode]);
+  const renderCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx || !photoCanvasRef.current || !sketchCanvasRef.current) return;
+
+    const width = canvas.width;
+    const height = canvas.height;
+
+    ctx.clearRect(0, 0, width, height);
+
+    if (isSketchMode) {
+      // Full Sketch Mode
+      ctx.drawImage(sketchCanvasRef.current, 0, 0);
+    } else {
+      // Photo Base Mode
+      ctx.drawImage(photoCanvasRef.current, 0, 0);
+
+      // If mouse is hovered, render Interactive Pencil Sketch Lens under cursor
+      if (isHovered && mousePos) {
+        const radius = 110;
+        ctx.save();
+
+        // Circular clipping region following mouse
+        ctx.beginPath();
+        ctx.arc(mousePos.x, mousePos.y, radius, 0, Math.PI * 2);
+        ctx.clip();
+
+        // Draw sketch inside lens
+        ctx.drawImage(sketchCanvasRef.current, 0, 0);
+
+        // Circular lens border
+        ctx.restore();
+        ctx.strokeStyle = "rgba(232, 178, 61, 0.9)";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(mousePos.x, mousePos.y, radius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Crosshair ring
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(mousePos.x, mousePos.y, radius + 4, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+  };
+
+  useEffect(() => {
+    renderCanvas();
+  }, [isSketchMode, mousePos, isHovered]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    setMousePos({ x, y });
+  };
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-[#0c0d14] flex items-center justify-center">
-      <canvas ref={canvasRef} className="w-full h-full object-cover transition-opacity duration-500" />
+    <div
+      ref={containerRef}
+      onMouseEnter={() => {
+        setIsHovered(true);
+        sfx.sketch();
+      }}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setMousePos(null);
+      }}
+      onMouseMove={handleMouseMove}
+      className="relative w-full h-full overflow-hidden bg-[#0a0b10] flex items-center justify-center cursor-crosshair group"
+    >
+      <canvas ref={canvasRef} className="w-full h-full object-cover" />
 
-      {/* Pencil Tip Icon Cursor moving live along sketch lines */}
-      {isSketchMode && pencilPos.active && (
-        <motion.div
-          className="absolute z-20 pointer-events-none flex items-center gap-1 bg-[#e8b23d] text-black px-2 py-0.5 rounded-full font-mono text-[9px] font-bold shadow-lg"
-          style={{ left: pencilPos.x, top: pencilPos.y }}
-          animate={{ scale: [1, 1.15, 1] }}
-          transition={{ repeat: Infinity, duration: 0.3 }}
-        >
-          <Pencil className="w-3 h-3 text-black" />
-          <span>SKETCHING...</span>
-        </motion.div>
-      )}
-
-      {/* Title tag overlay */}
-      <div className="absolute top-3 left-3 z-10 px-3 py-1 rounded bg-black/70 border border-white/10 backdrop-blur-md text-[10px] font-mono text-white/80 uppercase tracking-widest flex items-center gap-2">
-        <span className="w-2 h-2 rounded-full bg-[#e8b23d] animate-ping" />
-        <span>LIVE ART CANVAS — {title}</span>
+      {/* Floating Interactive Hover Badge */}
+      <div className="absolute top-4 left-4 z-10 px-3 py-1.5 rounded-full bg-black/80 border border-white/15 backdrop-blur-md text-[10px] font-mono text-white/90 uppercase tracking-widest flex items-center gap-2 shadow-lg pointer-events-none">
+        <span className="w-2 h-2 rounded-full bg-[#e8b23d] animate-pulse" />
+        <span>{isSketchMode ? "PENCIL SKETCH MODE" : isHovered ? "PENCIL LENS ACTIVE" : "HOVER TO REVEAL SKETCH"}</span>
       </div>
     </div>
   );
@@ -340,14 +374,14 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
 
   const [currentMission, setCurrentMission] = useState(1);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [isSketchMode, setIsSketchMode] = useState(true);
+  const [isSketchMode, setIsSketchMode] = useState(false); // Default to clean photo with interactive hover sketch lens
   const sfx = useSound(soundEnabled);
 
   const [achievements, setAchievements] = useState<string[]>([]);
   const [startTime] = useState(Date.now());
 
   const currentInfo = MISSIONS[currentMission - 1] || MISSIONS[0];
-  const isOddBoard = currentMission % 2 === 1; // 1, 3, 5: Content Left, Sketch Right. 2, 4: Sketch Left, Content Right
+  const isOddBoard = currentMission % 2 === 1;
 
   const unlockAchievement = (name: string) => {
     setAchievements((prev) => {
@@ -376,7 +410,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
     }
   }, [soundEnabled]);
 
-  // Keyboard arrow navigation
+  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight") {
@@ -457,11 +491,11 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
               sfx.click();
               setIsSketchMode((prev) => !prev);
             }}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-white/80 transition-all active:scale-95"
-            title="Toggle between Pencil Sketch and Raw Photo"
+            className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-mono text-white/90 transition-all active:scale-95 shadow-sm"
+            title="Toggle Full Pencil Sketch Mode"
           >
-            <Sparkles className={`w-3.5 h-3.5 ${isSketchMode ? "text-[#e8b23d]" : "text-white/40"}`} />
-            <span>{isSketchMode ? "Pencil Sketch" : "Raw Photo"}</span>
+            <Sparkles className={`w-3.5 h-3.5 ${isSketchMode ? "text-[#e8b23d]" : "text-white/60"}`} />
+            <span>{isSketchMode ? "Full Pencil Sketch" : "Photo Mode (Hover Sketch Lens)"}</span>
           </button>
 
           {/* Sound Toggle */}
@@ -503,7 +537,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                 isOddBoard ? "lg:flex-row" : "lg:flex-row-reverse"
               } items-center justify-between gap-8 lg:gap-12`}
             >
-              {/* BOARD CARD (LEFT or RIGHT depending on board number) */}
+              {/* BOARD CARD (LEFT or RIGHT) */}
               <div className="flex-1 w-full bg-[#0d0e14]/90 border border-white/15 backdrop-blur-xl rounded-2xl p-8 md:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.8)] flex flex-col justify-between min-h-[440px]">
                 <div>
                   {/* Top Ticket Header */}
@@ -644,7 +678,7 @@ export function ArcadeStage({ onClose }: { onClose: () => void }) {
                 </div>
               </div>
 
-              {/* LIVE CANVAS SKETCH ENGINE (RIGHT or LEFT side-by-side) */}
+              {/* LIVE INTERACTIVE HOVER PENCIL SKETCH CANVAS */}
               <div className="flex-1 w-full aspect-[4/3] rounded-2xl overflow-hidden border border-white/20 shadow-2xl relative min-h-[350px] lg:min-h-[440px]">
                 <CanvasSketchEngine
                   imageSrc={currentInfo.image}
