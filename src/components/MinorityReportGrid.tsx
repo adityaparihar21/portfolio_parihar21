@@ -847,7 +847,13 @@ function Scene({ projects, smoothScroll, interactionState, activeIdx, setInterac
   );
 }
 
-export default function MinorityReportGrid({ projects }: { projects: any[] }) {
+export default function MinorityReportGrid({
+  projects,
+  onOpenProject,
+}: {
+  projects: any[];
+  onOpenProject?: (p: any) => void;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,

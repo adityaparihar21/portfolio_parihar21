@@ -867,7 +867,9 @@ function SelectedWork({
   data,
   activeAudioId,
   setActiveAudioId,
+  onOpenProject,
 }: {
+  data: ReturnType<typeof useContent>;
   activeAudioId: string | null;
   setActiveAudioId: (id: string | null) => void;
   onOpenProject: (p: any) => void;
