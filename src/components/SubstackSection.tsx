@@ -13,8 +13,18 @@ interface SubstackPost {
   url: string;
 }
 
-// Initial curated fallback posts for instant initial render with zero delay
+// Initial curated fallback posts snapshot for instant render
 const FALLBACK_POSTS: SubstackPost[] = [
+  {
+    id: "hurry-makes-us-late",
+    title: "The Hurry That Makes Us Late",
+    subtitle: "There are two ways to be late.",
+    category: "Reflections & Time",
+    readTime: "4 min read",
+    date: "Aug 13, 2026",
+    bgImage: "https://substackcdn.com/image/fetch/$s_!URZC!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F9b63d861-2155-4f17-b240-3779e44cda75_1672x941.heic",
+    url: "https://wiseralph21.substack.com/p/the-hurry-that-makes-us-late",
+  },
   {
     id: "hollow-after-high",
     title: "THE HOLLOW AFTER THE HIGH",
@@ -72,27 +82,41 @@ export function SubstackSection() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLiveSyncing, setIsLiveSyncing] = useState(false);
 
-  // Live Auto-Fetching Substack RSS / Posts API on mount
+  // Live Auto-Fetching Substack Posts API with Cache Busting & Multi-Proxy Waterfall
   useEffect(() => {
     let isMounted = true;
 
     async function fetchLiveSubstackPosts() {
       try {
         setIsLiveSyncing(true);
-        // Attempt fetching Substack API via CORS Proxy
-        const proxyUrl = "https://api.allorigins.win/raw?url=";
-        const apiTarget = "https://wiseralph21.substack.com/api/v1/posts?limit=10";
+        const timestamp = Date.now();
+        const rawTargetUrl = `https://wiseralph21.substack.com/api/v1/posts?limit=10&t=${timestamp}`;
 
-        let response = await fetch(`${proxyUrl}${encodeURIComponent(apiTarget)}`);
-        if (!response.ok) {
-          // Direct fallback attempt
-          response = await fetch(apiTarget);
+        // Waterfall endpoints with cache-busting
+        const endpoints = [
+          `https://corsproxy.io/?${encodeURIComponent(rawTargetUrl)}`,
+          `https://api.allorigins.win/raw?url=${encodeURIComponent(rawTargetUrl)}`,
+          rawTargetUrl,
+        ];
+
+        let rawData: any = null;
+
+        for (const url of endpoints) {
+          try {
+            const res = await fetch(url, { cache: "no-store" });
+            if (res.ok) {
+              const parsed = await res.json();
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                rawData = parsed;
+                break;
+              }
+            }
+          } catch (e) {
+            // Try next proxy
+          }
         }
 
-        if (!response.ok) return;
-
-        const rawData = await response.json();
-        if (!Array.isArray(rawData) || rawData.length === 0) return;
+        if (!rawData || !Array.isArray(rawData) || rawData.length === 0) return;
 
         const parsedPosts: SubstackPost[] = rawData.map((item: any) => {
           // Parse date
@@ -300,7 +324,7 @@ export function SubstackSection() {
         </div>
 
         {/* Carousel Thumbnail Bar / Indicators */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
           {posts.map((post, idx) => {
             const isActive = idx === currentIndex;
             return (
