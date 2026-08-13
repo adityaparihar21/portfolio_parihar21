@@ -24,7 +24,7 @@ import { EngineeringPortfolio } from "../components/EngineeringPortfolio";
 import { GithubSection } from "../components/GithubSection";
 import { RadialIntroSequence } from "../components/intro/RadialIntro";
 import { DebugErrorBoundary } from "../components/DebugErrorBoundary";
-import { ArcadeStage } from "../components/ArcadeStage";
+import { SubstackSection } from "../components/SubstackSection";
 import { useAssetPreloader } from "../hooks/useAssetPreloader";
 import {
   ChevronDown,
@@ -1861,7 +1861,6 @@ export default function Index() {
   const [themeMode, setThemeMode] = useState<"select" | "creative" | "engineering">("select");
   const [hoverMode, setHoverMode] = useState<"none" | "creative" | "engineering">("none");
   const [selectedProject, setSelectedProject] = useState<DrawerProject | null>(null);
-  const [showArcade, setShowArcade] = useState(false);
 
   // Hydration-safe localStorage check
   useEffect(() => {
@@ -2120,41 +2119,11 @@ export default function Index() {
               </div>
             </section>
 
-            {/* --- REEL RUNNER (ABOUT ME) SECTION --- */}
-            <section className="relative w-full bg-[#050509] border-t border-white/10 overflow-hidden">
-              {/* Desktop/Tablet Banner */}
-              <div className="hidden md:flex flex-col items-center justify-center w-full h-[60vh] text-center px-6 relative z-10">
-                <div className="flex flex-col items-center gap-2 mb-8">
-                  <span className="text-[#e8b23d] font-mono text-xs tracking-[0.3em] uppercase">Secret Level Unlocked</span>
-                  <h2 className="text-5xl md:text-6xl font-serif font-medium text-white tracking-tight">The Memory Vault</h2>
-                </div>
-                <p className="text-white/60 max-w-xl mb-10 leading-relaxed font-light text-lg">
-                  You've made it this far. Why not step inside the vault? Test your memory, crack the code, and discover hidden fragments of my creative journey.
-                </p>
-                <button 
-                  onClick={() => setShowArcade(true)}
-                  className="px-10 py-4 rounded-full bg-white text-black font-semibold tracking-widest text-sm uppercase hover:scale-105 hover:bg-[#e8b23d] active:scale-95 transition-all duration-300"
-                >
-                  Unlock Vault
-                </button>
-              </div>
-              
-              {/* Mobile Fallback */}
-              <div className="flex md:hidden w-full h-[30vh] items-center justify-center p-6 text-center">
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-2">
-                    <span className="text-xl">👾</span>
-                  </div>
-                  <h3 className="text-white/80 font-mono text-sm tracking-widest uppercase">Interactive Arcade</h3>
-                  <p className="text-white/40 text-[10px] max-w-[220px] uppercase tracking-wider leading-relaxed">
-                    This experience requires a larger screen. Please visit on a desktop to play.
-                  </p>
-                </div>
-              </div>
-            </section>
-
             {/* --- LETTERBOXD SECTION --- */}
             <LetterboxdSection />
+
+            {/* --- SUBSTACK ESSAYS SECTION --- */}
+            <SubstackSection />
           </>
         )}
 
@@ -2203,20 +2172,6 @@ export default function Index() {
         isOpen={!!selectedProject} 
         onClose={() => setSelectedProject(null)} 
       />
-
-      {/* Fullscreen Arcade Overlay */}
-      <AnimatePresence>
-        {showArcade && (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="fixed inset-0 z-[9999]"
-          >
-            <ArcadeStage onClose={() => setShowArcade(false)} />
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
     </DebugErrorBoundary>
   );
