@@ -51,7 +51,7 @@ const SUBSTACK_POSTS: SubstackPost[] = [
     category: "Society & Commentary",
     readTime: "7 min read",
     date: "Jul 16, 2026",
-    bgImage: "", // Pure Substack Orange brand background (no poster image)
+    bgImage: "https://substack-post-media.s3.amazonaws.com/public/images/6f7bec6f-52d9-4b4f-a4d3-179b1e0e1d96_1025x576.jpeg",
     url: "https://wiseralph21.substack.com/p/the-cost-of-our-silence",
   },
   {
