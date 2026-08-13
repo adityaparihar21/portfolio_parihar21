@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, ExternalLink, BookOpen } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink, BookOpen, Quote } from "lucide-react";
 
 interface SubstackPost {
   id: string;
@@ -9,20 +9,20 @@ interface SubstackPost {
   category: string;
   readTime: string;
   date: string;
-  bgImage: string;
+  bgImage?: string;
   url: string;
 }
 
 const SUBSTACK_POSTS: SubstackPost[] = [
   {
-    id: "friendships-ended",
-    title: "The Friendships That Just Ended",
-    subtitle: "And Nobody Did Anything Wrong",
-    category: "Personal Essays & Reflections",
-    readTime: "5 min read",
-    date: "Jul 18, 2026",
-    bgImage: "https://substack-post-media.s3.amazonaws.com/public/images/bc3f9897-e978-4ca6-b121-65a4abd9bc0a_736x696.jpeg",
-    url: "https://wiseralph21.substack.com/p/the-friendships-that-just-ended",
+    id: "hollow-after-high",
+    title: "THE HOLLOW AFTER THE HIGH",
+    subtitle: "- post event thoughts",
+    category: "Reflections & Focus",
+    readTime: "4 min read",
+    date: "Jul 12, 2026",
+    bgImage: "https://substack-post-media.s3.amazonaws.com/public/images/ace826bd-59b6-471c-a61b-324cdece949e_1600x900.jpeg",
+    url: "https://wiseralph21.substack.com/p/the-hollow-after-the-high",
   },
   {
     id: "development-damage",
@@ -35,34 +35,34 @@ const SUBSTACK_POSTS: SubstackPost[] = [
     url: "https://wiseralph21.substack.com/p/development-has-an-address-so-does",
   },
   {
-    id: "cost-of-silence",
-    title: "The Cost of Our Silence",
-    subtitle: "not so democratic nation",
-    category: "Society & Commentary",
-    readTime: "7 min read",
-    date: "Jul 16, 2026",
-    bgImage: "/about.jpg",
-    url: "https://wiseralph21.substack.com/p/the-cost-of-our-silence",
-  },
-  {
-    id: "hollow-after-high",
-    title: "THE HOLLOW AFTER THE HIGH",
-    subtitle: "- post event thoughts",
-    category: "Reflections & Focus",
-    readTime: "4 min read",
-    date: "Jul 12, 2026",
-    bgImage: "https://substack-post-media.s3.amazonaws.com/public/images/ace826bd-59b6-471c-a61b-324cdece949e_1600x900.jpeg",
-    url: "https://wiseralph21.substack.com/p/the-hollow-after-the-high",
-  },
-  {
     id: "stranger-memories",
     title: "A STRANGER WITH MEMORIES",
     subtitle: "What an old shopkeeper taught me about showing up",
     category: "Short Stories & Life",
     readTime: "5 min read",
     date: "Jul 10, 2026",
-    bgImage: "/DOMEGALLERY/IMG_1470.JPG",
+    bgImage: "https://substack-post-media.s3.amazonaws.com/public/images/bc3f9897-e978-4ca6-b121-65a4abd9bc0a_736x696.jpeg",
     url: "https://wiseralph21.substack.com/p/a-stranger-with-memories",
+  },
+  {
+    id: "cost-of-silence",
+    title: "The Cost of Our Silence",
+    subtitle: "not so democratic nation",
+    category: "Society & Commentary",
+    readTime: "7 min read",
+    date: "Jul 16, 2026",
+    bgImage: "", // Pure Substack Orange brand background (no poster image)
+    url: "https://wiseralph21.substack.com/p/the-cost-of-our-silence",
+  },
+  {
+    id: "friendships-ended",
+    title: "The Friendships That Just Ended",
+    subtitle: "And Nobody Did Anything Wrong",
+    category: "Personal Essays & Reflections",
+    readTime: "5 min read",
+    date: "Jul 18, 2026",
+    bgImage: "https://substack-post-media.s3.amazonaws.com/public/images/bc3f9897-e978-4ca6-b121-65a4abd9bc0a_736x696.jpeg",
+    url: "https://wiseralph21.substack.com/p/the-friendships-that-just-ended",
   },
 ];
 
@@ -76,6 +76,9 @@ export function SubstackSection() {
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev === SUBSTACK_POSTS.length - 1 ? 0 : prev + 1));
   };
+
+  const currentPost = SUBSTACK_POSTS[currentIndex];
+  const hasImage = Boolean(currentPost.bgImage && currentPost.bgImage.trim().length > 0);
 
   return (
     <section className="relative w-full min-h-screen bg-[#06060b] overflow-hidden flex flex-col justify-center border-t border-white/10 py-24 px-6 md:px-12">
@@ -135,57 +138,71 @@ export function SubstackSection() {
         <div className="relative w-full aspect-[16/9] md:aspect-[21/9] rounded-3xl overflow-hidden border border-white/15 shadow-[0_30px_90px_rgba(0,0,0,0.8)]">
           <AnimatePresence mode="wait">
             <motion.div
-              key={SUBSTACK_POSTS[currentIndex].id}
+              key={currentPost.id}
               initial={{ opacity: 0, scale: 1.05 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               className="absolute inset-0 w-full h-full"
             >
-              {/* Background Article Image */}
-              <img
-                src={SUBSTACK_POSTS[currentIndex].bgImage}
-                alt={SUBSTACK_POSTS[currentIndex].title}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  // Fallback to local image if CDN image faces CORS/loading block
-                  (e.currentTarget as HTMLImageElement).src = "/DOMEGALLERY/IMG_1353.jpeg";
-                }}
-              />
+              {hasImage ? (
+                <>
+                  {/* Background Article Image */}
+                  <img
+                    src={currentPost.bgImage}
+                    alt={currentPost.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = "/DOMEGALLERY/IMG_1353.jpeg";
+                    }}
+                  />
+                  {/* Multi-stage Gradient Overlays for photo backgrounds */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-90" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+                </>
+              ) : (
+                /* Pure Substack Brand Orange-Dark Canvas (No poster/photo background) */
+                <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-[#1c0c05] via-[#0d0914] to-[#06060b] flex items-center justify-center p-8 overflow-hidden">
+                  {/* Substack Radial Brand Spotlight */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-[radial-gradient(circle_at_center,#FF6719_0%,transparent_60%)] opacity-20 blur-[90px] pointer-events-none" />
+                  
+                  {/* Subtle Substack Grid Guidelines */}
+                  <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,103,25,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,103,25,0.06)_1px,transparent_1px)] bg-[size:3rem_3rem] pointer-events-none" />
 
-              {/* Multi-stage Gradient Overlays for optimal readability */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-90" />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+                  {/* Giant Decorative Watermark Quote Icon */}
+                  <Quote className="absolute right-12 bottom-6 w-64 h-64 text-[#FF6719]/10 pointer-events-none rotate-12" />
+                </div>
+              )}
 
               {/* Article Content Overlay */}
               <div className="absolute inset-0 z-20 flex flex-col justify-end p-8 md:p-14 max-w-3xl">
                 {/* Meta Header */}
                 <div className="flex items-center gap-3 mb-4">
                   <span className="px-3 py-1 rounded-full bg-[#FF6719]/20 border border-[#FF6719]/40 text-[#FF6719] font-mono text-[10px] uppercase tracking-widest font-semibold">
-                    {SUBSTACK_POSTS[currentIndex].category}
+                    {currentPost.category}
                   </span>
                   <span className="text-white/40 text-xs font-mono">
-                    {SUBSTACK_POSTS[currentIndex].date}
+                    {currentPost.date}
                   </span>
                   <span className="text-white/20">•</span>
                   <span className="text-white/60 text-xs font-mono">
-                    {SUBSTACK_POSTS[currentIndex].readTime}
+                    {currentPost.readTime}
                   </span>
                 </div>
 
                 {/* Article Title */}
                 <h3 className="text-2xl md:text-4xl font-serif italic text-white font-medium tracking-tight mb-4 drop-shadow-md leading-tight">
-                  {SUBSTACK_POSTS[currentIndex].title}
+                  {currentPost.title}
                 </h3>
 
                 {/* Article Subtitle */}
                 <p className="text-white/70 font-sans text-sm md:text-base leading-relaxed font-light mb-8 max-w-2xl line-clamp-2 md:line-clamp-3">
-                  {SUBSTACK_POSTS[currentIndex].subtitle}
+                  {currentPost.subtitle}
                 </p>
 
                 {/* CTA Button */}
                 <a
-                  href={SUBSTACK_POSTS[currentIndex].url}
+                  href={currentPost.url}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-3 px-7 py-3.5 rounded-full bg-white hover:bg-[#FF6719] text-black hover:text-white font-semibold font-mono text-xs uppercase tracking-widest transition-all duration-300 w-fit active:scale-95 shadow-xl"
