@@ -52,7 +52,7 @@ const FALLBACK_POSTS: SubstackPost[] = [
     category: "Short Stories & Life",
     readTime: "5 min read",
     date: "Jul 10, 2026",
-    bgImage: "https://substack-post-media.s3.amazonaws.com/public/images/bc3f9897-e978-4ca6-b121-65a4abd9bc0a_736x696.jpeg",
+    bgImage: "", // Pure Substack Brand Canvas (no image in article)
     url: "https://wiseralph21.substack.com/p/a-stranger-with-memories",
   },
   {
@@ -72,7 +72,7 @@ const FALLBACK_POSTS: SubstackPost[] = [
     category: "Personal Essays & Reflections",
     readTime: "5 min read",
     date: "Jul 18, 2026",
-    bgImage: "https://substack-post-media.s3.amazonaws.com/public/images/bc3f9897-e978-4ca6-b121-65a4abd9bc0a_736x696.jpeg",
+    bgImage: "", // Pure Substack Brand Canvas (no image in article)
     url: "https://wiseralph21.substack.com/p/the-friendships-that-just-ended",
   },
 ];
@@ -138,6 +138,12 @@ export function SubstackSection() {
             if (imgMatch && imgMatch[1]) {
               coverImg = imgMatch[1];
             }
+          }
+
+          // Filter out author profile picture URL (which Substack uses when an article has no image)
+          const PROFILE_PIC_MARKER = "bc3f9897-e978-4ca6-b121-65a4abd9bc0a";
+          if (coverImg.includes(PROFILE_PIC_MARKER)) {
+            coverImg = "";
           }
 
           // Clean subtitle
@@ -259,7 +265,8 @@ export function SubstackSection() {
                     alt={currentPost.title}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = "/DOMEGALLERY/IMG_1353.jpeg";
+                      // On image load failure, hide element so background falls back to Substack Brand Canvas
+                      (e.currentTarget as HTMLImageElement).style.display = "none";
                     }}
                   />
                   {/* Multi-stage Gradient Overlays for photo backgrounds */}
@@ -268,12 +275,12 @@ export function SubstackSection() {
                 </>
               ) : (
                 /* Pure Substack Brand Orange-Dark Canvas (No poster/photo background) */
-                <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-[#1c0c05] via-[#0d0914] to-[#06060b] flex items-center justify-center p-8 overflow-hidden">
+                <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-[#2a0e05] via-[#120a16] to-[#06060b] flex items-center justify-center p-8 overflow-hidden">
                   {/* Substack Radial Brand Spotlight */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-[radial-gradient(circle_at_center,#FF6719_0%,transparent_60%)] opacity-20 blur-[90px] pointer-events-none" />
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-[radial-gradient(circle_at_center,#FF6719_0%,transparent_60%)] opacity-25 blur-[90px] pointer-events-none" />
                   
                   {/* Subtle Substack Grid Guidelines */}
-                  <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,103,25,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,103,25,0.06)_1px,transparent_1px)] bg-[size:3rem_3rem] pointer-events-none" />
+                  <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,103,25,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,103,25,0.08)_1px,transparent_1px)] bg-[size:3rem_3rem] pointer-events-none" />
 
                   {/* Giant Decorative Watermark Quote Icon */}
                   <Quote className="absolute right-12 bottom-6 w-64 h-64 text-[#FF6719]/10 pointer-events-none rotate-12" />
