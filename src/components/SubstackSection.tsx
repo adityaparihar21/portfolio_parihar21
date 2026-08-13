@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, ExternalLink, BookOpen, Quote } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink, BookOpen, Quote, RefreshCw } from "lucide-react";
 
 interface SubstackPost {
   id: string;
@@ -13,7 +13,8 @@ interface SubstackPost {
   url: string;
 }
 
-const SUBSTACK_POSTS: SubstackPost[] = [
+// Initial curated fallback posts for instant initial render with zero delay
+const FALLBACK_POSTS: SubstackPost[] = [
   {
     id: "hollow-after-high",
     title: "THE HOLLOW AFTER THE HIGH",
@@ -67,18 +68,96 @@ const SUBSTACK_POSTS: SubstackPost[] = [
 ];
 
 export function SubstackSection() {
+  const [posts, setPosts] = useState<SubstackPost[]>(FALLBACK_POSTS);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLiveSyncing, setIsLiveSyncing] = useState(false);
+
+  // Live Auto-Fetching Substack RSS / Posts API on mount
+  useEffect(() => {
+    let isMounted = true;
+
+    async function fetchLiveSubstackPosts() {
+      try {
+        setIsLiveSyncing(true);
+        // Attempt fetching Substack API via CORS Proxy
+        const proxyUrl = "https://api.allorigins.win/raw?url=";
+        const apiTarget = "https://wiseralph21.substack.com/api/v1/posts?limit=10";
+
+        let response = await fetch(`${proxyUrl}${encodeURIComponent(apiTarget)}`);
+        if (!response.ok) {
+          // Direct fallback attempt
+          response = await fetch(apiTarget);
+        }
+
+        if (!response.ok) return;
+
+        const rawData = await response.json();
+        if (!Array.isArray(rawData) || rawData.length === 0) return;
+
+        const parsedPosts: SubstackPost[] = rawData.map((item: any) => {
+          // Parse date
+          const dateObj = item.post_date ? new Date(item.post_date) : new Date();
+          const formattedDate = dateObj.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          });
+
+          // Estimate read time
+          const wordCount = item.wordcount || 500;
+          const readMins = Math.max(1, Math.ceil(wordCount / 200));
+
+          // Find background cover image
+          let coverImg = item.cover_image || "";
+          if (!coverImg && item.body_html) {
+            const imgMatch = item.body_html.match(/<img[^>]+src=["']([^"']+)["']/i);
+            if (imgMatch && imgMatch[1]) {
+              coverImg = imgMatch[1];
+            }
+          }
+
+          // Clean subtitle
+          const subtitleStr = item.subtitle || item.description || "";
+
+          return {
+            id: String(item.id || item.slug || Math.random()),
+            title: item.title ? item.title.trim() : "Untitled Essay",
+            subtitle: subtitleStr.trim(),
+            category: "Substack Journal",
+            readTime: `${readMins} min read`,
+            date: formattedDate,
+            bgImage: coverImg,
+            url: item.canonical_url || `https://wiseralph21.substack.com/p/${item.slug}`,
+          };
+        });
+
+        if (isMounted && parsedPosts.length > 0) {
+          setPosts(parsedPosts);
+        }
+      } catch (err) {
+        console.warn("Substack live sync notice: using fallback posts snapshot", err);
+      } finally {
+        if (isMounted) setIsLiveSyncing(false);
+      }
+    }
+
+    fetchLiveSubstackPosts();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const prevSlide = () => {
-    setCurrentIndex((prev) => (prev === 0 ? SUBSTACK_POSTS.length - 1 : prev - 1));
+    setCurrentIndex((prev) => (prev === 0 ? posts.length - 1 : prev - 1));
   };
 
   const nextSlide = () => {
-    setCurrentIndex((prev) => (prev === SUBSTACK_POSTS.length - 1 ? 0 : prev + 1));
+    setCurrentIndex((prev) => (prev === posts.length - 1 ? 0 : prev + 1));
   };
 
-  const currentPost = SUBSTACK_POSTS[currentIndex];
-  const hasImage = Boolean(currentPost.bgImage && currentPost.bgImage.trim().length > 0);
+  const currentPost = posts[currentIndex] || posts[0];
+  const hasImage = Boolean(currentPost?.bgImage && currentPost.bgImage.trim().length > 0);
 
   return (
     <section className="relative w-full min-h-screen bg-[#06060b] overflow-hidden flex flex-col justify-center border-t border-white/10 py-24 px-6 md:px-12">
@@ -93,8 +172,11 @@ export function SubstackSection() {
             <div className="flex items-center gap-3 mb-3">
               <span className="h-px w-8 bg-[#FF6719]" />
               <span className="text-[11px] font-mono tracking-[0.3em] uppercase text-[#FF6719]">
-                ESSAYS & WRITING
+                LIVE SUBSTACK FEED
               </span>
+              {isLiveSyncing && (
+                <RefreshCw className="w-3 h-3 text-[#FF6719] animate-spin opacity-70 ml-1" />
+              )}
             </div>
 
             <h2 className="text-4xl md:text-6xl font-serif font-medium text-white tracking-tight">
@@ -196,16 +278,18 @@ export function SubstackSection() {
                 </h3>
 
                 {/* Article Subtitle */}
-                <p className="text-white/70 font-sans text-sm md:text-base leading-relaxed font-light mb-8 max-w-2xl line-clamp-2 md:line-clamp-3">
-                  {currentPost.subtitle}
-                </p>
+                {currentPost.subtitle && (
+                  <p className="text-white/70 font-sans text-sm md:text-base leading-relaxed font-light mb-8 max-w-2xl line-clamp-2 md:line-clamp-3">
+                    {currentPost.subtitle}
+                  </p>
+                )}
 
                 {/* CTA Button */}
                 <a
                   href={currentPost.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-3 px-7 py-3.5 rounded-full bg-white hover:bg-[#FF6719] text-black hover:text-white font-semibold font-mono text-xs uppercase tracking-widest transition-all duration-300 w-fit active:scale-95 shadow-xl"
+                  className="inline-flex items-center gap-3 px-7 py-3.5 rounded-full bg-white hover:bg-[#FF6719] text-black hover:text-white font-semibold font-mono text-xs uppercase tracking-widest transition-all duration-300 w-fit active:scale-95 shadow-xl mt-2"
                 >
                   <span>Read Article on Substack</span>
                   <ExternalLink className="w-4 h-4" />
@@ -217,7 +301,7 @@ export function SubstackSection() {
 
         {/* Carousel Thumbnail Bar / Indicators */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          {SUBSTACK_POSTS.map((post, idx) => {
+          {posts.map((post, idx) => {
             const isActive = idx === currentIndex;
             return (
               <button
